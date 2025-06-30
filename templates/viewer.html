@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Media Viewer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(145deg, #1f1f2f, #2c2c3f);
+      color: #fff;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .viewer-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ffffff;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .media-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      position: relative;
+      padding: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .media-item:hover {
+      transform: scale(1.03);
+    }
+
+    video, canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .media-item .fa-lock {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #ff5c5c;
+      font-size: 18px;
+    }
+
+    .error-message {
+      background: rgba(255, 0, 0, 0.2);
+      color: #ffcfcf;
+      border: 1px solid #ff4d4d;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-size: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;">
+  <div class="viewer-container">
+    <h1><i class="fas fa-photo-film"></i> Media Viewer</h1>
+    <div id="media-grid" class="media-grid"></div>
+  </div>
+
+  <script>
+    const urlParts = window.location.pathname.split('/');
+    const itemID = urlParts[urlParts.length - 1] || '1';
+    const grid = document.getElementById('media-grid');
+
+    fetch(`/api/view/${itemID}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          grid.innerHTML = `
+            <div class="error-message">
+              <i class="fas fa-exclamation-triangle"></i> ${data.error}
+            </div>`;
+          return;
+        }
+
+        if (!data.files || data.files.length === 0) {
+          grid.innerHTML = `
+            <div class="error-message">
+              <i class="fas fa-folder-open"></i> No media files found.
+            </div>`;
+          return;
+        }
+
+        data.files.forEach(file => {
+          const ext = file.split('.').pop().toLowerCase();
+          const div = document.createElement('div');
+          div.className = 'media-item';
+          const filePath = `/static/cdn/${itemID}/${file}`;
+
+          if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
+            const canvasID = `canvas-${file.replace(/[^a-z0-9]/gi, '')}`;
+            div.innerHTML = `<canvas id="${canvasID}"></canvas><i class="fas fa-lock"></i>`;
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.getElementById(canvasID);
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0);
+            };
+            img.src = filePath;
+            img.crossOrigin = "anonymous";
+          } else if (["mp4", "webm", "ogg"].includes(ext)) {
+            div.innerHTML = `
+              <video controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;">
+                <source src="${filePath}" type="video/${ext}">
+                Your browser does not support the video tag.
+              </video>
+              <i class="fas fa-lock"></i>`;
+          }
+
+          grid.appendChild(div);
+        });
+      })
+      .catch(err => {
+        grid.innerHTML = `
+          <div class="error-message">
+            <i class="fas fa-bug"></i> Failed to load media. Please try again later.
+          </div>`;
+        console.error('Media viewer error:', err);
+      });
+  </script>
+</body>
+</html>

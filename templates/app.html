@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Horizon App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="/static/styles/app.css">
+</head>
+<body>
+
+<div id="block-screen" class="block-screen hidden">
+    <div class="block-modal">
+        <img src="/static/icons/timer.svg" alt="Timer Icon" id="timer-icon" />
+<h2>You're Temporarily Restricted</h2>
+<p>Due to unusual activity, your access has been paused. Please wait to resume.</p>
+<small>Repeated violations may result in longer restrictions or account suspension.</small>
+        <div class="timer-container">
+            <div class="timer-progress" id="timer-progress"></div>
+            <span class="timer-text" id="timer">--:--</span>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+<div class="lines">
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+  <div class="line"></div>
+</div>
+
+<div id="customMenu">
+    <ul>
+        <li onclick="copyText()"><i class="fas fa-copy"></i> Copy</li>
+        <li onclick="pasteText()"><i class="fas fa-paste"></i> Paste</li>
+        <li onclick="searchText()"><i class="fas fa-search"></i> Search</li>
+    </ul>
+</div>
+
+  <!-- Main Section -->
+  <div id="main" class="page active">
+    <div class="main-header">
+	      <a href="/login" class="login-btn" id="login-btn" style="display: none;">Login</a>
+      <div class="user-info">
+        <img id="avatar" src="" alt="Avatar" onerror="this.style.display='none'" aria-label="User Avatar">
+        <span id="username">Guest</span>
+<button id="notifications-btn" aria-label="Notifications">
+  <i class="fas fa-bell"></i>
+  <span id="notif-indicator" class="notif-indicator" style="display: none;"></span>
+</button>
+
+	  
+      </div>
+	  
+<!-- Progress Skeleton -->
+<div id="progress-card-skeleton" class="progress-card skeleton">
+  <div class="progress-item skeleton-level"></div>
+  <div class="tools-card">
+    <div class="progress-item skeleton-block"></div>
+    <div class="progress-item skeleton-block"></div>
+    <div class="progress-item skeleton-block"></div>
+    <div class="progress-item skeleton-block"></div>
+  </div>
+</div>
+
+<!-- Actual Progress Content (initially hidden) -->
+<div id="progress-card" class="progress-card" style="display: none;">
+  <div class="progress-item level">
+    <div class="value" id="current-level-value"></div>
+    <div class="label" id="next-level-label"></div>
+  </div>
+  <div class="progress-item">
+    <div class="value" id="current-unit-value"></div>
+    <div class="label">Unit</div>
+  </div>
+  <div class="progress-item">
+    <div class="value" id="current-week-value"></div>
+    <div class="label">Week</div>
+  </div>
+  <div class="progress-item">
+    <div class="value" id="completion-value"></div>
+    <div class="label">Completed</div>
+  </div>
+</div>
+    </div>
+	
+	  <div class="tools-card">
+    <div class="progress-item coins">
+      <div class="icon"><i class="fas fa-coins"></i></div>
+      <div class="value" id="coins-value">--</div>
+    </div>
+    <div class="progress-item points">
+      <div class="icon"><i class="fas fa-star"></i></div>
+      <div class="value" id="points-value">--</div>
+    </div>
+<div class="progress-item leaderboard-trigger">
+  <div class="icon"><i class="fas fa-trophy"></i></div>
+  <div class="value" id="leaderboard-value">My rating</div>
+</div>
+
+    <div class="progress-item strike">
+      <div class="icon"><i class="fas fa-fire"></i></div>
+      <div class="value" id="strike-value">-- day</div>
+    </div>
+  </div>
+  
+  <div class="coin-shop-card" onclick="showPage('shop')">
+  <div class="coin-shop-text">
+    <div class="shop-title-main">Shop with Coins</div>
+    <div class="shop-subtext">To buy items, first earn points<br>and exchange to coins</div>
+  </div>
+  <div class="coin-shop-image">
+    <img src="/static/icons/chest-image.png" alt="Chest Image">
+  </div>
+</div>
+
+	
+  </div>
+
+<div id="leaderboard" class="page">
+  <button id="leaderboard-back" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back
+  </button>
+
+  <div id="leaderboard-container"></div>
+</div>
+
+<div id="settings" class="page" style="display: none;">
+  <h1>Settings</h1>
+  <div class="settings-content">
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </div>
+</div>
+
+<div id="shop" class="page">
+  <header class="shop-header">
+    <div class="inventory-icon" onclick="showPage('inventory')" title="Inventory">
+      <i class="fas fa-box-open"></i>
+    </div>
+    <h1>Shop</h1>
+  </header>
+
+  <section class="products-section">
+    <h2>Products</h2>
+	<div class="notif-toggle"></div>
+    <div id="products-grid" class="products-grid"></div>
+  </section>
+</div>
+
+<!-- Notifications Page -->
+<div id="notifications" class="page" style="display: none;">
+  <h1>Notifications</h1>
+  <div class="settings-content">
+    <!-- Toggle General / Important -->
+    <div class="notif-toggle">
+      <button data-type="general" class="active">General</button>
+      <button data-type="important">Important</button>
+    </div>
+    <!-- Список уведомлений -->
+    <ul id="notifications-list">
+      <!-- JS подставит сюда <li>…</li> -->
+    </ul>
+  </div>
+</div>
+
+
+  <div id="inventory" class="page">
+    <header class="inventory-header">
+      <h1>Inventory</h1>
+    </header>
+    <section id="items-section" class="items-section"></section>
+  </div>
+  
+<!-- Today -->
+<div id="today" class="page">
+  <div class="calendar">
+    <span class="today-label" onclick="toggleCalendar()">
+  <i class="fas fa-calendar-alt"></i> Today <i class="fas fa-chevron-down"></i>
+</span>
+
+	<div id="unit-calendar" class="unit-calendar hidden"></div>
+    <div id="days" class="days"></div>
+  </div>
+
+  <div class="tasks-section">
+    <h2 id="task-count">Today's Tasks</h2>
+
+    <div class="accordion">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <span>Exam</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="accordion-content" id="final-exam-item">
+        <!-- Контент будет загружен через updateExamDisplay() -->
+      </div>
+    </div>
+
+  </div>
+  <!-- ВНЕ всех секций и контейнеров -->
+<div id="unit-picker" class="unit-picker"></div>
+
+</div>
+
+<!-- Today Tasks Page -->
+<div id="todaytasks" class="page" style="display: none;">
+  <header id="todaytasks-header" class="page-header" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #ddd;">
+    <div>
+      <h1 id="header-today" style="margin: 0; font-size: 1.5rem;">Today’s Tasks</h1>
+      <p id="todaytasks-unit" style="margin: 0.25rem 0 0; color: #666;">Unit 1.1</p>
+    </div>
+    <button id="finish-tasks-btn" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 1rem;">
+      Finish Tasks
+    </button>
+	<button id="done-tasks-btn" class="btn btn-success" style="padding: 0.5rem 1rem; font-size: 1rem; display: none;">Done</button>
+  </header>
+
+  <main id="todaytasks-content" class="page-content" style="padding: 1rem;">
+    <!-- Здесь будут динамически подгружаться интерактивные вопросы -->
+  </main>
+</div>
+
+
+
+<div id="coins-page" class="page">
+  <div class="balance-cards">
+    <div class="balance-card coin-card">
+      <div class="icon"><i class="fas fa-wallet"></i></div>
+      <div class="info">
+        <div class="value" id="coins-value-in-page">--</div>
+        <div class="label">Coins</div>
+      </div>
+    </div>
+
+    <div class="balance-card point-card">
+      <div class="icon"><i class="fas fa-star"></i></div>
+      <div class="info">
+        <div class="value" id="points-balance">--</div>
+        <div class="label">Active points</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exchange-box">
+    <p class="exchange-rate">
+      <i class="fas fa-sync-alt"></i>
+      Exchange rate: <strong>10 points = 1 coin</strong>
+    </p>
+    <input type="number" id="exchange-input" placeholder="Enter points to exchange (min 10)">
+    <button id="exchange-btn">
+      <i class="fas fa-exchange-alt"></i> Exchange
+    </button>
+    <div id="exchange-status">
+      <i class="fas fa-info-circle"></i>
+      <span id="exchange-message"></span>
+    </div>
+  </div>
+ 
+<div class="debt-section">
+  <h2 class="section-title">
+    <i class="fas fa-hand-holding-usd" style="color:#00ffbf"></i>
+    Debt Proposals
+  </h2>
+  <div class="debt-actions">
+    <button id="new-debt-btn">Propose Debt</button>
+  </div>
+  <div class="debt-lists">
+    <div class="debt-list" id="incoming-debts">
+      <h3>Incoming</h3>
+      <div class="loading">Loading...</div>
+    </div>
+    <div class="debt-list" id="outgoing-debts">
+      <h3>Outgoing</h3>
+      <div class="loading">Loading...</div>
+    </div>
+  </div>
+</div> 
+  
+<div class="transactions-section">
+  <h2 class="section-title">
+    <i class="fas fa-history" style="color: #ffcc00;"></i>
+    Points History
+  </h2>
+
+  <div id="points-history" class="transactions-list">
+    <div class="loading">Loading...</div>
+  </div>
+  
+</div>
+
+<div id="debt-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Propose New Debt</h3>
+    <input id="debt-user" placeholder="Username" />
+    <input id="debt-amount" type="number" placeholder="Amount" />
+    <input id="debt-interest" type="number" placeholder="Interest %" />
+    <input id="debt-due" type="datetime-local" />
+    <button id="debt-submit">Send</button>
+    <button id="debt-cancel">Cancel</button>
+  </div>
+</div>
+
+</div>
+
+<!-- Progress -->
+<div id="progress" class="page">
+<div id="loading" style="display: none; justify-content: center; align-items: center; height: 200px;">
+  <span class="loader-progress"></span>
+</div>
+
+  <div id="error-message"></div>
+  <div id="loading" style="display: none; justify-content: center; align-items: center; height: 100px;">
+    <div class="lds-dual-ring"></div>
+  </div>
+  <div id="progress-container">
+    <div class="progress-section">
+      <div class="progress-title">Current Level</div>
+      <div id="current-level" class="progress-label">Level: N/A</div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-title">My Progress</div>
+      <div class="progress-bar-container">
+        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+      </div>
+      <div id="progress-score" class="progress-label">Total Score: 0%</div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-title">Final Exam</div>
+      <div class="progress-bar-container">
+        <div id="progressFinalExamBar" class="progress-bar-fill" style="width: 0%;"></div>
+      </div>
+      <div id="finalExamLabel" class="progress-label">0 / 30 (0%)</div>
+    </div>
+<div class="progress-section">
+  <div class="progress-title">Today</div>
+  <div class="progress-bar-container">
+    <div id="progressTodayBar" class="progress-bar-fill" style="width: 0%;"></div>
+  </div>
+  <div id="todayLabel" class="progress-label">0 / 70 (0%)</div>
+</div>
+
+    <div id="exam-date"></div>
+    <div class="progress-section">
+      <div class="progress-title">Course Progress</div>
+      <div id="current-unit" class="progress-label">Unit N/A</div>
+      <div id="current-week" class="progress-label">Week N/A</div>
+      <div id="course-completion" class="progress-label">0% Completed</div>
+    </div>
+    <div class="progress-toggle">
+      <button id="toggle-progress" class="toggle-button active">Progress</button>
+      <button id="toggle-today" class="toggle-button">Today</button>
+    </div>
+    <div class="leaderboard-wrapper">
+      <table id="leaderboard-fixed-table">
+        <thead id="leaderboard-fixed-table-head"></thead>
+        <tbody id="leaderboard-fixed-table-body"></tbody>
+      </table>
+      <div class="scrollable-units">
+        <table id="leaderboard-units-table">
+          <thead id="leaderboard-units-table-head"></thead>
+          <tbody id="leaderboard-units-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Chat List -->
+  <div id="chat-list" class="page">
+    <div class="search">
+      <input type="text" placeholder="Search chats..." aria-label="Search chats">
+    </div>
+    <div class="chat-list">
+      <div class="chat-item" data-chat="group-General">
+        <i class="fas fa-users"></i>
+        <div>
+          <strong>My Group - General</strong>
+          <p>No message</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat UI -->
+  <div id="chat-ui" class="page chat-ui">
+    <div class="header">
+      <i class="fas fa-arrow-left back" aria-label="Back to chat list"></i>
+      <span class="title">Group General</span>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area" id="message-form">
+      <label for="file-input" class="attach-label">
+  <i class="fas fa-paperclip" aria-label="Attach file"></i>
+</label>
+<input id="file-input" type="file" style="display: none;" />
+
+      <input type="file" id="file-input" accept="image/jpeg,image/jpg,image/gif,image/png,video/mp4,video/webm,video/ogg,audio/mpeg,audio/mp3" aria-label="File upload">
+      <input type="text" id="message-input" placeholder="Type here..." aria-label="Type a message">
+      <button type="submit" id="send-button" aria-label="Send message"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Profile -->
+  <div id="profile" class="page">
+    <h1>Profile</h1>
+    <div class="profile-content">
+	<div class="settings-icon" onclick="showPage('settings')" title="Settings">
+  <i class="fas fa-cog"></i>
+</div>
+
+      <div class="avatar-section">
+        <img id="profile-avatar" src="" alt="Avatar" onerror="this.style.display='none'" aria-label="User Avatar">
+        <button id="change-avatar" class="change-avatar-btn">Change Avatar</button>
+        <input type="file" id="avatar-input" style="display: none;" accept="image/jpeg,image/jpg,image/png,image/gif">
+      </div>
+      <div class="user-info">
+        <span id="username-display">Guest</span>
+      </div>
+      <div class="balance-section">
+        <span id="balance-amount">0 UZS</span>
+        <span id="balance-status">Paid</span>
+      </div>
+<!-- Upload Files Section -->
+<div class="upload-section" onclick="document.getElementById('upload-file-input').click()" title="Upload Files">
+  <div class="upload-info">
+    <div class="shop-title-main"> Upload Files <i class="fas fa-chevron-right"></i> </div>
+    <div class="shop-subtext">To buy items, earn points<br>send bugs and earn points.</div>
+  </div>
+  <input type="file" id="upload-file-input" style="display: none;" accept=".zip,image/*,video/*">
+</div>
+
+
+    </div>
+  </div>
+
+
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#" data-page="main" class="active" aria-label="Main page"><i class="fas fa-home"></i>Main</a>
+    <a href="#" data-page="progress" aria-label="Progress page"><i class="fas fa-chart-line"></i>Progress</a>
+    <a href="#" data-page="today" aria-label="Today page"><i class="fas fa-calendar"></i>Today</a>
+    <a href="#" data-page="chat-list" aria-label="Chat list page"><i class="fas fa-comments"></i>Chat</a>
+    <a href="#" data-page="profile" aria-label="Profile page"><i class="fas fa-user"></i>Profile</a>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.11/lottie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+</body>
+</html>

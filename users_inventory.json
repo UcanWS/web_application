@@ -1,0 +1,322 @@
+{
+  "Abdulmalik": [
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 5,
+      "type": "Photo",
+      "time": "2025-06-15T09:50:23.831553"
+    },
+    {
+      "id": 14,
+      "name": "Basseyn Ticket",
+      "cost": 11,
+      "type": "Special",
+      "image": "/static/images/Special.jpg",
+      "time": "2025-06-19T21:30:18.092300"
+    },
+    {
+      "id": 6,
+      "name": "Muhamadali zapalllar Toʻplami",
+      "cost": 99,
+      "type": "video",
+      "image": "/static/images/Ali.jpg",
+      "time": "2025-06-19T23:20:30.550545",
+      "quantity": 1
+    }
+  ],
+  "Muhammadali": [
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 5,
+      "type": "Photo",
+      "time": "2025-06-15T11:04:20.875185",
+      "quantity": 1
+    },
+    {
+      "id": 10,
+      "name": "MLBB Custom da Apex Nova jamoasida bolish.",
+      "cost": 1,
+      "type": "MLBB",
+      "image": "/static/images/MLBB.png",
+      "time": "2025-06-19T11:41:51.858445",
+      "quantity": 1
+    },
+    {
+      "id": 7,
+      "name": "MLBB Ranked x1",
+      "cost": 87,
+      "type": "MLBB",
+      "image": "/static/images/Ranked.jpg",
+      "time": "2025-06-19T20:02:09.050594"
+    },
+    {
+      "id": 6,
+      "name": "Muhamadali zapalllar Toʻplami",
+      "cost": 11,
+      "type": "video",
+      "image": "/static/images/Ali.jpg",
+      "time": "2025-06-19T23:16:17.008044",
+      "quantity": 1
+    },
+    {
+      "id": 13,
+      "name": "WiFi 1 day Access 5Ghz",
+      "cost": 132,
+      "type": "System",
+      "image": "/static/images/Wifi5G.jpg",
+      "time": "2025-06-20T14:25:15.680487",
+      "quantity": 1
+    },
+    {
+      "id": 5,
+      "name": "Zakariyo Voice Zapalar To'plami",
+      "cost": 109,
+      "type": "Zapal",
+      "image": "/static/images/Mic.png",
+      "time": "2025-06-20T15:06:57.013869",
+      "quantity": 1
+    },
+    {
+      "id": 14,
+      "name": "Basseyn Ticket",
+      "cost": 109,
+      "type": "Special",
+      "image": "/static/images/special.gif",
+      "time": "2025-06-20T17:48:38.396860"
+    }
+  ],
+  "Legenda": [
+    {
+      "id": 14,
+      "name": "Basseyn Ticket",
+      "cost": 11,
+      "type": "Special",
+      "image": "/static/images/special.gif",
+      "time": "2025-06-20T14:52:38.019614",
+      "quantity": 1
+    },
+    {
+      "id": 13,
+      "name": "WiFi 1 day Access 5Ghz",
+      "cost": 132,
+      "type": "System",
+      "image": "/static/images/Wifi5G.jpg",
+      "time": "2025-06-20T14:52:44.083886"
+    },
+    {
+      "id": 13,
+      "name": "WiFi 1 day Access 5Ghz",
+      "cost": 132,
+      "type": "System",
+      "image": "/static/images/Wifi5G.jpg",
+      "time": "2025-06-20T14:52:49.300971"
+    },
+    {
+      "id": 13,
+      "name": "WiFi 1 day Access 5Ghz",
+      "cost": 132,
+      "type": "System",
+      "image": "/static/images/Wifi5G.jpg",
+      "time": "2025-06-20T14:52:54.477050"
+    },
+    {
+      "id": 13,
+      "name": "WiFi 1 day Access 5Ghz",
+      "cost": 132,
+      "type": "System",
+      "image": "/static/images/Wifi5G.jpg",
+      "time": "2025-06-20T14:52:59.377750"
+    },
+    {
+      "id": 13,
+      "name": "WiFi 1 day Access 5Ghz",
+      "cost": 132,
+      "type": "System",
+      "image": "/static/images/Wifi5G.jpg",
+      "time": "2025-06-20T14:53:04.296864"
+    },
+    {
+      "id": 1,
+      "name": "Elbek Zapalar toplami",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Elbek.png",
+      "time": "2025-06-20T14:53:15.366754",
+      "quantity": 1
+    },
+    {
+      "id": 11,
+      "name": "Abdulmalik Zaparil Pack.",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Abdulmalik.jpg",
+      "time": "2025-06-20T14:53:27.787604",
+      "quantity": 1
+    }
+  ],
+  "Muhammadiso": [
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 5,
+      "type": "Photo",
+      "time": "2025-06-15T18:48:52.856825",
+      "quantity": 1
+    },
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 5,
+      "type": "Photo",
+      "image": "/static/images/watch-7.png",
+      "time": "2025-06-15T19:47:11.108658",
+      "quantity": 1
+    },
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Behruz.jpg",
+      "time": "2025-06-19T19:43:05.089807"
+    },
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Behruz.jpg",
+      "time": "2025-06-19T19:44:13.041338"
+    },
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Behruz.jpg",
+      "time": "2025-06-19T19:52:09.343559"
+    },
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Behruz.jpg",
+      "time": "2025-06-19T20:20:11.969160"
+    },
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 110,
+      "type": "Zapal",
+      "image": "/static/images/Behruz.jpg",
+      "time": "2025-06-19T20:36:14.295319"
+    },
+    {
+      "id": 6,
+      "name": "Muhamadali zapalllar Toʻplami",
+      "cost": 99,
+      "type": "video",
+      "image": "/static/images/Ali.jpg",
+      "time": "2025-06-19T23:13:21.564058"
+    }
+  ],
+  "Elbek": [
+    {
+      "id": 2,
+      "name": "Behruz Zapal Rasmlar toplami",
+      "cost": 5,
+      "type": "Photo",
+      "image": "/static/images/Behruz.jpg",
+      "time": "2025-06-17T14:34:51.717784"
+    },
+    {
+      "id": 10,
+      "name": "MLBB Custom da Apex Nova jamoasida bolish.",
+      "cost": 1,
+      "type": "MLBB",
+      "image": "/static/images/MLBB.png",
+      "time": "2025-06-19T11:41:38.575190",
+      "quantity": 1
+    },
+    {
+      "id": 10,
+      "name": "MLBB Custom da Apex Nova jamoasida bolish.",
+      "cost": 1,
+      "type": "MLBB",
+      "image": "/static/images/MLBB.png",
+      "time": "2025-06-19T11:41:55.139433"
+    },
+    {
+      "id": 10,
+      "name": "MLBB Custom da Apex Nova jamoasida bolish.",
+      "cost": 1,
+      "type": "MLBB",
+      "image": "/static/images/MLBB.png",
+      "time": "2025-06-19T11:41:56.030809"
+    },
+    {
+      "id": 14,
+      "name": "Basseyn Ticket",
+      "cost": 169,
+      "type": "Special",
+      "image": "/static/images/special.gif",
+      "time": "2025-06-20T17:49:11.917303"
+    }
+  ],
+  "Behruz": [
+    {
+      "id": 9,
+      "name": "Change Nickname",
+      "cost": 50,
+      "type": "System",
+      "image": "/static/images/nickname-change.jpg",
+      "time": "2025-06-19T12:04:03.041615",
+      "quantity": 1
+    }
+  ],
+  "071-BKK": [
+    {
+      "id": 7,
+      "name": "MLBB Ranked x1",
+      "cost": 79,
+      "type": "MLBB",
+      "image": "/static/images/Ranked.jpg",
+      "time": "2025-06-19T12:59:22.343768"
+    },
+    {
+      "id": 7,
+      "name": "MLBB Ranked x1",
+      "cost": 79,
+      "type": "MLBB",
+      "image": "/static/images/Ranked.jpg",
+      "time": "2025-06-19T12:59:24.618313"
+    },
+    {
+      "id": 7,
+      "name": "MLBB Ranked x1",
+      "cost": 79,
+      "type": "MLBB",
+      "image": "/static/images/Ranked.jpg",
+      "time": "2025-06-19T12:59:26.249378"
+    },
+    {
+      "id": 7,
+      "name": "MLBB Ranked x1",
+      "cost": 79,
+      "type": "MLBB",
+      "image": "/static/images/Ranked.jpg",
+      "time": "2025-06-19T12:59:27.593884"
+    },
+    {
+      "id": 7,
+      "name": "MLBB Ranked x1",
+      "cost": 79,
+      "type": "MLBB",
+      "image": "/static/images/Ranked.jpg",
+      "time": "2025-06-19T12:59:29.048479"
+    }
+  ]
+}

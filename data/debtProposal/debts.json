@@ -1,0 +1,105 @@
+{
+  "next_id": 11,
+  "debts": [
+    {
+      "id": 1,
+      "proposer": "Muhammadali",
+      "proposee": "Legenda",
+      "amount": 200,
+      "interest": 100,
+      "due_date": "2025-06-15T15:00:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-15T12:59:17.082590"
+    },
+    {
+      "id": 2,
+      "proposer": "Abdulmalik",
+      "proposee": "Muhammadali",
+      "amount": 10,
+      "interest": 90,
+      "due_date": "2025-06-15T13:20:00.000Z",
+      "status": "declined",
+      "created_at": "2025-06-15T13:12:19.588451"
+    },
+    {
+      "id": 3,
+      "proposer": "Muhammadiso",
+      "proposee": "Abdulmalik",
+      "amount": 1000,
+      "interest": 20,
+      "due_date": "2025-06-17T19:00:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-15T17:53:01.973415"
+    },
+    {
+      "id": 4,
+      "proposer": "Muhammadali",
+      "proposee": "Muhammadiso",
+      "amount": 24,
+      "interest": 100,
+      "due_date": "2025-06-15T18:27:00.000Z",
+      "status": "declined",
+      "created_at": "2025-06-15T18:28:03.034822"
+    },
+    {
+      "id": 5,
+      "proposer": "Muhammadali",
+      "proposee": "Muhammadiso",
+      "amount": 24,
+      "interest": 100,
+      "due_date": "2025-06-15T18:30:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-15T18:28:30.781789"
+    },
+    {
+      "id": 6,
+      "proposer": "Abdulmalik",
+      "proposee": "Muhammadiso",
+      "amount": 10,
+      "interest": 10,
+      "due_date": "2025-06-15T18:31:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-15T18:29:34.916362"
+    },
+    {
+      "id": 7,
+      "proposer": "Muhammadali",
+      "proposee": "Legenda",
+      "amount": 10000,
+      "interest": 100,
+      "due_date": "2025-06-25T08:30:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-18T08:29:57.958187"
+    },
+    {
+      "id": 8,
+      "proposer": "Elbek",
+      "proposee": "Legenda",
+      "amount": 2000,
+      "interest": 100,
+      "due_date": "2025-06-20T08:32:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-18T08:32:26.147068"
+    },
+    {
+      "id": 9,
+      "proposer": "Abdulmalik",
+      "proposee": "Muhammadiso",
+      "amount": 9,
+      "interest": 99,
+      "due_date": "2025-06-18T08:33:00.000Z",
+      "status": "declined",
+      "created_at": "2025-06-18T08:33:16.400983"
+    },
+    {
+      "id": 10,
+      "proposer": "Muhammadiso",
+      "proposee": "Elbek",
+      "amount": 149550,
+      "interest": 100,
+      "due_date": "2025-06-19T12:45:00.000Z",
+      "status": "repaid",
+      "created_at": "2025-06-18T08:38:43.745659"
+    }
+  ]
+}
