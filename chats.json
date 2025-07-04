@@ -1,0 +1,71 @@
+{
+  "Elbek_Muhammadiso": [
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Elbek",
+      "message": "70",
+      "timestamp": "2025-07-04T09:44:51.424425",
+      "read": true
+    },
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Elbek",
+      "message": "qalesan",
+      "timestamp": "2025-07-04T09:50:53.525995",
+      "read": true
+    },
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Elbek",
+      "message": "5",
+      "timestamp": "2025-07-04T09:56:47.800253",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Muhammadiso",
+      "message": "sad",
+      "timestamp": "2025-07-04T09:57:09.012294",
+      "read": true
+    },
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Elbek",
+      "message": "",
+      "timestamp": "2025-07-04T10:05:24.336084",
+      "read": true,
+      "media_url": "/private_uploads/1751623524_Argus.mp3"
+    },
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Elbek",
+      "message": "",
+      "timestamp": "2025-07-04T10:17:21.616797",
+      "read": true,
+      "media_url": "/private_uploads/1751624241_Argus.mp3"
+    },
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Elbek",
+      "message": "",
+      "timestamp": "2025-07-04T10:17:28.450550",
+      "read": true,
+      "media_url": "/private_uploads/1751624248_ChatGPT_Image_Apr_30_2025_12_26_12_PM.png"
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Muhammadiso",
+      "message": "\u0444\u044b\u0432",
+      "timestamp": "2025-07-04T10:43:55.764764",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Muhammadiso",
+      "message": "",
+      "timestamp": "2025-07-04T10:51:55.364097",
+      "read": true,
+      "media_url": "/private_uploads/1751626315_HMPp3IWr1IQDeqmiG2Y9mJJMMZzbzV__Dl9FA7thLgpbdLYVGT8no-yn1oLHJ6PFyE1FrtC0LSFTkfCX7xVOqA.mp4"
+    }
+  ]
+}

@@ -103,9 +103,19 @@ const updateCoinsValue = () => {
       });
 
     // Show login button if Guest
+if (currentUser === 'Guest') {
+  loginBtn.style.display = 'block';
+
+
+  const reminderInterval = setInterval(() => {
     if (currentUser === 'Guest') {
-      loginBtn.style.display = 'block';
+     showModalStatus("You are not authorized. Please log in to your account to continue.", "failed");
+    } else {
+      clearInterval(reminderInterval); // Прекратить, если вошёл
     }
+  }, 3000); // каждые 60 секунд
+}
+
 
     // Handle connection errors
     socket.on('connect_error', (err) => {
@@ -195,8 +205,532 @@ function showPage(id) {
       onNotificationsPageOpen();
       showNotifIndicator(false);
       break;
+	  
+	case 'private-chatlist':
+      currentPrivateUser = null;
+      showNavigation();
+      loadPrivateChatUsers(); // <-- загружаем юзеров
+      break;
+	  
+	case 'chat-ui-private':
+      hideNavigation();
+      break;
   }
 }
+
+let currentPrivateUser = null;
+
+function scrollMessagesToBottom() {
+  const chatBox = document.querySelector('.messages-private');
+  if (chatBox) {
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+}
+
+async function loadPrivateChatUsers() {
+  const listContainer = document.getElementById('private-chat-list');
+  listContainer.innerHTML = '';
+
+  // Скелетоны
+  for (let i = 0; i < 4; i++) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'chat-private-item skeleton';
+    skeleton.innerHTML = `<i></i><div></div>`;
+    listContainer.appendChild(skeleton);
+  }
+
+  try {
+    const usersResponse = await fetch('/api/users');
+    const users = await usersResponse.json();
+    const allChatsResponse = await fetch('/chat/all');
+    const allChats = await allChatsResponse.json();
+
+    listContainer.innerHTML = '';
+
+    const usernames = Object.keys(users).filter(u => u !== currentUser);
+    if (usernames.length === 0) {
+      listContainer.innerHTML = '<p>No users found.</p>';
+      return;
+    }
+
+    usernames.sort((a, b) => {
+      const roomA = getRoomId(currentUser, a);
+      const roomB = getRoomId(currentUser, b);
+      const messagesA = allChats[roomA] || [];
+      const messagesB = allChats[roomB] || [];
+      const lastA = messagesA[messagesA.length - 1] || null;
+      const lastB = messagesB[messagesB.length - 1] || null;
+      if (!lastA && !lastB) return 0;
+      if (!lastA) return 1;
+      if (!lastB) return -1;
+      const timeA = new Date(lastA.timestamp).getTime();
+      const timeB = new Date(lastB.timestamp).getTime();
+      if (timeA !== timeB) return timeB - timeA;
+      return (lastA.sender !== currentUser) ? -1 : 1;
+    });
+
+    for (const username of usernames) {
+      const avatarResponse = await fetch(`/get_avatar/${username}`);
+      const { avatar_url } = await avatarResponse.json();
+
+      const roomId = getRoomId(currentUser, username);
+      const messages = allChats[roomId] || [];
+      const last = messages[messages.length - 1] || null;
+
+      let preview = '<p>Start private chat</p>';
+      if (last) {
+        if (last.media_url) preview = '<p>[media]</p>';
+        else if (last.message) {
+          const msg = last.message.length > 40 ? last.message.slice(0, 40) + '...' : last.message;
+          preview = `<p>${msg}</p>`;
+        }
+      }
+
+      const unreadCount = messages.filter(
+        m => m.receiver === currentUser && !m.read
+      ).length;
+
+      const item = document.createElement('div');
+      item.className = 'chat-private-item';
+      item.dataset.chat = username;
+
+      const avatarHtml = avatar_url
+        ? `<div class="avatar"><img src="${avatar_url}" alt="${username}'s avatar"></div>`
+        : `<div class="avatar fallback">!</div>`;
+
+      item.innerHTML = `
+        ${avatarHtml}
+        <div>
+          <strong>${username}</strong>
+          ${preview}
+        </div>
+        ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
+      `;
+
+      item.onclick = () => openPrivateChat(username);
+      listContainer.appendChild(item);
+    }
+  } catch (err) {
+    listContainer.innerHTML = `<p>Error loading users: ${err}</p>`;
+  }
+}
+
+
+
+// Генерация room_id в JS
+function getRoomId(user1, user2) {
+  return [user1, user2].sort().join('_');
+}
+
+
+// Открыть чат
+function openPrivateChat(username) {
+  currentPrivateUser = username;
+
+  showPage('chat-ui-private');
+
+  // Присоединение к сокет-комнате
+  socket.emit('join_private', {
+    sender: currentUser,
+    receiver: username
+  });
+
+  // Загрузка чата
+  loadPrivateMessages();
+  scrollMessagesToBottom();
+
+  // Проверка онлайн-статуса
+  fetch('/api/sessions/')
+    .then(res => res.json())
+    .then(data => {
+      const isOnline = data.sessions.some(s => s.username === username);
+      const title = `${username} ${isOnline ? '<span class="online-status">● online</span>' : '<span class="offline-status">● offline</span>'}`;
+      document.getElementById('private-chat-username').innerHTML = title;
+    })
+    .catch(err => {
+      console.error('Error fetching session data:', err);
+      document.getElementById('private-chat-username').innerText = username;
+    });
+	
+	const chatItem = document.querySelector(`.chat-private-item[data-chat="${username}"]`);
+if (chatItem) {
+  chatItem.classList.remove('unread');
+}
+}
+
+
+// Загрузка истории
+function loadPrivateMessages() {
+  const chatBox = document.getElementById('private-messages');
+  chatBox.innerHTML = '<p>Loading...</p>';
+
+  fetch(`/chat/${currentUser}/${currentPrivateUser}`)
+    .then(res => res.json())
+    .then(messages => {
+      chatBox.innerHTML = '';
+      messages.forEach(addPrivateMessage);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      scrollMessagesToBottom();
+
+      // ⬅️ Пометить сообщения как прочитанные
+      markMessagesAsRead();
+	  scrollMessagesToBottom();
+    })
+    .catch(err => {
+      chatBox.innerHTML = `<p>Error loading messages: ${err}</p>`;
+    });
+}
+
+function markMessagesAsRead() {
+  fetch(`/chat/read/${currentUser}/${currentPrivateUser}`, {
+    method: 'POST'
+  }).catch(console.error);
+}
+
+
+
+// Отправка текста
+function sendPrivateTextMessage() {
+  const input = document.getElementById('private-message-input');
+  const message = input.value.trim();
+  if (!message) return;
+
+  const msg = {
+    sender: currentUser,
+    receiver: currentPrivateUser,
+    message: message,
+    timestamp: new Date().toISOString()
+  };
+
+  socket.emit('send_private_message', msg);
+  input.value = '';
+}
+
+// Обработка Enter
+document.getElementById('private-message-input').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    sendPrivateTextMessage();
+  }
+});
+
+// Кнопка отправки
+document.getElementById('private-send-button').onclick = sendPrivateTextMessage;
+
+// Отправка медиа
+document.getElementById('private-file-input').onchange = function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('sender', currentUser);
+  formData.append('receiver', currentPrivateUser);
+
+  fetch('/chat/send_media', {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.media_url) {
+        const msg = {
+          sender: currentUser,
+          receiver: currentPrivateUser,
+          message: '',
+          media_url: data.media_url,
+          timestamp: new Date().toISOString()
+        };
+        socket.emit('send_private_message', msg);
+      }
+    })
+    .catch(console.error);
+
+  this.value = ''; // сброс input
+};
+
+socket.emit('join_all_private_rooms', { username: currentUser });
+
+socket.on('receive_private_message', msg => {
+  scrollMessagesToBottom();
+  const isCurrentChat =
+    (msg.sender === currentPrivateUser && msg.receiver === currentUser) ||
+    (msg.sender === currentUser && msg.receiver === currentPrivateUser);
+
+  if (isCurrentChat) {
+    addPrivateMessage(msg);
+
+    // ⬅️ Если ты сейчас в этом чате — пометить как прочитанное
+    if (msg.receiver === currentUser) {
+      markMessagesAsRead();
+    }
+  } else {
+    showChatNotification({ sender: msg.sender, message: msg.message });
+    loadPrivateChatUsers();
+
+    const chatItem = document.querySelector(`.chat-private-item[data-chat="${msg.sender}"]`);
+    if (chatItem) {
+      chatItem.classList.add('unread');
+    }
+  }
+});
+
+
+function showChatNotification({ sender, message }) {
+  const container = document.getElementById('toast-container');
+
+  const toast = document.createElement('div');
+  toast.className = `toast info`;
+  toast.style.setProperty('--hide-delay', `7s`);
+
+  const icon = document.createElement('div');
+  icon.className = 'toast-icon';
+  icon.innerHTML = `<i class="fas fa-comments"></i>`;
+
+  const msg = document.createElement('div');
+  msg.className = 'toast-message';
+  msg.innerHTML = `<b>${sender}</b>: ${message || '[media]'}`;
+
+  const openBtn = document.createElement('div');
+  openBtn.className = 'toast-action';
+  openBtn.innerHTML = `Open Chat`;
+  openBtn.onclick = () => {
+    openPrivateChat(sender);
+    toast.remove();
+  };
+
+  const closeBtn = document.createElement('div');
+  closeBtn.className = 'toast-close';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.onclick = () => toast.remove();
+
+  toast.append(icon, msg, openBtn, closeBtn);
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => toast.classList.add('active'));
+  //setTimeout(() => toast.remove(), 7000);
+}
+
+// Добавить сообщение в DOM
+function addPrivateMessage(msg) {
+  const chatBox = document.getElementById('private-messages');
+  const div = document.createElement('div');
+
+  const isSentByMe = msg.sender === currentUser;
+
+  div.className = 'message-private ' + (isSentByMe ? 'sent' : 'received');
+
+  let readIcon = '';
+  if (isSentByMe) {
+    const isRead = msg.read === true;
+    readIcon = `<span class="read-status ${isRead ? 'read' : 'unread'}">
+      <i class="fas fa-check"></i>
+    </span>`;
+  }
+
+  div.innerHTML = `
+    <strong>${msg.sender}</strong> ${msg.message || ''}
+    ${msg.media_url ? renderMedia(msg.media_url) : ''}
+    <br><small>${new Date(msg.timestamp).toLocaleString()} ${readIcon}</small>
+  `;
+
+  chatBox.appendChild(div);
+  scrollMessagesToBottom();
+}
+
+
+
+// Media cache
+const mediaCache = new Map();
+
+function renderMedia(url) {
+  const ext = url.split('.').pop().toLowerCase();
+  const wrapperId = `media-${Math.random().toString(36).substring(2, 9)}`;
+
+  let typeLabel = '';
+  let icon = '';
+
+  if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+    typeLabel = 'Photo';
+    icon = 'fa-image';
+  } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+    typeLabel = 'Video';
+    icon = 'fa-video';
+  } else if (['mp3'].includes(ext)) {
+    typeLabel = 'Audio';
+    icon = 'fa-music';
+  } else {
+    typeLabel = 'File';
+    icon = 'fa-file-alt';
+  }
+
+  return `
+    <div id="${wrapperId}" class="media-wrapper-private">
+      <button onclick="downloadAndShowMedia('${url}', '${ext}', '${wrapperId}')" class="media-download-btn">
+        <i class="fas ${icon}"></i> Download ${typeLabel}
+      </button>
+      <div class="media-content" style="margin-top: 10px;"></div>
+    </div>
+  `;
+}
+
+function downloadAndShowMedia(url, ext, wrapperId) {
+  const wrapper = document.getElementById(wrapperId);
+  const mediaBox = wrapper.querySelector('.media-content');
+  const btn = wrapper.querySelector('.media-download-btn');
+
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Downloading...`;
+
+  // Check cache
+  if (mediaCache.has(url)) {
+    renderFromBlobURL(mediaCache.get(url), ext, mediaBox, btn, wrapperId);
+    return;
+  }
+
+  fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      mediaCache.set(url, blobUrl);
+      renderFromBlobURL(blobUrl, ext, mediaBox, btn, wrapperId);
+    })
+    .catch(err => {
+      btn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Failed`;
+      console.error('Download failed:', err);
+    });
+}
+
+function renderFromBlobURL(blobUrl, ext, container, btn, wrapperId) {
+  let html = '';
+
+  if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+    html = `<img src="${blobUrl}" class="media-img-private">`;
+    btn.remove();
+  } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+    html = `<video controls preload="metadata" class="media-video-private">
+              <source src="${blobUrl}" type="video/${ext}">
+            </video>`;
+    btn.remove();
+  } else if (['mp3'].includes(ext)) {
+    html = `
+      <div class="telegram-audio-player-private">
+        <button class="play-pause-btn-private">
+          <i class="fas fa-play"></i>
+        </button>
+        <div class="progress-container-private">
+          <div class="progress-bar-private"></div>
+          <div class="progress-scrubber-private"></div>
+        </div>
+        <div class="time-display-private">
+          <span class="current-time">0:00</span> / <span class="duration">0:00</span>
+        </div>
+        <button class="speed-btn-private">1x</button>
+      </div>
+      <audio id="audio-${wrapperId}" src="${blobUrl}"></audio>
+    `;
+  } else {
+    html = `<a href="${blobUrl}" download class="media-file-link-private">
+              <i class="fas fa-file-download"></i> Download file
+            </a>`;
+    btn.remove();
+  }
+
+  container.innerHTML = html;
+
+  if (ext === 'mp3') {
+    const audio = document.getElementById(`audio-${wrapperId}`);
+    const playPauseBtn = container.querySelector('.play-pause-btn-private');
+    const progressBar = container.querySelector('.progress-bar-private');
+    const scrubber = container.querySelector('.progress-scrubber-private');
+    const currentTimeDisplay = container.querySelector('.current-time');
+    const durationDisplay = container.querySelector('.duration');
+    const speedBtn = container.querySelector('.speed-btn-private');
+
+    let isDragging = false;
+    const speeds = [1, 1.5, 2];
+    let currentSpeedIndex = 0;
+
+    // Format time in MM:SS
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      seconds = Math.floor(seconds % 60);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    // Update progress bar and time display
+    audio.addEventListener('loadedmetadata', () => {
+      durationDisplay.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!isDragging) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = `${progress}%`;
+        scrubber.style.left = `${progress}%`;
+        currentTimeDisplay.textContent = formatTime(audio.currentTime);
+      }
+    });
+
+    // Play/Pause toggle
+    playPauseBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      } else {
+        audio.pause();
+        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+      }
+    });
+
+    // Playback speed toggle
+    speedBtn.addEventListener('click', () => {
+      currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
+      audio.playbackRate = speeds[currentSpeedIndex];
+      speedBtn.textContent = `${speeds[currentSpeedIndex]}x`;
+    });
+
+    // Scrubber drag functionality
+    progressBar.parentElement.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      updateScrubber(e);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) updateScrubber(e);
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    function updateScrubber(e) {
+      const rect = progressBar.parentElement.getBoundingClientRect();
+      let pos = (e.clientX - rect.left) / rect.width;
+      pos = Math.max(0, Math.min(1, pos));
+      const time = pos * audio.duration;
+      audio.currentTime = time;
+      progressBar.style.width = `${pos * 100}%`;
+      scrubber.style.left = `${pos * 100}%`;
+      currentTimeDisplay.textContent = formatTime(time);
+    }
+
+    btn.remove();
+  }
+}
+
+socket.on('messages_read', ({ reader, sender }) => {
+  if (sender !== currentUser) return;
+
+  const icons = document.querySelectorAll('.message-private.sent .read-status');
+  icons.forEach(el => {
+    el.classList.remove('unread');
+    el.classList.add('read');
+  });
+});
+
+
+
 
 
 // === JS: открыть страницу Notifications и загрузить данные ===
@@ -2672,13 +3206,18 @@ function openTodayTaskPage(title, questions) {
 
     const subList = Array.isArray(q.subquestions) ? q.subquestions : [q];
     const groupedBoxChoose = [];
+    const groupedWriteIn = [];
 
-    subList.forEach((sub) => {
+    subList.forEach(sub => {
       if (sub.type === 'box-choose') {
         groupedBoxChoose.push(sub);
-        return;
+      } else if (sub.type === 'write-in-blank') {
+        groupedWriteIn.push(sub);
       }
+    });
 
+    subList.forEach(sub => {
+      if (sub.type === 'box-choose' || sub.type === 'write-in-blank') return;
       const subDiv = document.createElement('div');
       subDiv.className = 'exam-subquestion';
 
@@ -2686,14 +3225,6 @@ function openTodayTaskPage(title, questions) {
         const p = document.createElement('p');
         p.className = 'question-text';
         p.innerHTML = `${sub.id || 'Q'}. ${sub.text || ''}`;
-
-        if (sub.type === 'write-in-blank' && p.innerHTML.includes('____')) {
-          p.innerHTML = p.innerHTML.replace(
-            '____',
-            `<input type="text" class="write-in-blank-input" name="q${sub.id}" placeholder="____" autocomplete="off">`
-          );
-        }
-
         subDiv.appendChild(p);
       }
 
@@ -2753,12 +3284,11 @@ function openTodayTaskPage(title, questions) {
             }
           };
         });
-
         inputContainer.querySelectorAll('.unscramble-input').forEach(inputEl => {
           inputEl.onclick = () => {
             if (!inputEl.classList.contains('filled')) return;
-            const index = inputEl.dataset.letterIndex;
-            const letterEl = letterContainer.querySelector(`.unscramble-letter[data-index="${index}"]`);
+            const idx = inputEl.dataset.letterIndex;
+            const letterEl = letterContainer.querySelector(`.unscramble-letter[data-index="${idx}"]`);
             if (letterEl) letterEl.classList.remove('used');
             inputEl.textContent = '';
             inputEl.classList.remove('filled');
@@ -2776,44 +3306,52 @@ function openTodayTaskPage(title, questions) {
       wrapper.appendChild(subDiv);
     });
 
+    if (groupedWriteIn.length) {
+      const subDiv = document.createElement('div');
+      subDiv.className = 'exam-subquestion';
+      groupedWriteIn.forEach(sub => {
+        const p = document.createElement('p');
+        p.className = 'question-text';
+        p.innerHTML = `${sub.id}. ${sub.text.replace('____', `<input type="text" class="write-in-blank-input" name="q${sub.id}" placeholder="____" autocomplete="off">`)}`;
+        subDiv.appendChild(p);
+      });
+      wrapper.appendChild(subDiv);
+    }
+
     if (groupedBoxChoose.length) {
       const subDiv = document.createElement('div');
       subDiv.className = 'exam-subquestion';
-
       const optionsDiv = document.createElement('div');
       optionsDiv.className = 'box-choose-options';
       let selected = null;
 
-      const allOptions = [
-        ...new Set(groupedBoxChoose.flatMap(sub =>
-          (sub.options && sub.options.length) ? sub.options : (q.options || [])
-        ))
-      ];
+      function handleOptionClick(optEl) {
+        const val = optEl.textContent;
+        if (selected === val) {
+          optEl.classList.remove('selected');
+          selected = null;
+          return;
+        }
+        optionsDiv.querySelectorAll('.box-choose-option').forEach(el => el.classList.remove('selected'));
+        optEl.classList.add('selected');
+        selected = val;
+        subDiv.querySelectorAll('.box-choose-blank').forEach(blank => {
+          if (!blank.textContent || blank.textContent === '_____') {
+            blank.classList.add('highlight-pending');
+            blank.style.borderColor = '#4a90e2';
+          }
+        });
+      }
 
-      allOptions.forEach((opt, i) => {
+      const allOpts = [...new Set(groupedBoxChoose.flatMap(s => (s.options && s.options.length) ? s.options : (q.options || [])))];
+      allOpts.forEach((opt, i) => {
         const span = document.createElement('span');
         span.className = 'box-choose-option';
         span.textContent = opt;
         span.style.setProperty('--index', i);
-        span.onclick = () => {
-          if (selected === opt) {
-            selected = null;
-            span.classList.remove('selected');
-          } else {
-            optionsDiv.querySelectorAll('.box-choose-option').forEach(el => el.classList.remove('selected'));
-            span.classList.add('selected');
-            selected = opt;
-            subDiv.querySelectorAll('.box-choose-blank').forEach(blank => {
-              if (!blank.textContent || blank.textContent === '_____') {
-                blank.classList.add('highlight-pending');
-                blank.style.borderColor = '#4a90e2';
-              }
-            });
-          }
-        };
+        span.onclick = () => handleOptionClick(span);
         optionsDiv.appendChild(span);
       });
-
       subDiv.appendChild(optionsDiv);
 
       groupedBoxChoose.forEach(sub => {
@@ -2827,33 +3365,28 @@ function openTodayTaskPage(title, questions) {
       setTimeout(() => {
         subDiv.querySelectorAll('.box-choose-blank').forEach(blank => {
           blank.onclick = () => {
-            if (blank.textContent && blank.textContent !== '_____') {
-              const value = blank.dataset.value;
-              if (value) {
-                const restore = document.createElement('span');
-                restore.className = 'box-choose-option';
-                restore.textContent = value;
-                restore.style.setProperty('--index', 99); // в конец
-                restore.onclick = optionsDiv.querySelector('.box-choose-option')?.onclick || (() => {});
-                optionsDiv.appendChild(restore);
-              }
+            if (blank.classList.contains('filled')) {
+              const restored = blank.dataset.value;
+              const restoreSpan = document.createElement('span');
+              restoreSpan.className = 'box-choose-option';
+              restoreSpan.textContent = restored;
+              restoreSpan.onclick = () => handleOptionClick(restoreSpan);
+              optionsDiv.appendChild(restoreSpan);
               blank.textContent = '_____';
-              blank.removeAttribute('data-value');
+              blank.classList.remove('filled', 'highlight-pending');
               blank.style.borderColor = '';
+              delete blank.dataset.value;
+              selected = null;
               return;
             }
-
             if (!selected) return;
             blank.textContent = selected;
+            blank.classList.add('filled');
+            blank.classList.remove('highlight-pending');
             blank.dataset.value = selected;
             blank.style.borderColor = '';
-            blank.classList.remove('highlight-pending');
             optionsDiv.querySelectorAll('.box-choose-option').forEach(optEl => {
-              if (optEl.textContent === selected) {
-                optEl.classList.remove('selected');
-                optEl.classList.add('used');
-                setTimeout(() => optEl.remove(), 300);
-              }
+              if (optEl.textContent === selected) optEl.remove();
             });
             selected = null;
           };
@@ -2866,12 +3399,33 @@ function openTodayTaskPage(title, questions) {
     content.appendChild(wrapper);
   });
 
-  document.getElementById('finish-tasks-btn').onclick = () => finishTodayTasks(title, questions);
+  document.getElementById('finish-tasks-btn').onclick = () => {
+    const btn = document.getElementById('floating-finish-btn');
+    if (btn) btn.style.display = 'none';
+    finishTodayTasks(title, questions);
+  };
+
   document.getElementById('done-tasks-btn').onclick = () => {
     showPage('today');
     content.innerHTML = '';
     document.getElementById('done-tasks-btn').style.display = 'none';
     document.getElementById('finish-tasks-btn').style.display = 'inline-block';
+    const floating = document.getElementById('floating-finish-btn');
+    if (floating) floating.style.display = 'none';
+  };
+
+  // Create floating finish button
+  let floatingBtn = document.getElementById('floating-finish-btn');
+  if (!floatingBtn) {
+    floatingBtn = document.createElement('button');
+    floatingBtn.id = 'floating-finish-btn';
+    floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
+    document.body.appendChild(floatingBtn);
+  }
+  floatingBtn.style.display = 'block';
+  floatingBtn.onclick = () => {
+    floatingBtn.style.display = 'none';
+    finishTodayTasks(title, questions);
   };
 
   initCustomAudioPlayers();
@@ -3107,7 +3661,7 @@ function finishTodayTasks(title, questions) {
     else if (qid) errors.push(`Listening answer missing for question ${qid}`);
   });
 
-  // 5. Errors check
+  // 5. Проверка ошибок
   if (errors.length) {
     showToastNotification(errors[0], 'warning');
     return;
@@ -3121,6 +3675,10 @@ function finishTodayTasks(title, questions) {
     answers
   };
 
+  // ПОКАЗАТЬ МОДАЛКУ
+  document.getElementById('updateModal').style.display = 'flex';
+  startUpdateStatusText();
+
   fetch('/api/submit-tasks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -3128,6 +3686,10 @@ function finishTodayTasks(title, questions) {
   })
     .then(res => res.json().then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
+      // СКРЫТЬ МОДАЛКУ
+      document.getElementById('updateModal').style.display = 'none';
+	  stopUpdateStatusText();
+
       if (!ok) throw new Error(data.error || 'Submission failed');
 
       const { incorrect_list = [], correct, total, percent } = data;
@@ -3147,29 +3709,28 @@ function finishTodayTasks(title, questions) {
           resultHTML.push(`<p class="question-text"><strong>${item.q}.</strong> ${sub.text || ''}</p>`);
 
           // multiple-choice / true-false
-if (sub.type === 'true_false' || (sub.type === 'multiple_choice' && Array.isArray(sub.options))) {
-  const options = sub.type === 'true_false' ? ['True', 'False'] : sub.options;
-  resultHTML.push(`<div class="question-options">`);
-  options.forEach((opt, i) => {
-    const isUser = item.user === opt;
-    const isCorrect = item.correct === opt;
-    const isWrong = isUser && !isCorrect;
-    const letter = String.fromCharCode(65 + i);
+          if (sub.type === 'true_false' || (sub.type === 'multiple_choice' && Array.isArray(sub.options))) {
+            const options = sub.type === 'true_false' ? ['True', 'False'] : sub.options;
+            resultHTML.push(`<div class="question-options">`);
+            options.forEach((opt, i) => {
+              const isUser = item.user === opt;
+              const isCorrect = item.correct === opt;
+              const isWrong = isUser && !isCorrect;
+              const letter = String.fromCharCode(65 + i);
 
-    resultHTML.push(`
-      <div class="option-group">
-        <input type="radio" disabled ${isUser ? 'checked' : ''}>
-        <label style="${isWrong ? 'background-color: #fdd;' : ''};">
-          <span class="option-letter">${letter}</span>
-          <span class="option-text">${opt}</span>
-          ${isWrong ? ' ❌' : ''}
-        </label>
-      </div>
-    `);
-  });
-  resultHTML.push(`</div>`);
-}
-
+              resultHTML.push(`
+                <div class="option-group">
+                  <input type="radio" disabled ${isUser ? 'checked' : ''}>
+                  <label style="${isWrong ? 'background-color: #fdd;' : ''};">
+                    <span class="option-letter">${letter}</span>
+                    <span class="option-text">${opt}</span>
+                    ${isWrong ? ' ❌' : ''}
+                  </label>
+                </div>
+              `);
+            });
+            resultHTML.push(`</div>`);
+          }
 
           // box-choose
           else if (sub.type === 'box-choose') {
@@ -3213,7 +3774,7 @@ if (sub.type === 'true_false' || (sub.type === 'multiple_choice' && Array.isArra
 
       content.innerHTML = resultHTML.join('');
 
-      // Toggle buttons
+      // Кнопки
       document.getElementById('finish-tasks-btn').style.display = 'none';
       let doneBtn = document.getElementById('done-tasks-btn');
       if (!doneBtn) {
@@ -3236,9 +3797,11 @@ if (sub.type === 'true_false' || (sub.type === 'multiple_choice' && Array.isArra
     })
     .catch(err => {
       console.error(err);
+      document.getElementById('updateModal').style.display = 'none'; // скрываем даже при ошибке
       showToastNotification(err.message, 'error');
     });
 }
+
 
 
 
@@ -3687,8 +4250,10 @@ function stopSpecialMusic() {
   }
 }
 
-function showModalStatus(text, type = "success") {
-  // Проверяем, существует ли модальное окно, иначе создаём его
+const animationCache = {}; // Кеш JSON-данных
+let currentAnim = null;
+
+async function showModalStatus(text, type = "success") {
   let modal = document.getElementById('statusModal');
   if (!modal) {
     modal = document.createElement('div');
@@ -3697,7 +4262,7 @@ function showModalStatus(text, type = "success") {
     modal.innerHTML = `
       <div class="status-modal-content">
         <div id="statusAnimation" class="lottie-animation"></div>
-        <p id="statusText" class="status-text"></p>
+        <p id="statusText-modal" class="status-text-modal"></p>
         <p id="statusSubText" class="status-subtext"></p>
         <button id="statusOkBtn" class="status-modal-btn">OK</button>
       </div>
@@ -3705,7 +4270,10 @@ function showModalStatus(text, type = "success") {
     document.body.appendChild(modal);
   }
 
-  // Определяем путь к анимации и текст подзаголовка
+  const animationContainer = document.getElementById('statusAnimation');
+  const statusText = document.getElementById('statusText-modal');
+  const statusSubText = document.getElementById('statusSubText');
+
   let animationFile = "success.json";
   let subText = "Success";
 
@@ -3714,40 +4282,48 @@ function showModalStatus(text, type = "success") {
     subText = "Failed";
   }
 
-  // Обновляем текст
-  document.getElementById('statusText').textContent = text;
-  document.getElementById('statusSubText').textContent = subText;
+  statusText.textContent = text;
+  statusSubText.textContent = subText;
 
-  // Очищаем и настраиваем контейнер анимации
-  const animationContainer = document.getElementById('statusAnimation');
+  animationContainer.style.width = type === 'failed' ? '200px' : '140px';
+  animationContainer.style.height = type === 'failed' ? '200px' : '140px';
   animationContainer.innerHTML = '';
 
-  // Размер анимации в зависимости от типа
-  if (type === 'failed') {
-    animationContainer.style.width = '200px';
-    animationContainer.style.height = '200px';
-  } else {
-    animationContainer.style.width = '140px';
-    animationContainer.style.height = '140px';
+  // Останавливаем текущую анимацию
+  if (currentAnim) {
+    currentAnim.destroy();
+    currentAnim = null;
   }
 
-  // Загружаем Lottie-анимацию
-  lottie.loadAnimation({
+  // Загружаем JSON только один раз
+  let animationData = animationCache[animationFile];
+  if (!animationData) {
+    try {
+      const response = await fetch(`/static/animations/${animationFile}`);
+      animationData = await response.json();
+      animationCache[animationFile] = animationData; // кешируем
+    } catch (error) {
+      console.error("Failed to load animation:", error);
+      return;
+    }
+  }
+
+  // Загружаем Lottie из кеша
+  currentAnim = lottie.loadAnimation({
     container: animationContainer,
     renderer: 'svg',
     loop: false,
     autoplay: true,
-    path: `/static/animations/${animationFile}`
+    animationData: animationData
   });
 
-  // Показываем модалку
   modal.style.display = 'flex';
 
-  // Кнопка закрытия
   document.getElementById('statusOkBtn').onclick = () => {
     modal.style.display = 'none';
   };
 }
+
 
 // Отключение стандартного контекстного меню
 document.addEventListener('contextmenu', function(e) {
@@ -3922,3 +4498,109 @@ document.addEventListener('mouseup', function() {
             console.error('Paste error:', err);
         }
     }
+	
+let updateStatusTimeout = null;
+let index = 0;
+let fallbackIndex = 0;
+let inFallback = false;
+
+const messages = [
+  { text: "Javoblaringizni tahlil qilayapmiz", icon: "🧪" },
+  { text: "Hozircha yaxshi ketyapsiz", icon: "🚀" },
+  { text: "Hmm... qiziqarli natijalar chiqyapti", icon: "👀" },
+  { text: "Har bir detalga e’tibor bermoqdamiz", icon: "🧐" },
+  { text: "Yakuniy hisob-kitob ketmoqda", icon: "📊" },
+  { text: "AI natijalarni yakunlamoqda", icon: "🤖" }
+];
+
+const fallbackMessages = [
+  {
+    text: "Bir oz dam oldik, lekin gaz beramiz!",
+    icon: "🔧"
+  },
+  {
+    text: "Voy, negadur tizim sekinlashdi... bu vaqti-vaqti bilan bo‘lib turadi. Iltimos, sabrli bo‘ling!",
+    icon: "🐢"
+  },
+  {
+    text: "Sekinlashganimiz rost, ammo to‘xtamadik! Hamma narsa nazoratda ",
+    icon: "🛠️"
+  }
+];
+
+
+const statusText = document.getElementById("statusText");
+
+function updateStatusText() {
+  if (!statusText) return;
+
+  statusText.classList.remove("slide-in");
+  statusText.classList.add("slide-out");
+
+  setTimeout(() => {
+    let currentMessage;
+
+    if (inFallback) {
+      fallbackIndex = (fallbackIndex + 1) % fallbackMessages.length;
+      currentMessage = fallbackMessages[fallbackIndex];
+      statusText.classList.add("status-fallback");
+    } else {
+      index++;
+
+      if (index >= messages.length) {
+        // Переход в fallback режим
+        inFallback = true;
+        fallbackIndex = 0;
+        currentMessage = fallbackMessages[fallbackIndex];
+        statusText.classList.add("status-fallback");
+      } else {
+        currentMessage = messages[index];
+      }
+    }
+
+    // Обновление текста и иконки
+    statusText.innerHTML = `
+      <span class="status-text-inner">${currentMessage.text}</span>
+      <span class="status-icon">${currentMessage.icon}</span>
+    `;
+
+    statusText.classList.remove("slide-out");
+    void statusText.offsetWidth; // Force reflow
+    statusText.classList.add("slide-in");
+
+    const delay = inFallback || index >= messages.length - 2 ? 5000 : 2000;
+    updateStatusTimeout = setTimeout(updateStatusText, delay);
+  }, 400);
+}
+
+function startUpdateStatusText() {
+  if (!statusText) return;
+
+  // Сброс состояний
+  clearTimeout(updateStatusTimeout);
+  index = 0;
+  fallbackIndex = 0;
+  inFallback = false;
+  statusText.classList.remove("status-fallback");
+
+  const firstMessage = messages[index];
+  statusText.innerHTML = `
+    <span class="status-text-inner">${firstMessage.text}</span>
+    <span class="status-icon">${firstMessage.icon}</span>
+  `;
+  statusText.classList.add("slide-in");
+
+  updateStatusTimeout = setTimeout(updateStatusText, 2000);
+}
+
+function stopUpdateStatusText() {
+  clearTimeout(updateStatusTimeout);
+  updateStatusTimeout = null;
+  index = 0;
+  fallbackIndex = 0;
+  inFallback = false;
+
+  if (statusText) {
+    statusText.classList.remove("status-fallback");
+  }
+}

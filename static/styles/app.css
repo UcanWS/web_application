@@ -21,32 +21,52 @@
       overflow-x: hidden;
     }
 
-    /* Navigation */
-/* Arc Liquid Glass Navigation - Premium Style */
 nav {
-  position: fixed;
-  bottom: 0;
+  position: fixed; /* 🛠 ОБЯЗАТЕЛЬНО fixed! */
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: 480px;
-  height: 72px;
+  width: calc(100% - 48px);
+  max-width: 520px;
+  height: 76px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 40px 40px 0 0 / 30px 30px 0 0;
-  backdrop-filter: blur(18px) saturate(200%);
+  padding: 0 12px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(30px) saturate(180%);
   box-shadow:
-    inset 0 0 1px rgba(255, 255, 255, 0.3),
-    0 -8px 32px rgba(0, 0, 0, 0.35),
-    0 4px 12px rgba(0, 160, 255, 0.08);
+    inset 0 0 2px rgba(255, 255, 255, 0.2),
+    0 10px 30px rgba(0, 255, 255, 0.1),
+    0 0 32px rgba(0, 180, 255, 0.06),
+    inset 0 0 24px rgba(255, 255, 255, 0.05);
+
   border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
   z-index: 999;
-  transition: transform 0.4s ease, opacity 0.3s ease;
+  transition: all 0.4s ease;
   will-change: transform, opacity;
+  overflow: hidden;
+
+  /* Вернём фиксированность и добавим псевдоэлемент корректно */
 }
+
+nav::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 10%, rgba(255, 255, 255, 0.25), transparent 60%);
+  opacity: 0.4;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+
 
 /* Navigation Item */
 nav a {
@@ -55,61 +75,61 @@ nav a {
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 13px;
   font-weight: 500;
   transition: all 0.3s ease;
   position: relative;
 }
 
-/* Icon */
+/* Icon Style */
 nav a i {
   font-size: 22px;
-  margin-bottom: 2px;
   padding: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 8px rgba(0, 200, 255, 0.1);
+  margin-bottom: 2px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
   transition: all 0.3s ease-in-out;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Hover Effect */
+/* Hover Animation */
 nav a:hover i {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.15);
-  box-shadow: 0 0 12px rgba(0, 200, 255, 0.4);
+  background: rgba(0, 255, 255, 0.3);
+  transform: scale(1.1) rotate(6deg);
+  box-shadow: 0 0 14px rgba(0, 255, 255, 0.4);
 }
 nav a:hover {
-  color: #00d0ff;
-  transform: translateY(-3px);
+  color: #00eaff;
 }
 
-/* Active State */
+/* Active Item */
 nav a.active {
-  color: #00cfff;
+  color: #00ffff;
 }
 nav a.active i {
-  background: rgba(0, 200, 255, 0.2);
-  box-shadow: 0 0 16px rgba(0, 200, 255, 0.6);
-  transform: scale(1.2);
+  background: rgba(0, 255, 255, 0.2);
+  transform: scale(1.0);
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.6);
 }
 
 /* Disabled */
 nav a.disabled {
-    cursor: no-drop;
-    opacity: 0.4;
-    filter: grayscale(100%);
+  cursor: not-allowed;
+  opacity: 0.3;
+  filter: grayscale(100%);
 }
 
-/* Когда скрыто */
+/* Hide */
 nav.nav-hidden {
-  transform: translate(-50%, 120%) scale(0.96);
+  transform: translate(-50%, 150%) scale(0.95);
   opacity: 0;
   pointer-events: none;
 }
 
-/* Когда появляется */
+/* Show */
 nav:not(.nav-hidden) {
   transform: translate(-50%, 0) scale(1);
   opacity: 1;
@@ -118,9 +138,9 @@ nav:not(.nav-hidden) {
 /* Mobile Responsive */
 @media (max-width: 500px) {
   nav {
-    height: 60px;
-    border-radius: 30px 30px 0 0 / 22px 22px 0 0;
-    width: calc(100% - 16px);
+    height: 62px;
+    border-radius: 18px;
+    width: calc(100% - 20px);
   }
 
   nav a {
@@ -128,10 +148,11 @@ nav:not(.nav-hidden) {
   }
 
   nav a i {
-    font-size: 20px;
+    font-size: 18px;
     padding: 8px;
   }
 }
+
 
     /* Pages */
     .page {
@@ -488,94 +509,97 @@ nav:not(.nav-hidden) {
       background-color: #cc0000;
     }
 
+/* Контейнер карточки прогресса */
 .progress-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(0, 122, 255, 0.25);
-  border-radius: 20px;
-  padding: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  gap: 16px;
+  gap: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Элемент прогресса (базовый стиль) */
 .progress-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
   border-radius: 20px;
-  padding: 12px 20px;
+  padding: 14px 24px;
   font-size: 16px;
   font-weight: 600;
-  width: 100%;
-  max-width: 220px;
+  min-width: 120px;
+  flex: 1;
   color: #fff;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease;
   cursor: pointer;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.progress-item:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
+/* При наведении: лёгкое поднятие и изменение градиента */
+.progress-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+  transform: translateY(-3px);
 }
 
+/* Особый элемент для уровня с более ярким акцентом */
 .progress-item.level {
-  background: rgba(0, 122, 255, 0.6);
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.7), rgba(0, 180, 255, 0.65));
   font-size: 20px;
-  padding: 18px 24px;
-  border-radius: 25px;
-  max-width: none;
+  padding: 20px 28px;
+  border-radius: 28px;
+  flex: none;
   width: 100%;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.4);
 }
 
+/* Иконка внутри элемента */
 .progress-item .icon {
-  margin-right: 10px;
-  font-size: 18px;
+  margin-right: 12px;
+  font-size: 20px;
 }
 
+/* Значение внутри элемента */
 .progress-item .value {
-  margin: 0 6px;
+  margin: 0 8px;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 20px;
 }
 
+/* Подпись внутри элемента */
 .progress-item .label {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.9);
-  margin-left: 6px;
+  margin-left: 8px;
 }
 
-.progress-item:not(.level) {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  min-width: 120px;
-  flex: 1;
-}
-
+/* Если элемент отключён */
 .progress-item.disabled {
-  opacity: 0.5;                   /* делает элемент полупрозрачным */
-  filter: grayscale(0.8);         /* добавляет обесцвечивание */
-  cursor: not-allowed;           /* курсор, как при недоступном */
-  transition: all 0.3s ease;
+  opacity: 0.5;
+  filter: grayscale(0.8);
+  cursor: not-allowed;
+  transition: opacity 0.3s ease;
 }
 
-
+/* Адаптивные стили */
 @media (max-width: 768px) {
   .progress-card {
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
 
   .progress-item {
@@ -585,20 +609,20 @@ nav:not(.nav-hidden) {
 
   .progress-item.level {
     font-size: 18px;
-    padding: 16px;
+    padding: 18px 22px;
   }
 }
 
 @media (max-width: 480px) {
   .progress-item .label {
-    font-size: 0.65rem;
-    padding: 1px 4px;
+    font-size: 0.8rem;
   }
 
   .progress-item .value {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
+
 
 .tools-card {
   display: grid;
@@ -719,42 +743,297 @@ nav:not(.nav-hidden) {
       outline: none;
     }
 
-    /* Chat List */
-    .chat-list .chat-item {
-      display: flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+/* Общий контейнер списка чатов */
+.chat-list {
+  padding: 16px;
+}
 
-    .chat-list .chat-item:hover {
-      background: rgba(255, 255, 255, 0.12);
-      transform: translateY(-2px);
-    }
+/* Общий стиль для чата */
+.chat-list .chat-item,
+.chat-list .chat-private-item {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-    .chat-list .chat-item i {
-      font-size: 26px;
-      margin-right: 12px;
-      color: #00c6ff;
-    }
+.chat-list .chat-item:hover,
+.chat-list .chat-private-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Индивидуальная настройка приватного чата */
+.chat-list .chat-private-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 198, 255, 0.15);
+}
+
+.chat-list .chat-private-item:hover {
+  background: rgba(0, 198, 255, 0.1);
+}
+
+/* Аватар / иконка в стиле пузыря */
+.chat-icon {
+  width: 48px;
+  height: 48px;
+  margin-right: 16px;
+  background: linear-gradient(135deg, #3f87ff, #8058f5);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Текстовая часть: имя и превью */
+.chat-list .chat-item div,
+.chat-list .chat-private-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-list strong {
+  font-weight: 600;
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.chat-list p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Контейнер всех сообщений */
+.messages-private {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  overflow-y: auto;
+  height: calc(100vh - 200px);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Общий стиль для сообщения */
+.message-private {
+  position: relative;
+  padding: 14px 18px;
+  border-radius: 20px;
+  max-width: 70%;
+  word-wrap: break-word;
+  line-height: 1.5;
+  font-size: 15px;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Отправленные сообщения */
+.message-private.sent {
+  align-self: flex-end;
+  background: rgba(0, 122, 255, 0.2);
+  color: #e6f0ff;
+  border-bottom-right-radius: 6px;
+  box-shadow: 0 0 12px rgba(0, 122, 255, 0.35);
+}
+
+/* Полученные сообщения */
+.message-private.received {
+  align-self: flex-start;
+  background: rgba(240, 240, 240, 0.08);
+  color: #ffffff;
+  border-bottom-left-radius: 6px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+/* Хвостик отправленного */
+.message-private.sent::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  bottom: 0px;
+  width: 12px;
+  height: 12px;
+  background: rgba(0, 122, 255, 0.25);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 122, 255, 0.4);
+}
+
+/* Хвостик полученного */
+.message-private.received::after {
+  content: "";
+  position: absolute;
+  left: -6px;
+  bottom: 0px;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+}
+
+/* Время */
+.message-private small {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  opacity: 0.6;
+  text-align: right;
+  color: #ffffff;
+}
+
+/* Медиа внутри сообщения */
+.message-private img,
+.message-private video,
+.message-private audio {
+  margin-top: 10px;
+  max-width: 100%;
+  border-radius: 14px;
+  display: block;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+.message-private strong {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #aad4ff; /* для отправленных */
+  margin-bottom: 4px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+
+/* Для полученных сообщений можно другой цвет */
+.message-private.received strong {
+  color: #ffffff;
+}
+
+
+/* Скрытие скроллбара (для Chrome) */
+.messages-private::-webkit-scrollbar {
+  display: none;
+}
+
+.media-wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px;
+  border-radius: 12px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.media-download-btn {
+  background: #0084ff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.media-download-btn i {
+  margin-right: 8px;
+}
+.media-download-btn:hover {
+  background: #006fd6;
+}
+
+.media-img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.media-video {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+.media-audio {
+  width: 100%;
+}
+
+.media-file-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.media-file-link:hover {
+  text-decoration: underline;
+}
+
+
+
+.online-status {
+  color: #0f0;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.offline-status {
+  color: #999;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.toast-action {
+  background: #00c6ff;
+  color: white;
+  padding: 4px 10px;
+  margin-top: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-block;
+}
+.toast-action:hover {
+  background: #009ad9;
+}
+
+.chat-private-item.unread {
+  border: 2px solid #00c6ff;
+  background-color: rgba(0, 198, 255, 0.05);
+}
 
     /* Chat UI */
-    .chat-ui .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 12px;
-      border-radius: 12px;
-      backdrop-filter: blur(8px);
-    }
+.chat-ui .header {
+  position: sticky;
+  top: 0;
+  z-index: 10; /* чтобы оставался поверх контента */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
 
     .chat-ui .back {
       font-size: 18px;
@@ -1100,7 +1379,7 @@ nav:not(.nav-hidden) {
     /* Input Area */
     .chat-ui .input-area {
       position: fixed;
-      bottom: 80px;
+      bottom: 20px;
       left: 20px;
       right: 20px;
       background: rgba(255, 255, 255, 0.1);
@@ -1147,11 +1426,11 @@ nav:not(.nav-hidden) {
     .chat-ui .input-area button {
       background: linear-gradient(145deg, #007aff, #00c6ff);
       border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
+      border-radius: 25px;
+      width: 45px;
+      height: 45px;
       color: #fff;
-      font-size: 18px;
+      font-size: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -2252,11 +2531,6 @@ nav:not(.nav-hidden) {
     padding: 12px;
   }
 
-  .info {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .name, .cost {
     font-size: 1em;
   }
@@ -2372,7 +2646,6 @@ nav:not(.nav-hidden) {
     /* Responsive Design */
     @media (max-width: 600px) {
       .chat-ui .input-area {
-        bottom: 70px;
         left: 10px;
         right: 10px;
       }
@@ -2617,73 +2890,65 @@ nav:not(.nav-hidden) {
 
 .calendar {
   margin-bottom: 25px;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.2); /* Прозрачный светлый фон */
-  border-radius: 20px;
-  backdrop-filter: blur(12px); /* Эффект размытия */
-  -webkit-backdrop-filter: blur(12px); /* Поддержка Safari */
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Тонкая граница для стеклянного эффекта */
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-
-/* Days */
+/* Контейнер дней */
 .days {
   display: flex;
   justify-content: center;
-  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
+/* Стили одного дня */
 .days .day {
-  padding: 12px 18px;
-  border-radius: 15px;
-  background: #f7f7f7;
-  color: #333;
+  padding: 14px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #222;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.08);
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
+/* Наведение */
 .days .day:hover {
-  background: #e0e0e0;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
+/* Активный день */
 .days .day.active {
-  background: linear-gradient(135deg, #007bff, #00c6ff);
+  background: linear-gradient(135deg, rgba(0,123,255,0.8), rgba(0,198,255,0.8));
   color: white;
-  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+  box-shadow: 0 6px 16px rgba(0,123,255,0.35);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.days .day {
-  padding: 12px 18px;
-  border-radius: 15px;
-  background: #f7f7f7;
-  color: #333;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  cursor: pointer;
-}
-
-.days .day:hover {
-  background: #e0e0e0;
-}
-
-.days .day.active {
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: white;
-  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
-}
-
+/* Заблокированные дни */
 .days .day.locked {
-  background: #ddd;
-  color: #888;
+  background: rgba(200, 200, 200, 0.4);
+  color: #999;
   cursor: not-allowed;
   pointer-events: none;
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.2);
 }
+
 
 .fa-3d-icon {
   display: inline-block; /* Explicitly ensure icon is visible */
@@ -4219,8 +4484,8 @@ input[type="radio"] {
 .box-choose-blank:not(:empty) {
     background: var(--glass-filled-bg);
     border: 1px solid #b7bec7;
-    color: #333;
-    font-weight: 600;
+    color: white;
+    font-weight: bold;
     border-radius: 16px;
     backdrop-filter: blur(5px);
     box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
@@ -4717,8 +4982,6 @@ input[type="radio"]:checked + label::after {
 }
 
 .exam-subquestion {
-  background: rgba(255, 255, 255, 0.08); /* мягкая прозрачность */
-  backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   border-radius: 24px; /* более округлённый стиль */
@@ -5415,7 +5678,7 @@ input.write-in-blank-input:focus {
 }
 
 /* Основной текст */
-.status-text {
+.status-text-modal {
   font-size: 1.5rem;
   font-weight: 600;
   color: #fff;
@@ -5628,4 +5891,663 @@ input.write-in-blank-input:focus {
   opacity: 0.4;
   pointer-events: none;
   background: rgba(255, 255, 255, 0.05);
+}
+
+#floating-finish-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 0;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 64px;
+
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 10px rgba(0, 200, 255, 0.4);
+  cursor: pointer;
+
+  display: none; /* по умолчанию скрыта */
+  transition: all 0.3s ease;
+}
+
+
+.media-wrapper {
+  position: relative;
+  max-width: -webkit-fill-available;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform 0.3s ease;
+}
+.media-wrapper:hover {
+  transform: scale(1.02);
+}
+
+.media-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.blurred {
+  filter: blur(12px) brightness(0.7);
+}
+
+.media-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.media-placeholder {
+  background: rgba(0, 0, 0, 0.2);
+  width: 200px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.media-final {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+/* Контейнер скелетона */
+.chat-private-item.skeleton {
+  pointer-events: none;
+  animation: private-item-animation 2s linear infinite;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, rgba(100, 100, 100, 0.2) 25%, rgba(150, 150, 150, 0.3) 50%, rgba(100, 100, 100, 0.2) 75%);
+  background-size: 200% 100%;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(0, 198, 255, 0.15);
+}
+
+/* Иконка (аватарка) в скелетоне */
+.chat-private-item.skeleton i {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  margin-right: 12px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, rgba(100, 100, 100, 0.2) 25%, rgba(150, 150, 150, 0.3) 50%, rgba(100, 100, 100, 0.2) 75%);
+  background-size: 200% 100%;
+  animation: private-item-animation 2s linear infinite;
+}
+
+/* Контент в скелетоне */
+.chat-private-item.skeleton div {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(100, 100, 100, 0.2) 25%, rgba(150, 150, 150, 0.3) 50%, rgba(100, 100, 100, 0.2) 75%);
+  background-size: 200% 100%;
+  animation: private-item-animation 2s linear infinite;
+}
+
+/* Стили для аватарки (изображение или заглушка) */
+.chat-private-item .avatar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 30px;
+  color: #fff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: perspective(80px) rotateX(10deg);
+  transition: transform 0.2s ease;
+}
+
+.chat-private-item .avatar:hover {
+  transform: perspective(80px) rotateX(0deg) scale(1.05);
+}
+
+/* Стили для изображения аватарки */
+.chat-private-item .avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Стили для заглушки без аватарки */
+.chat-private-item .avatar.fallback {
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
+}
+
+/* Анимация скелетона с серым градиентным шиммером */
+@keyframes private-item-animation {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.chat-private-item .unread-badge {
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.message-private.sent .read-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  margin-left: 5px;
+  color: white;
+}
+
+.read-status.unread {
+  background-color: crimson;
+}
+
+.read-status.read {
+  background-color: mediumseagreen;
+}
+
+.chat-icon {
+  margin: auto 20px auto 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #ffffff;
+  flex-shrink: 0;
+
+  /* Многоцветный фон с мягкой анимацией */
+  background: linear-gradient(
+    135deg,
+    #00c9ff,
+    #00f2fe,
+    #4facfe,
+    #38f9d7,
+    #43e97b,
+    #f9f871,
+    #00c9ff
+  );
+  background-size: 600% 600%;
+  animation: rainbowGlass 12s ease infinite;
+
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Глянцевый эффект сверху */
+.chat-icon::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  pointer-events: none;
+}
+
+/* Hover: небольшое увеличение и тень */
+.chat-icon:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Анимация переливания цветов */
+@keyframes rainbowGlass {
+  0%   { background-position: 0% 50%; }
+  25%  { background-position: 50% 50%; }
+  50%  { background-position: 100% 50%; }
+  75%  { background-position: 50% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* private-telegram-audio-player-private */
+.telegram-audio-player-private {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(241, 241, 241, 0.7), rgba(255, 255, 255, 0.4));
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 10px;
+  gap: 10px;
+  width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* private-play-pause-btn-private */
+.play-pause-btn-private {
+  background: linear-gradient(135deg, #3390EC, #2a74c0);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* private-play-pause-btn-private-hover */
+.play-pause-btn-private:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* private-telegram-audio-player-private */
+.telegram-audio-player-private {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(241, 241, 241, 0.7), rgba(255, 255, 255, 0.4));
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 10px;
+  gap: 10px;
+  width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* private-play-pause-btn-private */
+.play-pause-btn-private {
+  background: linear-gradient(135deg, #3390EC, #2a74c0);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* private-play-pause-btn-private-hover */
+.play-pause-btn-private:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* private-progress-container-private */
+.progress-container-private {
+  flex-grow: 1;
+  height: 8px;
+  background: linear-gradient(90deg, rgba(211, 211, 211, 0.5), rgba(255, 255, 255, 0.3));
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* private-progress-bar-private */
+.progress-bar-private {
+  height: 100%;
+  background: linear-gradient(90deg, #3390EC, #2a74c0);
+  border-radius: 4px;
+  width: 0;
+  transition: width 0.1s linear;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* private-progress-scrubber-private */
+.progress-scrubber-private {
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, #3390EC, #2a74c0);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+/* private-progress-scrubber-private-hover */
+.progress-scrubber-private:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* private-time-display-private */
+.time-display-private {
+  font-size: 12px;
+  color: #333;
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* private-speed-btn-private */
+.speed-btn-private {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #3390EC;
+  cursor: pointer;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+
+/* private-speed-btn-private-hover */
+.speed-btn-private:hover {
+  color: #2a74c0;
+}
+
+/* private-media-img-private */
+.media-img-private {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+/* private-media-video-private */
+.media-video-private {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+/* private-media-file-link-private */
+.media-file-link-private {
+  color: #3390EC;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* private-media-file-link-private-hover */
+.media-file-link-private:hover {
+  color: #2a74c0;
+}
+
+.update-modal {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(30px);
+  animation: fadeIn 0.5s ease-in-out forwards;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.update-modal::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 22px 22px;
+  animation: particleFloat 12s linear infinite;
+  opacity: 0.2;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100px);
+  }
+}
+
+.update-modal-content {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(28px);
+  border-radius: 24px;
+  padding: 32px 36px;
+  width: 92%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  animation: slideIn 0.5s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.update-modal-content::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+  opacity: 0.25;
+  animation: softPulse 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(50px);
+}
+
+
+@keyframes softPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0.35;
+  }
+}
+
+
+.update-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+  margin-bottom: 16px;
+  box-shadow: 0 0 12px rgba(0, 150, 255, 0.5);
+}
+
+.update-icon video {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.status-text-container {
+  position: relative;
+  max-width: 100%;
+  padding: 0 16px; /* немного внутреннего отступа */
+  height: auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#statusText {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+  text-align: center;
+  white-space: normal; /* 💡 разрешаем перенос */
+  word-break: break-word; /* 💡 если одно длинное слово — перенеси */
+  max-width: 100%;
+  padding: 0 4px;
+
+  /* Эффект стеклянной подсветки */
+  color: #e0f7ff;
+  background: linear-gradient(90deg, #00ffe5, #00aaff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Мягкое свечение */
+  text-shadow:
+    0 0 4px rgba(0, 255, 255, 0.2),
+    0 0 12px rgba(0, 160, 255, 0.25);
+
+  /* Плавность смены */
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    background-position 0.6s ease;
+}
+
+/* Иконки (emoji, svg и т.п.) */
+.status-icon {
+  display: inline;
+  filter: none;
+  -webkit-text-fill-color: initial !important;
+  color: inherit;
+  background: none;
+  text-shadow: none;
+}
+
+#statusText.status-fallback {
+  background: linear-gradient(90deg, #ff3c3c, #ff7e7e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 6px rgba(255, 80, 80, 0.3),
+    0 0 16px rgba(255, 80, 80, 0.5);
+  font-weight: 600;
+  animation: pulseText 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseText {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-in-out forwards;
+}
+
+.slide-out {
+  animation: slideOut 0.4s ease-in-out forwards;
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-30px); /* Slide up */
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(30px); /* Slide in from below */
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

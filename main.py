@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for, session , send_file, abort , flash
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room
 import os
 import json
 import time
@@ -526,7 +526,6 @@ def save_inventory_for_user(username, user_inventory):
 @app.route('/api/items')
 def get_items():
     items = load_items()
-    time.sleep(2)
     return jsonify(items)
 
 
@@ -2329,7 +2328,7 @@ def get_history():
 
 @app.route('/api/get-student-progress-history', methods=['GET'])
 def get_student_progress_history():
-    time.sleep(3)
+
     username = request.args.get('username')
     if not username:
         return jsonify({"error": "Username not provided"}), 400
@@ -2800,6 +2799,7 @@ def create_today():
 
 @app.route('/api/submit-tasks', methods=['POST'])
 def submit_tasks():
+    time.sleep(65)
     data     = request.get_json(force=True)
     level    = data.get('level')
     unit     = data.get('unit')
@@ -2891,10 +2891,10 @@ def submit_tasks():
                 "username": username,
                 "amount": 100,
                 "description": f"Reward for completing '{title}' with {int(percent)}%"
-            }, timeout=2)
+            }, timeout=5)  # увеличенный таймаут
             resp.raise_for_status()
-        except Exception as e:
-            current_app.logger.error(f"Failed to call add_transaction: {e}")
+        except Exception:
+            reward_given = False  # откатываем награду, если не сработало
 
     return jsonify({
         "title":          title,
@@ -2975,6 +2975,152 @@ def get_today_questions():
         return jsonify({"error": "No task files found in this unit"}), 404
 
     return jsonify({"today_tasks": today_tasks}), 200
+
+
+
+CHAT_FILE = 'chats.json'
+PRIVATE_UPLOAD_FOLDER = 'private_uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'webm', 'mp3'}
+
+app.config['PRIVATE_UPLOAD_FOLDER'] = PRIVATE_UPLOAD_FOLDER
+
+# Убедимся, что папка и файл существуют
+os.makedirs(PRIVATE_UPLOAD_FOLDER, exist_ok=True)
+if not os.path.exists(CHAT_FILE):
+    with open(CHAT_FILE, 'w') as f:
+        json.dump({}, f)
+
+# Вспомогательные функции
+def get_room_id(user1, user2):
+    return f"{min(user1, user2)}_{max(user1, user2)}"
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Отдача медиафайлов
+@app.route('/private_uploads/<filename>')
+def serve_private_upload(filename):
+    return send_from_directory(app.config['PRIVATE_UPLOAD_FOLDER'], filename)
+
+# Получение истории переписки между двумя пользователями
+@app.route('/chat/<user1>/<user2>', methods=['GET'])
+def get_chat(user1, user2):
+    room_id = get_room_id(user1, user2)
+    with open(CHAT_FILE, 'r') as f:
+        chats = json.load(f)
+    return jsonify(chats.get(room_id, []))
+
+# Загрузка медиафайла через fetch
+@app.route('/chat/send_media', methods=['POST'])
+def send_media_file():
+    sender = request.form.get('sender')
+    receiver = request.form.get('receiver')
+    file = request.files.get('file')
+
+    if not (sender and receiver and file):
+        return jsonify({'error': 'Missing sender, receiver or file'}), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'Invalid file type'}), 400
+
+    filename = secure_filename(f"{int(time.time())}_{file.filename}")
+    filepath = os.path.join(app.config['PRIVATE_UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+
+    return jsonify({'media_url': f"/private_uploads/{filename}"}), 200
+
+# Socket: Присоединение к комнате
+@socketio.on('join_private')
+def handle_join_private(data):
+    sender = data['sender']
+    receiver = data['receiver']
+    room = get_room_id(sender, receiver)
+    join_room(room)
+    print(f"{sender} joined private room: {room}")
+
+# Socket: Отправка текстового или медиа сообщения
+@socketio.on('send_private_message')
+def handle_private_message(data):
+    sender = data['sender']
+    receiver = data['receiver']
+    message = data.get('message', '')
+    media_url = data.get('media_url', None)
+    timestamp = datetime.utcnow().isoformat()
+
+    room = get_room_id(sender, receiver)
+
+    msg = {
+        'sender': sender,
+        'receiver': receiver,
+        'message': message,
+        'timestamp': timestamp,
+        'read': False  # ← ДОБАВЬ ЭТУ СТРОКУ
+    }
+
+    if media_url:
+        msg['media_url'] = media_url
+
+    # Сохраняем
+    if os.path.exists(CHAT_FILE):
+        with open(CHAT_FILE, 'r') as f:
+            chats = json.load(f)
+    else:
+        chats = {}
+
+    chats.setdefault(room, []).append(msg)
+
+    with open(CHAT_FILE, 'w') as f:
+        json.dump(chats, f, indent=2)
+
+    emit('receive_private_message', msg, room=room, include_self=True)
+
+    
+@app.route('/chat/all')
+def get_all_chats():
+    try:
+        with open(CHAT_FILE, 'r') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@socketio.on('join_all_private_rooms')
+def join_all_rooms(data):
+    username = data['username']
+    with open(CHAT_FILE, 'r') as f:
+        chats = json.load(f)
+
+    for room_id in chats:
+        if username in room_id:
+            join_room(room_id)
+            
+@app.route('/chat/read/<user1>/<user2>', methods=['POST'])
+def mark_messages_as_read(user1, user2):
+    room_id = get_room_id(user1, user2)
+
+    with open(CHAT_FILE, 'r') as f:
+        chats = json.load(f)
+
+    messages = chats.get(room_id, [])
+    updated = False
+
+    for msg in messages:
+        if msg.get('receiver') == user1 and not msg.get('read'):
+            msg['read'] = True
+            updated = True
+
+    if updated:
+        with open(CHAT_FILE, 'w') as f:
+            json.dump(chats, f, indent=2)
+
+        # Уведомить отправителя, что сообщение прочитано
+        socketio.emit('messages_read', {
+            'reader': user1,
+            'sender': user2
+        }, room=get_room_id(user1, user2))
+
+    return jsonify({'status': 'ok', 'updated': updated})
+
 
     
 if __name__ == '__main__':

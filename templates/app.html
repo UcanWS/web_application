@@ -24,6 +24,32 @@
 </div>
 
 <div id="toast-container"></div>
+
+<div id="updateModal" class="update-modal">
+  <div class="update-modal-content">
+    <div class="update-icon">
+      <video 
+        src="/static/icons/AI_icon.mp4" 
+        autoplay 
+        loop 
+        muted 
+        playsinline 
+        width="100%" 
+        loading="lazy"
+      ></video>
+    </div>
+
+    <h2>Analyzing Your Answers</h2>
+
+    <!-- animated text container -->
+    <div class="status-text-container">
+      <p id="statusText">Preparing your results...</p>
+    </div>
+  </div>
+</div>
+
+
+
 <div class="lines">
   <div class="line"></div>
   <div class="line"></div>
@@ -79,11 +105,11 @@
   </div>
   <div class="progress-item">
     <div class="value" id="current-unit-value"></div>
-    <div class="label">Unit</div>
+    <div class="label"></div>
   </div>
   <div class="progress-item">
     <div class="value" id="current-week-value"></div>
-    <div class="label">Week</div>
+    <div class="label"></div>
   </div>
   <div class="progress-item">
     <div class="value" id="completion-value"></div>
@@ -374,21 +400,44 @@
   </div>
 </div>
 
-  <!-- Chat List -->
-  <div id="chat-list" class="page">
-    <div class="search">
-      <input type="text" placeholder="Search chats..." aria-label="Search chats">
-    </div>
-    <div class="chat-list">
-      <div class="chat-item" data-chat="group-General">
-        <i class="fas fa-users"></i>
-        <div>
-          <strong>My Group - General</strong>
-          <p>No message</p>
-        </div>
-      </div>
-    </div>
+<!-- Chat List -->
+<div id="chat-list" class="page">
+  <div class="search">
+    <input type="text" placeholder="Search chats..." aria-label="Search chats">
   </div>
+
+  <div class="chat-list">
+<!-- Групповой чат -->
+<div class="chat-item" data-chat="group-General">
+  <div class="chat-icon"><i class="fas fa-users"></i></div>
+  <div>
+    <strong>My Group - General</strong>
+    <p>No message</p>
+  </div>
+</div>
+
+<!-- Private Chats -->
+<div class="chat-private-item" onclick="showPage('private-chatlist')">
+  <div class="chat-icon"><i class="fas fa-comments"></i></div>
+  <div>
+    <strong>Private Chats</strong>
+    <p>View available users</p>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+  
+  <!-- Private Chat List -->
+<div id="private-chatlist" class="page">
+  <h1>Private Chats</h1>
+  <div class="chat-list" id="private-chat-list">
+    <p>Loading users...</p>
+  </div>
+</div>
+
 
   <!-- Chat UI -->
   <div id="chat-ui" class="page chat-ui">
@@ -408,6 +457,28 @@
       <button type="submit" id="send-button" aria-label="Send message"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
+
+<!-- Chat UI - Private -->
+<div id="chat-ui-private" class="page chat-ui">
+  <div class="header">
+    <i class="fas fa-arrow-left back" onclick="showPage('private-chatlist')" aria-label="Back to chat list"></i>
+    <span class="title" id="private-chat-username">Private Chat</span>
+  </div>
+
+  <div class="messages-private" id="private-messages"></div>
+
+  <div class="input-area" id="private-message-form">
+    <label for="private-file-input" class="attach-label">
+      <i class="fas fa-paperclip" aria-label="Attach file"></i>
+    </label>
+    <input id="private-file-input" type="file" accept="image/*,video/*,audio/*" style="display:none;" />
+    <input type="text" id="private-message-input" placeholder="Type here..." aria-label="Type a message">
+    <button type="submit" id="private-send-button" aria-label="Send message">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
 
   <!-- Profile -->
   <div id="profile" class="page">

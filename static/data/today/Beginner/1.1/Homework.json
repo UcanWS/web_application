@@ -1,5 +1,61 @@
 [
   {
+    "id": 0,
+    "text": "Choose the correct word for each sentence (Bo‘sh joyga to‘g‘ri so‘zni qo‘ying)",
+    "type": "box-choose",
+    "options": ["business?", "you.", "I'm not.", "I am", "I'm Luz", "Murat.", "study?","to meet you"],
+    "subquestions": [
+      {
+        "id": "0.1",
+        "type": "box-choose",
+        "text": "Hello, ____",
+        "correct": "I'm Luz"
+      },
+      {
+        "id": "0.2",
+        "type": "box-choose",
+        "text": "Hi, I'm ____",
+        "correct": "Murat."
+      },
+      {
+        "id": "0.3",
+        "type": "box-choose",
+        "text": "Nice ____",
+        "correct": "to meet you"
+      },
+      {
+        "id": "0.4",
+        "type": "box-choose",
+        "text": "And ____",
+        "correct": "you."
+      },
+      {
+        "id": "0.5",
+        "type": "box-choose",
+        "text": "Are you here to ____ ",
+        "correct": "study?"
+      },
+      {
+        "id": "0.6",
+        "type": "box-choose",
+        "text": "No, ____",
+        "correct": "I'm not."
+      },
+      {
+        "id": "0.7",
+        "type": "box-choose",
+        "text": "Are you here on ____ .",
+        "correct": "business?"
+      },
+	  {
+        "id": "0.8",
+        "type": "box-choose",
+        "text": "Yes, ____ .",
+        "correct": "I am"
+      }
+    ]
+  },
+  {
     "id": 1,
     "type": "greetings",
     "text": "Greetings and Introductions (Salomlashish va tanishish)",
@@ -193,6 +249,67 @@
         "text": "Which one is polite? (Qaysi ibora xushmuomalalik bilan?)",
         "options": ["Excuse me", "Go away", "What?"],
         "correct": "Excuse me"
+      }
+    ]
+  },
+    {
+    "id": 7,
+    "text": "Complete the conversation Chris and David. Use these words: And,Hello,Hi,Holiday,Nice,No,Study,yes,you.",
+    "type": "write-in-blank",
+    "subquestions": [
+      {
+        "id": "7.1",
+        "type": "write-in-blank",
+        "text": "____, I'm Chris.",
+        "correct": "Hello"
+      },
+      {
+        "id": "7.2",
+        "type": "write-in-blank",
+        "text": "____, I'm David.",
+        "correct": "Hi"
+      },
+      {
+        "id": "7.3",
+        "type": "write-in-blank",
+        "text": "____ to meet you.",
+        "correct": "Nice"
+      },
+      {
+        "id": "7.4",
+        "type": "write-in-blank",
+        "text": "Chris: ____ you.",
+        "correct": "And"
+      },
+      {
+        "id": "7.5",
+        "type": "write-in-blank",
+        "text": "Are ____ here on holiday?",
+        "correct": "you"
+      },
+      {
+        "id": "7.6",
+        "type": "write-in-blank",
+        "text": "David: ____, I'm not.",
+        "correct": "No"
+      },
+      {
+        "id": "7.7",
+        "type": "write-in-blank",
+        "text": "I'm here to ____ and you?",
+        "correct": "study"
+      },
+	  {
+        "id": "7.8",
+        "type": "write-in-blank",
+        "text": "Are you here on ____ ?",
+        "correct": "holiday"
+      },
+	  {
+        "id": "7.9",
+        "type": "write-in-blank",
+        "text": "Chris: ____, I'm.",
+        "correct": "Yes"
       }
     ]
   }

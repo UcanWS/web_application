@@ -1137,6 +1137,24 @@
             "description": "Reward for completing 'Reading Tasks' with 100%",
             "time": "2025-06-30T08:13:25.881078",
             "balance_before": 147024.0
+        },
+        {
+            "amount": -1230,
+            "description": "Exchange to coins",
+            "time": "2025-07-04T01:22:24.713604",
+            "balance_before": 147124.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Listening Tasks' with 80%",
+            "time": "2025-07-04T16:22:30.618193",
+            "balance_before": 145894.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Listening Tasks' with 80%",
+            "time": "2025-07-04T16:35:47.354662",
+            "balance_before": 145994.0
         }
     ],
     "Zakariyo": [
