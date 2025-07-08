@@ -248,6 +248,7 @@ def get_users():
 @app.route('/api/get-student-progress', methods=['GET'])
 def get_progress():
 
+    time.sleep(2)
     # Получаем имя пользователя из параметров запроса
     current_user = request.args.get("username")
     
@@ -791,6 +792,113 @@ def get_balance(username):
         "balance": balances[username],
         "transactions": transactions.get(username, [])
     })
+
+@app.route('/api/transfer', methods=['POST'])
+def transfer_points():
+    data = request.json
+    if not data:
+        return jsonify({"error": "No JSON data provided"}), 400
+
+    sender = data.get("sender")
+    receiver = data.get("receiver")
+    amount = data.get("amount")
+
+    if not sender or not receiver or amount is None:
+        return jsonify({"error": "sender, receiver, and amount are required"}), 400
+
+    if sender == receiver:
+        return jsonify({"error": "Sender and receiver cannot be the same"}), 400
+
+    balances = load_balances()
+    transactions = load_transactions()
+
+    if sender not in balances or balances[sender] < amount:
+        return jsonify({"error": "Insufficient balance or sender not found"}), 400
+
+    # Ensure both users exist
+    if receiver not in balances:
+        balances[receiver] = 0.0
+    if sender not in transactions:
+        transactions[sender] = []
+    if receiver not in transactions:
+        transactions[receiver] = []
+
+    # Time now in UTC+5
+    now = (datetime.utcnow() + timedelta(hours=5)).isoformat()
+
+    # Record sender transaction
+    transactions[sender].append({
+        "amount": -amount,
+        "description": f"Transferred to {receiver}",
+        "time": now,
+        "balance_before": balances[sender]
+    })
+
+    # Record receiver transaction
+    transactions[receiver].append({
+        "amount": amount,
+        "description": f"Received from {sender}",
+        "time": now,
+        "balance_before": balances[receiver]
+    })
+
+    # Update balances
+    balances[sender] -= amount
+    balances[receiver] += amount
+
+    # Save changes
+    store_balances(balances)
+    store_transactions(transactions)
+
+    return jsonify({
+        "message": "Transfer successful",
+        "sender": sender,
+        "receiver": receiver,
+        "amount": amount,
+        "sender_new_balance": balances[sender],
+        "receiver_new_balance": balances[receiver]
+    })
+
+@app.route('/api/cancel_transfer', methods=['POST'])
+def cancel_transfer():
+    data = request.json
+    transaction_id = data.get("transaction_id")
+    username = data.get("username")
+
+    balances = load_balances()
+    transactions = load_transactions()
+
+    user_txns = transactions.get(username, [])
+    txn = next((t for t in user_txns if t["id"] == transaction_id), None)
+
+    if not txn or not txn.get("can_cancel"):
+        return jsonify({"error": "Transaction not found or cannot be canceled"}), 400
+
+    txn_time = datetime.fromisoformat(txn["time"])
+    if datetime.utcnow() - txn_time > timedelta(minutes=3):
+        return jsonify({"error": "Cancelation window expired"}), 400
+
+    # Отменить: списать у получателя, вернуть отправителю
+    receiver_name = txn["description"].split(" to ")[-1]
+    amount = txn["amount"]
+
+    # Обратная запись для получателя
+    if receiver_name in balances:
+        balances[receiver_name] -= amount
+        transactions[receiver_name] = [
+            t for t in transactions[receiver_name]
+            if not (t["description"].startswith("Received") and t["amount"] == amount and txn["time"] in t["time"])
+        ]
+
+    balances[username] += amount
+    txn["description"] += " (Canceled)"
+    txn["can_cancel"] = False
+
+    store_balances(balances)
+    store_transactions(transactions)
+
+    return jsonify({"message": "Transaction canceled successfully."})
+
 
 # 📦 ВНЕ функции get_balance:
 def load_user_coins():
@@ -2225,19 +2333,33 @@ def change_password():
         return jsonify({'error': 'Unauthorized'}), 401
 
     data = request.get_json()
-    current_password = data.get('currentPassword')
-    new_password = data.get('newPassword')
 
-    username = session.get('username')
+    current_password = (data.get('currentPassword') or '').strip()
+    new_password = (data.get('newPassword') or '').strip()
 
-    if loggedUsers.get(username) != current_password:
-        return jsonify({'error': 'Incorrect current password'})
+    if not current_password or not new_password:
+        return jsonify({'error': 'All fields are required.'}), 400
+
+    username = session['username']
+
+    if username not in loggedUsers:
+        return jsonify({'error': 'User not found.'}), 404
+
+    if loggedUsers[username] != current_password:
+        return jsonify({'error': 'Incorrect current password'}), 403
+
+    if current_password == new_password:
+        return jsonify({'error': 'New password must be different from the current password'}), 400
 
     loggedUsers[username] = new_password
-    with open(USER_DATA_FILE, 'w') as f:
-        json.dump(loggedUsers, f)
 
-    return jsonify({'message': 'Password updated successfully'})
+    try:
+        with open(USER_DATA_FILE, 'w') as f:
+            json.dump(loggedUsers, f)
+    except Exception as e:
+        return jsonify({'error': 'Failed to save new password.'}), 500
+
+    return jsonify({'message': 'Password updated successfully'}), 200
     
 DATA_FILE = 'historyofprogress.json'
 
@@ -2799,7 +2921,7 @@ def create_today():
 
 @app.route('/api/submit-tasks', methods=['POST'])
 def submit_tasks():
-    time.sleep(65)
+    time.sleep(6)
     data     = request.get_json(force=True)
     level    = data.get('level')
     unit     = data.get('unit')
@@ -3121,7 +3243,307 @@ def mark_messages_as_read(user1, user2):
 
     return jsonify({'status': 'ok', 'updated': updated})
 
+import uuid  # 🔥 Добавьте в начало файла
 
+@app.route('/api/lucky_event', methods=['POST'])
+def lucky_event():
+    import uuid
+    import random
+    data = request.json
+    username = data.get("username")
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
+
+    SPIN_COST = 500
+
+    # Load data
+    spins = load_json("spins.json")
+    boxes = load_json("boxes.json")
+    balances = load_balances()
+    transactions = load_transactions()
+
+    # Ensure defaults
+    spins.setdefault(username, 0)
+    boxes.setdefault(username, {"A": 0, "B": 0, "C": 0})
+    balances.setdefault(username, 0.0)
+    transactions.setdefault(username, [])
+
+    if balances[username] < SPIN_COST:
+        return jsonify({"error": "Insufficient points for a spin."}), 403
+
+    balance_before_spin = balances[username]
+    balances[username] -= SPIN_COST
+
+    transactions[username].append({
+        "id": str(uuid.uuid4()),
+        "amount": -SPIN_COST,
+        "description": "🎰 Lucky Spin",
+        "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+        "balance_before": balance_before_spin,
+        "can_cancel": False
+    })
+
+    spins[username] += 1
+    got_ball = False
+    won = 0
+    reward = 0
+    winning_box = None
+
+    # Every 10th spin gives a ball
+    if spins[username] >= 10:
+        spins[username] = 0
+        got_ball = True
+        box = random.choice(["A", "B", "C"])
+        boxes[username][box] += 1
+
+        if boxes[username][box] >= 3:
+            # Big win
+            won = random.randint(7000, 30000)
+            balance_before = balances[username]
+            balances[username] += won
+
+            transactions[username].append({
+                "id": str(uuid.uuid4()),
+                "amount": won,
+                "description": f"🎁 Lucky Box Win ({box})",
+                "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+                "balance_before": balance_before,
+                "can_cancel": False
+            })
+
+            boxes[username] = {"A": 0, "B": 0, "C": 0}
+            winning_box = box
+    else:
+        # Normal spin: small chance of up to 100 pts
+        if random.random() < 0.15:  # 15% chance
+            reward = random.randint(1, 100)
+            balance_before = balances[username]
+            balances[username] += reward
+
+            transactions[username].append({
+                "id": str(uuid.uuid4()),
+                "amount": reward,
+                "description": "💫 Lucky Spin Reward",
+                "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+                "balance_before": balance_before,
+                "can_cancel": False
+            })
+
+    store_json("spins.json", spins)
+    store_json("boxes.json", boxes)
+    store_balances(balances)
+    store_transactions(transactions)
+
+    return jsonify({
+        "spin_count": spins[username],
+        "got_ball": got_ball,
+        "current_boxes": boxes[username],
+        "won": won or reward,
+        "winning_box": winning_box,
+        "new_balance": balances[username]
+    })
+    
+@app.route('/api/spin_state', methods=['POST'])
+def get_spin_state():
+    data = request.json
+    username = data.get('username')
+    if not username:
+        return jsonify({"error": "Username required"}), 400
+
+    spins = load_json("spins.json")
+    boxes = load_json("boxes.json")
+    spins.setdefault(username, 0)
+    boxes.setdefault(username, {"A": 0, "B": 0, "C": 0})
+
+    return jsonify({
+        "spin_count": spins[username],
+        "current_boxes": boxes[username]
+    })
+
+STRIKES_FILE = 'data/strikes.json'
+
+def load_strikes():
+    if not os.path.exists(STRIKES_FILE):
+        return {}
+    with open(STRIKES_FILE, 'r') as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return {}
+
+def save_strikes(data):
+    with open(STRIKES_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+from datetime import datetime
+
+# Список всех Units в порядке
+Units = [
+  "1.1","1.2","1.3","2.1","2.2","2.3","3.1","3.2","3.3",
+  "4.1","4.2","4.3","5.1","5.2","5.3","6.1","6.2","6.3",
+  "7.1","7.2","7.3","8.1","8.2","8.3","9.1","9.2","9.3",
+  "10.1","10.2","10.3","11.1","11.2","11.3","12.1","12.2","12.3"
+]
+
+@app.route('/api/check-strike', methods=['POST'])
+def check_strike():
+    data = request.get_json(silent=True) or {}
+    username        = data.get('username')
+    current_unit    = data.get('currentUnit')
+    unit_percent    = data.get('unitPercent')
+    submitted_count = data.get('submittedCount')
+    total_tasks     = data.get('totalTasks')
+
+    print(f"[check-strike] user={username}, unit={current_unit}, "
+          f"percent={unit_percent}, submitted={submitted_count}/{total_tasks}")
+
+    # Проверяем входные параметры
+    if not all([username, current_unit]) or unit_percent is None \
+       or submitted_count is None or total_tasks is None:
+        print("[check-strike] Ошибка: Missing parameters")
+        return jsonify({"error": "Missing parameters"}), 400
+
+    strikes_data = load_strikes()
+    user_data = strikes_data.get(username, {
+        "strikes": 0,
+        "lastStrikeByUnit": {}
+    })
+    last_by_unit = user_data["lastStrikeByUnit"]
+
+    # 1) Сброс, если сделал все задачи и percent<80
+    if submitted_count == total_tasks and unit_percent < 80.0:
+        print(f"[check-strike] Сброс: пользователь сделал все задачи "
+              f"и percent={unit_percent}% < 80%")
+        user_data["strikes"] = 0
+        last_by_unit.clear()
+        strikes_data[username] = user_data
+        save_strikes(strikes_data)
+        print(f"[check-strike] После сброса: {user_data}")
+        return jsonify(user_data)
+
+    # 2) Сброс, если перешёл на новый юнит, пропустив предыдущий без штриха
+    try:
+        idx = Units.index(current_unit)
+    except ValueError:
+        idx = -1
+
+    if idx > 0:
+        prev_unit = Units[idx - 1]
+        # Если предыдущего unit нет в lastStrikeByUnit → сбрасываем
+        if prev_unit not in last_by_unit:
+            print(f"[check-strike] Сброс: пропущен unit {prev_unit} без штриха")
+            user_data["strikes"] = 0
+            last_by_unit.clear()
+            # Продолжаем дальше, чтобы дать шанс на current_unit
+        else:
+            print(f"[check-strike] Предыдущий unit {prev_unit} успешно пройден")
+
+
+    # 3) Начисляем штрих по current_unit, если percent>=80 и ещё нет сегодня
+    if unit_percent >= 80.0:
+        today_str = datetime.utcnow().strftime('%Y-%m-%d')
+        if last_by_unit.get(current_unit) != today_str:
+            user_data["strikes"] = user_data.get("strikes", 0) + 1
+            last_by_unit[current_unit] = today_str
+            print(f"[check-strike] Начислен штрих: strikes={user_data['strikes']}, unit={current_unit}")
+        else:
+            print(f"[check-strike] Сегодня штрих за {current_unit} уже был")
+    else:
+        print(f"[check-strike] percent={unit_percent}% < 80, штрихи не изменены")
+
+    # Сохраняем состояние
+    strikes_data[username] = user_data
+    save_strikes(strikes_data)
+    print(f"[check-strike] Конечное состояние: {user_data}")
+    return jsonify(user_data)
+
+
+
+
+
+# Можно добавить endpoint, чтобы получить количество strike по пользователю
+@app.route('/api/get-strikes/<username>')
+def get_strikes(username):
+    strikes_data = load_strikes()
+    user_data = strikes_data.get(username, {
+        "strikes": 0,
+        "lastStrikeUnit": None,
+        "lastUpdated": None
+    })
+    return jsonify(user_data)
+
+@app.route('/api/get-results/average', methods=['GET'])
+def get_results_average():
+    level    = request.args.get('level')
+    unit     = request.args.get('unit')
+    username = request.args.get('username')
+
+    if not level or not unit:
+        return jsonify({"error": "Missing level or unit"}), 400
+
+    # 1) Собираем все файлы задач (без exam)
+    unit_dir = os.path.join(BASE_TASKS_DIR, level, unit)
+    if not os.path.isdir(unit_dir):
+        return jsonify({"error": "Unit directory not found"}), 404
+
+    all_files = [
+        f for f in os.listdir(unit_dir)
+        if f.endswith('.json') and 'exam' not in f.lower()
+    ]
+    total_tasks = len(all_files)
+
+    # 2) Загружаем результаты пользователей
+    submissions = load_results(level, unit)
+    result = {}
+
+    for user, tasks in submissions.items():
+        percents = []
+
+        if isinstance(tasks, dict):
+            for key, value in tasks.items():
+                # пропускаем категории-экзамены
+                if 'exam' in key.lower():
+                    continue
+                # если под записью dict с percent
+                if isinstance(value, dict) and 'percent' in value:
+                    try:
+                        percents.append(float(value['percent']))
+                    except (ValueError, TypeError):
+                        pass
+                # если запись сама число/строка
+                elif isinstance(value, (int, float, str)):
+                    try:
+                        percents.append(float(value))
+                    except (ValueError, TypeError):
+                        pass
+
+        elif isinstance(tasks, list):
+            for item in tasks:
+                if isinstance(item, dict) and 'percent' in item:
+                    try:
+                        percents.append(float(item['percent']))
+                    except (ValueError, TypeError):
+                        pass
+
+        submitted_count = len(percents)
+        total_percent   = sum(percents)
+        average_percent = (total_percent / total_tasks) if total_tasks > 0 else 0
+
+        result[user] = {
+            "average_percent": average_percent,
+            "submitted_count": submitted_count,
+            "total_tasks": total_tasks
+        }
+
+    # 3) Если юзер без записей — возвращаем 0/total_tasks
+    if username and username not in result:
+        result[username] = {
+            "average_percent": 0.0,
+            "submitted_count": 0,
+            "total_tasks": total_tasks
+        }
+
+    return jsonify(result), 200
     
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)

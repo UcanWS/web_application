@@ -11,7 +11,7 @@
     "id": 2,
     "name": "Behruz Zapal Rasmlar toplami",
     "cost": 120,
-    "items_left": 982,
+    "items_left": 981,
     "type": "Zapal",
     "image": "/static/images/Behruz.jpg"
   },
@@ -26,7 +26,7 @@
   {
     "id": 4,
     "name": "MLBB 40 diamonds",
-    "cost": 4999,
+    "cost": 10999,
     "items_left": 0,
     "type": "MLBB",
     "image": "/static/images/MLBB.jpg"
@@ -43,7 +43,7 @@
     "id": 6,
     "name": "Muhamadali zapalllar Toʻplami",
     "cost": 90,
-    "items_left": 0,
+    "items_left": 9,
     "type": "video",
     "image": "/static/images/Ali.jpg"
   },
@@ -51,14 +51,14 @@
     "id": 7,
     "name": "MLBB Ranked x1",
     "cost": 79,
-    "items_left": 4,
+    "items_left": 0,
     "type": "MLBB",
     "image": "/static/images/Ranked.jpg"
   },
   {
     "id": 8,
     "name": "MLBB Weekly Diamond Pass",
-    "cost": 9990,
+    "cost": 19990,
     "items_left": 1,
     "type": "MLBB",
     "image": "/static/images/MLBB Weekly.png"
@@ -110,5 +110,21 @@
     "items_left": 12,
     "type": "Special",
     "image": "/static/images/special.gif"
+  },
+  {
+    "id": 15,
+    "name": "Doubled points for Today section 3 Units ",
+    "cost": 1990,
+    "items_left": 10,
+    "type": "System",
+    "image": "/static/icons/star.png"
+  },
+  {
+    "id": 16,
+    "name": "Paid Meme Pack ",
+    "cost": 100,
+    "items_left": 10,
+    "type": "System",
+    "image": "/static/images/memes.jpg"
   }
 ]

@@ -21,53 +21,61 @@
 	let accountStatus = null;
 	
 function fetchPoints(username) {
-    const pointsValue = document.getElementById("points-value");
-    const progressCard = document.getElementById("progress-card");
-    
-    if (!pointsValue || !progressCard) return;
+  const pointsValue = document.getElementById("points-value");
+  const progressCard = document.getElementById("progress-card");
 
-    const mainPage = document.getElementById("main");
-    if (!mainPage.classList.contains("active")) return;
+  if (!pointsValue || !progressCard) return;
 
-    const updatePointsValue = () => {
-        const cachedPoints = sessionStorage.getItem('userPoints');
-        if (cachedPoints) {
-            pointsValue.innerText = cachedPoints;
-            return true;
-        }
+  const mainPage = document.getElementById("main");
+  if (!mainPage.classList.contains("active")) return;
 
-        fetch(`/api/get_balance/${username}`)
-            .then(response => {
-                if (!response.ok) throw new Error();
-                return response.json();
-            })
-            .then(data => {
-                pointsValue.innerText = data.balance;
-                sessionStorage.setItem('userPoints', data.balance);
-            })
-            .catch(() => {
-                pointsValue.innerText = "0";
-                sessionStorage.setItem('userPoints', "0");
-            });
-        return false;
-    };
-	
-	
+  // Используем Intl для форматирования в компактном стиле
+  const formatter = new Intl.NumberFormat('en', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1
+  });
 
-    if (progressCard.style.display !== "none") {
-        updatePointsValue();
-    } else {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach(mutation => {
-                if (mutation.attributeName === "style" && progressCard.style.display !== "none") {
-                    updatePointsValue();
-                    observer.disconnect();
-                }
-            });
-        });
-        observer.observe(progressCard, { attributes: true });
+  const updatePointsValue = () => {
+    const cachedPoints = sessionStorage.getItem('userPoints');
+    if (cachedPoints) {
+      pointsValue.innerText = formatter.format(parseInt(cachedPoints));
+      return true;
     }
+
+    fetch(`/api/get_balance/${username}`)
+      .then(response => {
+        if (!response.ok) throw new Error();
+        return response.json();
+      })
+      .then(data => {
+        const formatted = formatter.format(data.balance);
+        pointsValue.innerText = formatted;
+        sessionStorage.setItem('userPoints', data.balance);
+      })
+      .catch(() => {
+        pointsValue.innerText = "0";
+        sessionStorage.setItem('userPoints', "0");
+      });
+
+    return false;
+  };
+
+  if (progressCard.style.display !== "none") {
+    updatePointsValue();
+  } else {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === "style" && progressCard.style.display !== "none") {
+          updatePointsValue();
+          observer.disconnect();
+        }
+      });
+    });
+    observer.observe(progressCard, { attributes: true });
+  }
 }
+
 
 const updateCoinsValue = () => {
   const username = sessionStorage.getItem("username");
@@ -77,7 +85,8 @@ const updateCoinsValue = () => {
     .then(res => res.json())
     .then(data => {
       if (data && typeof data.coins === "number") {
-        document.getElementById("coins-value").textContent = data.coins;
+        const coins = Math.floor(data.coins); // удаляет дробную часть
+        document.getElementById("coins-value").textContent = coins.toLocaleString();
       } else {
         document.getElementById("coins-value").textContent = "--";
       }
@@ -86,7 +95,6 @@ const updateCoinsValue = () => {
       document.getElementById("coins-value").textContent = "--";
     });
 };
-
 
     // Show username and avatar
     document.getElementById('username').textContent = currentUser;
@@ -837,17 +845,24 @@ async function loadUserCoins(username) {
   try {
     const res = await fetch(`/api/get_user_coins/${username}`);
     const data = await res.json();
-    if (res.ok) {
-      document.getElementById("coins-value").textContent = data.coins.toFixed(2);
-	  document.getElementById("coins-value-in-page").textContent = data.coins.toFixed(2);
+
+    if (res.ok && typeof data.coins === "number") {
+      const coins = Math.floor(data.coins); // Убираем дробную часть
+      const formattedCoins = coins.toLocaleString(); // Форматируем для читаемости
+
+      document.getElementById("coins-value").textContent = formattedCoins;
+      document.getElementById("coins-value-in-page").textContent = formattedCoins;
     } else {
       document.getElementById("coins-value").textContent = "--";
+      document.getElementById("coins-value-in-page").textContent = "--";
     }
   } catch (e) {
     document.getElementById("coins-value").textContent = "--";
+    document.getElementById("coins-value-in-page").textContent = "--";
     console.error("Failed to load coins:", e);
   }
 }
+
 
 async function loadPointsHistory(username) {
   const container = document.getElementById("points-history");
@@ -859,41 +874,55 @@ async function loadPointsHistory(username) {
 
     if (res.ok && Array.isArray(data.history)) {
       if (data.history.length === 0) {
-        container.innerHTML = '<div class="loading">No history yet.</div>';
+        container.innerHTML = '<div class="loading">No transactions yet.</div>';
         return;
       }
 
-      // ⬇️ Сортировка: новые сверху
       data.history.sort((a, b) => new Date(b.time) - new Date(a.time));
-
       container.innerHTML = "";
+
+      const currencyFormatter = new Intl.NumberFormat("en-US", {
+        maximumFractionDigits: 0,
+      });
+
+      const dateOptions = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
 
       data.history.forEach(entry => {
         const div = document.createElement("div");
         div.className = `transaction-entry ${entry.amount > 0 ? "positive" : "negative"}`;
 
         const date = new Date(entry.time);
-        const timeString = date.toLocaleString();
+        const timeString = date.toLocaleString(undefined, dateOptions);
 
         div.innerHTML = `
-          <div class="entry-description">${entry.description}</div>
+          <div class="entry-info">
+            <div class="entry-description">${entry.description}</div>
+            <div class="entry-time">${timeString}</div>
+          </div>
           <div class="entry-meta">
-            <span class="entry-amount">${entry.amount > 0 ? "+" : ""}${entry.amount}</span>
-            <span class="entry-balance-before">Balance before: ${entry.balance_before.toFixed(2)}</span>
-            <span class="entry-time">${timeString}</span>
+            <div class="entry-amount">${entry.amount > 0 ? "+" : ""}${currencyFormatter.format(entry.amount)}</div>
+            <div class="entry-balance-before">Before: ${currencyFormatter.format(entry.balance_before)}</div>
           </div>
         `;
 
         container.appendChild(div);
       });
     } else {
-      container.innerHTML = '<div class="loading">Failed to load history.</div>';
+      container.innerHTML = '<div class="loading">Failed to load point history.</div>';
     }
   } catch (e) {
-    console.error("Failed to load points history:", e);
+    console.error("Error fetching history:", e);
     container.innerHTML = '<div class="loading">Network error.</div>';
   }
 }
+
+
 
 
 
@@ -963,6 +992,54 @@ document.querySelector(".progress-item.coins").addEventListener("click", () => {
 });
 
 
+document.querySelector(".progress-item.points").addEventListener("click", () => {
+  showPage("points-page");
+  const username = sessionStorage.getItem("username");
+  if (username) {
+	loadPointsHistory(username);
+    loadUserCoins(username); // обновляет в самой странице
+    loadUserPoints(username); // обновляет points
+    updateCoinsValue();       // 🔄 обновляет иконку снизу
+    sessionStorage.removeItem("userPoints"); // удаляем кэш, чтобы пересчитался
+  }
+});
+
+
+document.querySelector(".progress-item.strike").addEventListener("click", () => {
+  showPage("strikes-page");
+
+  const username = sessionStorage.getItem("username");
+  if (!username) return;
+
+  fetch(`/api/get-strikes/${encodeURIComponent(username)}`)
+    .then(res => res.json())
+    .then(data => {
+      const lastStrikes = data.lastStrikeByUnit || {};
+      const totalStrikes = data.strikes || 0;
+      const pendingUnits = data.pendingUnits || []; // Новый массив с ожидаемыми
+
+      document.getElementById("strike-total").textContent = totalStrikes;
+      const container = document.getElementById("unit-strike-list");
+      container.innerHTML = "";
+
+      Units.forEach(unit => {
+        const div = document.createElement("div");
+        div.className = "unit-strike-item";
+        div.textContent = `Unit ${unit}`;
+
+        if (lastStrikes[unit]) {
+          div.classList.add("strike");
+        } else if (pendingUnits.includes(unit)) {
+          div.classList.add("pending");
+        }
+
+        container.appendChild(div);
+      });
+    })
+    .catch(err => {
+      console.error("Ошибка при получении strike истории:", err);
+    });
+});
 
 
 
@@ -1516,34 +1593,75 @@ let currentUnit  = null;
 let activeCurrentUnit = null;
 
 function getNextExamDate(unit, startDate, studyDays) {
-  const oddDays = [1, 3, 5]; // Monday, Wednesday, Friday
-  const evenDays = [2, 4, 6]; // Tuesday, Thursday, Saturday
-  const courseStartDate = new Date(startDate);
+  console.log('📅 getNextExamDate called with:');
+  console.log('   ➤ unit:', unit);
+  console.log('   ➤ startDate:', startDate);
+  console.log('   ➤ studyDays:', studyDays);
+
   const currentDate = new Date();
-  currentDate.setHours(17, 32, 0, 0); // Set to 05:32 PM +05 on June 12, 2025
-  let tempDate = new Date(courseStartDate);
+  let baseDate = startDate ? new Date(startDate) : currentDate;
+  baseDate.setHours(0, 0, 0, 0);
 
-  const [unitNum] = unit.split('-').map(Number);
-  const totalWeeks = Math.ceil(unitNum * 3); // Assuming 3 study days per week
-  let studyDaysElapsed = 0;
+  // 🔹 Константы
+  const daysPerUnit = 3;
+  const midExamDays = 6 * daysPerUnit;     // After Unit 6.3
+  const finalExamDays = 12 * daysPerUnit;  // After Unit 12.3
 
-  while (studyDaysElapsed < totalWeeks) {
-    if ((studyDays === "odd" && oddDays.includes(tempDate.getDay())) ||
-        (studyDays === "even" && evenDays.includes(tempDate.getDay()))) {
-      studyDaysElapsed++;
+  // 🔹 Разбор текущего Unit
+  const [week, day] = unit.split('.').map(Number);
+  const currentStudyDays = (week - 1) * daysPerUnit + day;
+
+  console.log('   ➤ week:', week, 'day:', day);
+  console.log('   ➤ currentStudyDays:', currentStudyDays);
+
+  // 🔹 Разрешённые учебные дни
+  const oddDays = [1, 3, 5];   // Mon, Wed, Fri
+  const evenDays = [2, 4, 6];  // Tue, Thu, Sat
+  const allowedDays = studyDays === "even" ? evenDays : oddDays;
+
+  // 🔹 Вспомогательная функция: найти дату экзамена после N учебных дней
+  function calculateExamDate(targetDays) {
+    let count = 0;
+    let temp = new Date(baseDate);
+
+    // Найдём первый разрешённый учебный день
+    while (!allowedDays.includes(temp.getDay())) {
+      temp.setDate(temp.getDate() + 1);
     }
-    tempDate.setDate(tempDate.getDate() + 1);
+
+    while (count < targetDays) {
+      if (allowedDays.includes(temp.getDay())) {
+        count++;
+      }
+      temp.setDate(temp.getDate() + 1);
+    }
+
+    const readable = temp.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    console.log(`   ✅ Target ${targetDays} study days reached: ${readable}`);
+    return readable;
   }
 
-  while (tempDate <= currentDate || !((studyDays === "odd" && oddDays.includes(tempDate.getDay())) ||
-                                     (studyDays === "even" && evenDays.includes(tempDate.getDay())))) {
-    tempDate.setDate(tempDate.getDate() + 1);
+  // 🔹 Решаем, какой экзамен следующий
+  if (currentStudyDays < midExamDays) {
+    console.log('   ➤ Mid Term is next');
+    return calculateExamDate(midExamDays);
+  } else if (currentStudyDays < finalExamDays) {
+    console.log('   ➤ Final Exam is next');
+    return calculateExamDate(finalExamDays);
+  } else {
+    console.log('   🚫 Course finished, no upcoming exams');
+    return "No upcoming exams";
   }
-
-  return tempDate.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
 }
+
+
+
 
 function getNextLevel(currentLevel) {
   const levels = ['Beginner', 'Elementary', 'Pre-intermediate', 'IELTS L1', 'IELTS L2'];
@@ -1570,6 +1688,7 @@ const Units = [
 ];
 
 function fetchStudentProgress() {
+  let currentView = "progress";
   const username = getCurrentUser();
   const errorMessageEl = document.getElementById("error-message");
   const progressCard = document.getElementById("progress-card");
@@ -1581,12 +1700,9 @@ function fetchStudentProgress() {
   const unitsTableBody = document.getElementById("leaderboard-units-table-body");
   const toggleProgress = document.getElementById("toggle-progress");
   const toggleToday = document.getElementById("toggle-today");
+  const skeletonCard = document.getElementById("progress-card-skeleton");
 
-  let currentView = "progress"; // Default view
-  
-const skeletonCard = document.getElementById("progress-card-skeleton");
-
-if (skeletonCard) skeletonCard.style.display = "flex";
+  if (skeletonCard) skeletonCard.style.display = "flex";
 
   errorMessageEl.style.display = "none";
   progressCard.style.display = "none";
@@ -1602,7 +1718,7 @@ if (skeletonCard) skeletonCard.style.display = "flex";
           <th>Progress %</th>
         </tr>
       `;
-      unitsTableHead.innerHTML = ''; // No unit columns in Progress view
+      unitsTableHead.innerHTML = '';
     } else if (view === "today") {
       fixedTableHead.innerHTML = `
         <tr>
@@ -1624,12 +1740,11 @@ if (skeletonCard) skeletonCard.style.display = "flex";
     fixedTableBody.innerHTML = "";
     unitsTableBody.innerHTML = "";
     updateTableHeaders(view);
-    const fixedColumnCount = 3; // Rank, Name, Progress % or Today %
-    let unitsColumnCount = view === "progress" ? 0 : (Units.indexOf(activeCurrentUnit) + 1);
 
     if (view === "progress") {
       const sortedLeaderboard = Object.entries(data)
         .sort(([, a], [, b]) => b.progress - a.progress);
+
       sortedLeaderboard.forEach(([student, studentInfo], index) => {
         const fixedRow = document.createElement('tr');
         const formattedProgress = parseFloat(studentInfo.progress).toFixed(2);
@@ -1665,145 +1780,89 @@ if (skeletonCard) skeletonCard.style.display = "flex";
           <td>${progressHtml}</td>
         `;
         fixedTableBody.appendChild(fixedRow);
-        // No unit columns in Progress view
-        const unitsRow = document.createElement('tr');
-        unitsRow.innerHTML = '';
-        unitsTableBody.appendChild(unitsRow);
+        unitsTableBody.appendChild(document.createElement('tr'));
       });
-} else if (view === "today") {
-  // ВСЕ Units от 1.1 до 12.3
-  const relevantUnits = Units;
+    } else if (view === "today") {
+      const relevantUnits = Units;
+      const sortedToday = Object.entries(data).map(([student, info]) => {
+        const unitPercentages = {};
+        relevantUnits.forEach(unit => {
+          const tasks = info.tasks.filter(t => t.unit === unit);
+          unitPercentages[unit] = tasks.length
+            ? tasks.reduce((sum, t) => sum + t.percent, 0) / tasks.length
+            : 0;
+        });
+        const average_percent = relevantUnits.reduce((sum, u) => sum + unitPercentages[u], 0) / relevantUnits.length;
+        return [student, { ...info, unitPercentages, average_percent }];
+      }).filter(([, info]) => info.average_percent > 0)
+        .sort(([, a], [, b]) => b.average_percent - a.average_percent);
 
-  // Считаем для каждого студента процент по каждому юниту и средний по всем 36 юнитам
-  const sortedToday = Object.entries(data)
-    .map(([student, info]) => {
-      const unitPercentages = {};
-      relevantUnits.forEach(unit => {
-        // Берём только задачи этого юнита
-        const tasks = info.tasks.filter(t => t.unit === unit);
-        // Если нет задач — 0%, иначе среднее по задачам
-        unitPercentages[unit] = tasks.length
-          ? tasks.reduce((sum, t) => sum + t.percent, 0) / tasks.length
-          : 0;
-      });
-      // Средний процент по всем Units
-      const average_percent = relevantUnits
-        .reduce((sum, u) => sum + unitPercentages[u], 0)
-        / relevantUnits.length;
+      if (sortedToday.length === 0) {
+        fixedTableBody.innerHTML = `
+          <tr><td colspan="3" style="text-align: center;">No results for today</td></tr>`;
+        unitsTableBody.innerHTML = `
+          <tr><td colspan="${relevantUnits.length}" style="text-align: center;"></td></tr>`;
+      } else {
+        sortedToday.forEach(([student, info], index) => {
+          const fixedRow = document.createElement('tr');
+          fixedRow.innerHTML = `
+            <td><div class="student-avatar">${index + 1}</div></td>
+            <td class="student-name">${student}</td>
+            <td>${info.average_percent.toFixed(2)}%</td>
+          `;
+          fixedTableBody.appendChild(fixedRow);
 
-      return [student, { ...info, unitPercentages, average_percent }];
-    })
-    // Отсекаем тех, у кого средний 0
-    .filter(([, info]) => info.average_percent > 0)
-    // Сортируем по новому среднему
-    .sort(([, a], [, b]) => b.average_percent - a.average_percent);
+          if (student === username) {
+            fetch('/api/update-history', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: username,
+                averagePercent: info.average_percent
+              })
+            }).then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+              .then(console.log)
+              .catch(e => console.error('Update-history error:', e));
+          }
 
-  // Если никто не набрал >0
-  if (sortedToday.length === 0) {
-    fixedTableBody.innerHTML = `
-      <tr>
-        <td colspan="3" style="text-align: center;">No results for today</td>
-      </tr>`;
-    unitsTableBody.innerHTML = `
-      <tr>
-        <td colspan="${relevantUnits.length}" style="text-align: center;"></td>
-      </tr>`;
-  } else {
-    sortedToday.forEach(([student, info], index) => {
-      // Фиксированная колонка: rank, имя, общий Today %
-      const fixedRow = document.createElement('tr');
-      fixedRow.innerHTML = `
-        <td><div class="student-avatar">${index + 1}</div></td>
-        <td class="student-name">${student}</td>
-        <td>${info.average_percent.toFixed(2)}%</td>
-      `;
-      fixedTableBody.appendChild(fixedRow);
-	  
-	  if (student === username) {
-  fetch('/api/update-history', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      username: username,
-      averagePercent: info.average_percent
-    })
-  })
-  .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-  .then(console.log)
-  .catch(e => console.error('Update-history error:', e));
-}
-
-
-      // Колонки по каждому юниту
-      const unitsRow = document.createElement('tr');
-      unitsRow.innerHTML = relevantUnits
-        .map(unit => `<td>${info.unitPercentages[unit].toFixed(2)}%</td>`)
-        .join('');
-      unitsTableBody.appendChild(unitsRow);
-    });
-  }
-}
+          const unitsRow = document.createElement('tr');
+          unitsRow.innerHTML = relevantUnits
+            .map(unit => `<td>${info.unitPercentages[unit].toFixed(2)}%</td>`)
+            .join('');
+          unitsTableBody.appendChild(unitsRow);
+        });
+      }
+    }
 
     progressContainer.style.display = "block";
     loadingEl.style.display = "none";
   }
 
-  // Set initial headers
-  updateTableHeaders(currentView);
+  updateTableHeaders("progress");
 
   fixedTableBody.innerHTML = `
-    <tr>
-      <td colspan="${3}" class="loading-spinner">
-        <div class="lds-spinner">
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
-        </div>
-      </td>
-    </tr>
-  `;
+    <tr><td colspan="3" class="loading-spinner">
+      <div class="lds-spinner">${'<div></div>'.repeat(12)}</div>
+    </td></tr>`;
   unitsTableBody.innerHTML = `
-    <tr>
-      <td colspan="${Units.indexOf(activeCurrentUnit) + 1}" class="loading-spinner"></td>
-    </tr>
-  `;
+    <tr><td colspan="${Units.indexOf(activeCurrentUnit) + 1}" class="loading-spinner"></td></tr>`;
 
-  const progressPromise = fetch(`/api/get-student-progress?username=${username}`)
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(data => { throw new Error(data.error); });
-      }
-      return response.json();
-    });
-
-  const progressHistoryPromise = fetch(`/api/get-student-progress-history?username=${username}`)
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(data => { throw new Error(data.error); });
-      }
-      return response.json();
-    });
-
-  const todayResultsPromise = fetch(`/api/get-results/today?level=${currentLevel}`)
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(data => { throw new Error(data.error); });
-      }
-      return response.json();
-    });
+  const progressPromise = fetch(`/api/get-student-progress?username=${username}`).then(r => r.ok ? r.json() : r.json().then(data => { throw new Error(data.error); }));
+  const progressHistoryPromise = fetch(`/api/get-student-progress-history?username=${username}`).then(r => r.ok ? r.json() : r.json().then(data => { throw new Error(data.error); }));
+  const todayResultsPromise = fetch(`/api/get-results/today?level=${currentLevel}`).then(r => r.ok ? r.json() : r.json().then(data => { throw new Error(data.error); }));
 
   Promise.all([progressPromise, progressHistoryPromise, todayResultsPromise])
     .then(([progressData, progressHistoryData, todayResultsData]) => {
       const progressInfo = progressData[username] || {};
       const summaryInfo = progressHistoryData[username] || {};
 
-      progressInfo.finalExam = parseFloat(summaryInfo.finalExam || "0.00%".replace('%', '')) || (progressInfo.finalExam ?? 0);
-      progressInfo.weeklyExams = parseFloat(summaryInfo.weeklyExams || "0.00%".replace('%', '')) || (progressInfo.weeklyExams ?? 0);
-      progressInfo.totalScore = parseFloat(summaryInfo.totalScore || "0.00%".replace('%', '')) || (progressInfo.totalScore ?? 0);
+      progressInfo.finalExam = parseFloat(summaryInfo.finalExam || "0").toFixed(2);
+      progressInfo.weeklyExams = parseFloat(summaryInfo.weeklyExams || "0").toFixed(2);
+      progressInfo.totalScore = parseFloat(summaryInfo.totalScore || "0").toFixed(2);
       progressInfo.level = summaryInfo.level || progressInfo.level || 'Beginner';
       progressInfo.coins = progressInfo.coins || 0;
       progressInfo.points = progressInfo.points || 0;
-      progressInfo.leaderboardRank = progressInfo.leaderboardRank || '#1';
+      progressInfo.leaderboardRank = progressInfo.leaderboardRank || '#--';
       progressInfo.strikeDays = progressInfo.strikeDays || 0;
 
       const { progress = 0, start_date, study_days = "odd", finalExam, weeklyExams, level, coins, points, leaderboardRank, strikeDays } = progressInfo;
@@ -1811,19 +1870,20 @@ if (skeletonCard) skeletonCard.style.display = "flex";
 
       const currentDate = new Date();
       currentDate.setHours(17, 32, 0, 0);
-      const totalCourseDays = 90;
       const courseStartDate = new Date(start_date);
       const daysElapsed = Math.floor((currentDate - courseStartDate) / (1000 * 60 * 60 * 24)) + 1;
-      const completionPercentage = Math.round(Math.min((daysElapsed / totalCourseDays) * 100, 100));
+      const completionPercentage = Math.round(Math.min((daysElapsed / 90) * 100, 100));
 
       const oddDays = [1, 3, 5];
       const evenDays = [2, 4, 6];
       let studyDaysElapsed = 0;
       let tempDate = new Date(courseStartDate);
+
       while (!((study_days === "odd" && oddDays.includes(tempDate.getDay())) ||
-              (study_days === "even" && evenDays.includes(tempDate.getDay())))) {
+               (study_days === "even" && evenDays.includes(tempDate.getDay())))) {
         tempDate.setDate(tempDate.getDate() + 1);
       }
+
       const firstStudyDate = new Date(tempDate);
       tempDate = new Date(firstStudyDate);
       while (tempDate <= currentDate) {
@@ -1838,20 +1898,18 @@ if (skeletonCard) skeletonCard.style.display = "flex";
       const dayInWeek = ((studyDaysElapsed - 1) % 3) + 1;
       const unit = `${studyWeeksElapsed + 1}.${dayInWeek}`;
       const weekNumber = studyWeeksElapsed + 1;
-
       const nextExamDate = getNextExamDate(unit, start_date, study_days);
 
-      // Update global variables
       currentLevel = level;
       currentUnit = unit;
       activeCurrentUnit = unit;
 
-      // Использование этих значений для генерации Today Tasks
+      updateStrikes();
       generateTodayTasks(currentLevel, currentUnit);
 
-      // Обновление интерфейса
-	  if (skeletonCard) skeletonCard.style.display = "none";
-if (progressCard) progressCard.style.display = "flex";
+      if (skeletonCard) skeletonCard.style.display = "none";
+      if (progressCard) progressCard.style.display = "flex";
+
       document.getElementById("current-level-value").textContent = level;
       document.getElementById("next-level-label").textContent = `Next: ${getNextLevel(level)}`;
       document.getElementById("current-unit-value").textContent = `Unit ${unit}`;
@@ -1861,34 +1919,42 @@ if (progressCard) progressCard.style.display = "flex";
       document.getElementById("points-value").textContent = `${points}`;
       document.getElementById("leaderboard-value").textContent = leaderboardRank;
       document.getElementById("strike-value").textContent = strikeDays > 0 ? `${strikeDays} day${strikeDays > 1 ? 's' : ''}` : 'None';
-      progressCard.style.display = "flex";
-
       document.getElementById("current-level").textContent = `Level: ${level}`;
-      const totalScore = parseFloat(progress).toFixed(2);
-      document.getElementById("progress-score").textContent = `Total Score: ${totalScore}%`;
-      document.getElementById("progress-bar-fill").style.width = `${totalScore}%`;
+      document.getElementById("progress-score").textContent = `Total Score: ${parseFloat(progress).toFixed(2)}%`;
+      document.getElementById("progress-bar-fill").style.width = `${parseFloat(progress).toFixed(2)}%`;
 
-      const finalExamVal = parseFloat(finalExam || 0).toFixed(2);
-      const finalExamPercent = ((parseFloat(finalExamVal) / 30) * 100).toFixed(2);
-      document.getElementById("finalExamLabel").textContent = `${finalExamVal} / 30 (${finalExamPercent}%)`;
+      const finalExamPercent = ((parseFloat(finalExam) / 30) * 100).toFixed(2);
+      document.getElementById("finalExamLabel").textContent = `${finalExam} / 30 (${finalExamPercent}%)`;
       const finalExamBar = document.getElementById("progressFinalExamBar");
       if (finalExamBar) finalExamBar.style.width = `${finalExamPercent}%`;
 
-const todayVal = parseFloat((summaryInfo.today || "0.00%").replace('%', '')).toFixed(2);
-const todayPercent = ((parseFloat(todayVal) / 70) * 100).toFixed(2);
-document.getElementById("todayLabel").textContent = `${todayVal} / 70 (${todayPercent}%)`;
-const todayBar = document.getElementById("progressTodayBar");
-if (todayBar) todayBar.style.width = `${todayPercent}%`;
+      const studentTodayInfo = todayResultsData[username];
+      let todayAverage = 0;
 
+      if (studentTodayInfo && studentTodayInfo.tasks) {
+        const unitPercentages = {};
+        Units.forEach(unit => {
+          const tasks = studentTodayInfo.tasks.filter(t => t.unit === unit);
+          unitPercentages[unit] = tasks.length
+            ? tasks.reduce((sum, t) => sum + t.percent, 0) / tasks.length
+            : 0;
+        });
 
-      let examMessage, examIcon;
-      if (weekNumber <= 6) {
-        examMessage = `Mid Term Exam: ${nextExamDate}`;
-        examIcon = '<i class="fas fa-calendar-day"></i>';
-      } else {
-        examMessage = `Final Exam: ${nextExamDate}`;
-        examIcon = '<i class="fas fa-calendar-check"></i>';
+        todayAverage = Units.reduce((sum, unit) => sum + unitPercentages[unit], 0) / Units.length;
+        todayAverage = parseFloat(todayAverage.toFixed(2));
       }
+
+      const todayPercent = ((todayAverage / 70) * 100).toFixed(2);
+      document.getElementById("todayLabel").textContent = `${todayAverage.toFixed(2)} / 70 (${todayPercent}%)`;
+      const todayBar = document.getElementById("progressTodayBar");
+      if (todayBar) todayBar.style.width = `${todayPercent}%`;
+
+      const examMessage = weekNumber <= 6
+        ? `Mid Term Exam: ${nextExamDate}`
+        : `Final Exam: ${nextExamDate}`;
+      const examIcon = weekNumber <= 6
+        ? '<i class="fas fa-calendar-day"></i>'
+        : '<i class="fas fa-calendar-check"></i>';
       document.getElementById("exam-date").innerHTML = `${examIcon} ${examMessage}`;
 
       document.getElementById("current-unit").textContent = `Unit ${unit}`;
@@ -1902,16 +1968,13 @@ if (todayBar) todayBar.style.width = `${todayPercent}%`;
         })
         .then(leaderboardData => ({ leaderboardData, todayResultsData }));
     })
-    .then(({ leaderboardData, todayResultsData }) => {
-      return fetch(`/api/get-history?username=${username}`)
-        .then(response => {
-          if (!response.ok) throw new Error('Failed to fetch history');
-          return response.json();
-        })
-        .then(historyData => ({ leaderboardData, historyData: historyData || [], todayResultsData }));
-    })
+    .then(({ leaderboardData, todayResultsData }) =>
+      fetch(`/api/get-history?username=${username}`)
+        .then(r => r.ok ? r.json() : [])
+        .then(historyData => ({ leaderboardData, historyData, todayResultsData }))
+    )
     .then(({ leaderboardData, historyData, todayResultsData }) => {
-      updateLeaderboard(currentView, leaderboardData, historyData);
+      updateLeaderboard("progress", leaderboardData, historyData);
 
       toggleProgress.addEventListener('click', () => {
         if (currentView !== "progress") {
@@ -1919,31 +1982,16 @@ if (todayBar) todayBar.style.width = `${todayPercent}%`;
           toggleProgress.classList.add('active');
           toggleToday.classList.remove('active');
           loadingEl.style.display = "flex";
-          fixedTableBody.innerHTML = `
-            <tr>
-              <td colspan="3" class="loading-spinner">
-                <div class="lds-spinner">
-                  <div></div><div></div><div></div><div></div>
-                  <div></div><div></div><div></div><div></div>
-                  <div></div><div></div><div></div><div></div>
-                </div>
-              </td>
-            </tr>
-          `;
+          fixedTableBody.innerHTML = `<tr><td colspan="3" class="loading-spinner"><div class="lds-spinner">${'<div></div>'.repeat(12)}</div></td></tr>`;
           unitsTableBody.innerHTML = '';
           fetch('/api/get-leaderboard')
-            .then(response => {
-              if (!response.ok) throw new Error('Failed to fetch leaderboard');
-              return response.json();
-            })
-            .then(newLeaderboardData => {
-              updateLeaderboard("progress", newLeaderboardData, historyData);
-            })
-            .catch(error => {
-              console.error('⚠️ Error:', error);
+            .then(r => r.ok ? r.json() : Promise.reject('Leaderboard error'))
+            .then(newLeaderboard => updateLeaderboard("progress", newLeaderboard, historyData))
+            .catch(e => {
               errorMessageEl.textContent = "Failed to load leaderboard";
               errorMessageEl.style.display = "block";
               loadingEl.style.display = "none";
+              console.error(e);
             });
         }
       });
@@ -1954,49 +2002,40 @@ if (todayBar) todayBar.style.width = `${todayPercent}%`;
           toggleToday.classList.add('active');
           toggleProgress.classList.remove('active');
           loadingEl.style.display = "flex";
-          const unitsColumnCount = Units.indexOf(activeCurrentUnit) + 1;
-          fixedTableBody.innerHTML = `
-            <tr>
-              <td colspan="3" class="loading-spinner">
-                <div class="lds-spinner">
-                  <div></div><div></div><div></div><div></div>
-                  <div></div><div></div><div></div><div></div>
-                  <div></div><div></div><div></div><div></div>
-                </div>
-              </td>
-            </tr>
-          `;
-          unitsTableBody.innerHTML = `
-            <tr>
-              <td colspan="${unitsColumnCount}" class="loading-spinner"></td>
-            </tr>
-          `;
+          fixedTableBody.innerHTML = `<tr><td colspan="3" class="loading-spinner"><div class="lds-spinner">${'<div></div>'.repeat(12)}</div></td></tr>`;
+          unitsTableBody.innerHTML = `<tr><td colspan="${Units.indexOf(activeCurrentUnit) + 1}" class="loading-spinner"></td></tr>`;
           fetch(`/api/get-results/today?level=${currentLevel}`)
-            .then(response => {
-              if (!response.ok) throw new Error('Failed to fetch today results');
-              return response.json();
-            })
-            .then(newTodayResults => {
-              updateLeaderboard("today", newTodayResults, historyData);
-            })
-            .catch(error => {
-              console.error('⚠️ Error:', error);
+            .then(r => r.ok ? r.json() : Promise.reject('Today error'))
+            .then(newToday => updateLeaderboard("today", newToday, historyData))
+            .catch(e => {
               errorMessageEl.textContent = "Failed to load today's leaderboard";
               errorMessageEl.style.display = "block";
               loadingEl.style.display = "none";
+              console.error(e);
             });
         }
       });
     })
-    .catch(error => {
-      console.error('⚠️ Error:', error);
-      errorMessageEl.textContent = "You are not an active student";
+    .catch(err => {
+      console.warn("⚠️ Student not active:", err.message);
+      if (skeletonCard) skeletonCard.style.display = "none";
+      if (progressCard) progressCard.style.display = "none";
+      progressContainer.style.display = "none";
+      loadingEl.style.display = "none";
+      errorMessageEl.innerHTML = `
+        <div class="glass-error">
+          <div class="icon"><i class="fas fa-user-slash"></i></div>
+          <strong>You are not an active student</strong><br>
+          <span>Join the course or <a href="https://t.me/SAV571420" target="_blank">Support Center</a> to activate your account.</span>
+        </div>
+      `;
       errorMessageEl.style.display = "block";
     })
     .finally(() => {
       loadingEl.style.display = "none";
     });
 }
+
 
 // Stub for generating tasks — replace with actual implementation
 function generateTodayTasks(level, unit) {
@@ -2065,7 +2104,7 @@ function fetchLeaderboardRank(username) {
     }
 }
 
-	
+	/*
 	document.addEventListener("DOMContentLoaded", function() {
     // Предполагаем, что currentUser — это строка с именем пользователя
     const username = currentUser.trim(); // Убираем лишние пробелы
@@ -2136,7 +2175,7 @@ function fetchLeaderboardRank(username) {
                 pointsValue.innerText = "--";
             }
         });
-});
+});*/
 
     // Initial load
     showPage('main');
@@ -2148,78 +2187,165 @@ document
     showPage('leaderboard');
   });
 
+async function updateStrikes() {
+  try {
+    // 1) Получаем средний процент + submitted_count и total_tasks, передаём username
+    const avgUrl = `/api/get-results/average`
+      + `?level=${encodeURIComponent(currentLevel)}`
+      + `&unit=${encodeURIComponent(currentUnit)}`
+      + `&username=${encodeURIComponent(currentUser)}`;
+    const avgRes = await fetch(avgUrl);
+    if (!avgRes.ok) throw new Error(avgRes.statusText);
+    const avgData = await avgRes.json();
 
-// Populate leaderboard UI
+    const stats = avgData[username] || {
+      average_percent: 0,
+      submitted_count: 0,
+      total_tasks: 0
+    };
+    const unitPercent    = stats.average_percent;
+    const submittedCount = stats.submitted_count;
+    const totalTasks     = stats.total_tasks;
+
+    // 2) Отправляем на сервер данные для начисления или сброса штрихов
+    const strikeRes = await fetch('/api/check-strike', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username:        username,
+        currentUnit:     currentUnit,
+        unitPercent:     unitPercent,
+        submittedCount:  submittedCount,
+        totalTasks:      totalTasks
+      })
+    });
+    if (!strikeRes.ok) throw new Error(strikeRes.statusText);
+    const { strikes } = await strikeRes.json();
+
+    // 3) Обновляем UI
+    const text = strikes > 0
+      ? `${strikes} Strike${strikes > 1 ? 's' : ''}`
+      : '0 Strike';
+    document.getElementById("strike-value").textContent = text;
+
+  } catch (e) {
+    console.error('Failed to update strikes:', e);
+  }
+}
+
+
+async function fetchAvatar(name) {
+    // Попытка загрузить изображение, если не найдено — показать первую букву
+    try {
+        const response = await fetch(`/avatars/${encodeURIComponent(name)}.png`);
+        if (response.ok) {
+            return `<img src="/avatars/${name}.png" alt="${name}'s avatar" />`;
+        } else {
+            throw new Error('Avatar not found');
+        }
+    } catch {
+        const firstLetter = name.charAt(0).toUpperCase();
+        return `<div class="avatar-placeholder">${firstLetter}</div>`;
+    }
+}
+
+// Обновить таблицу лидеров
 async function updateLeaderboardUI() {
     const leaderboardContainer = document.getElementById('leaderboard-container');
     if (!leaderboardContainer) {
         console.error('Leaderboard container element not found');
         return;
     }
-    console.log('Starting leaderboard update');
 
-    let loadingHTML = `<div id="leaderboard_loading" class="leaderboard-loading">
-        <div class="skeleton skeleton-avatar"></div>
-        <div class="skeleton skeleton-text"></div>
-        <div class="skeleton skeleton-list"></div>
-        <div class="skeleton skeleton-list"></div>
-        <div class="skeleton skeleton-list"></div>
-    </div>`;
-    leaderboardContainer.innerHTML = loadingHTML;
-    console.log('Loading skeleton applied');
+    leaderboardContainer.innerHTML = `
+<div class="leaderboard-loading">
+  <div class="skeleton skeleton-title"></div>
+
+  <div class="skeleton-top-3">
+    <div class="skeleton-top-player">
+      <div class="skeleton skeleton-avatar-top"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line" style="width: 40px;"></div>
+    </div>
+    <div class="skeleton-top-player">
+      <div class="skeleton skeleton-avatar-top"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line" style="width: 40px;"></div>
+    </div>
+    <div class="skeleton-top-player">
+      <div class="skeleton skeleton-avatar-top"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line" style="width: 40px;"></div>
+    </div>
+  </div>
+
+  <div class="skeleton skeleton-list"></div>
+  <div class="skeleton skeleton-list"></div>
+  <div class="skeleton skeleton-list"></div>
+</div>
+`;
 
     try {
-        console.log('Fetching leaderboard data from /api/leaderboard');
         const response = await fetch('/api/leaderboard');
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        console.log('Leaderboard data received:', data);
 
-        let leaderboardHTML = `<div class="leaderboard">
-            <h2>Leaderboard</h2>
-            <div class="top-3">`;
+        let leaderboardHTML = `
+            <div class="leaderboard">
+                <button class="back-button" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <h2>Leaderboard</h2>
+                <div class="top-3">`;
 
-        const medalIcons = [
-            "<i class='fas fa-crown' style='color: gold;'></i>",
-            "<i class='fas fa-medal' style='color: silver;'></i>",
-            "<i class='fas fa-award' style='color: #cd7f32;'></i>"
-        ];
+        const topOrder = [1, 0, 2]; // Центровка: 2-й, 1-й, 3-й
 
-        for (let i = 0; i < data.top_3.length; i++) {
-            let player = data.top_3[i];
-            let avatar = await fetchAvatar(player.name);
-            let rankClass = ["gold", "silver", "bronze"][i] || "";
+        for (let i of topOrder) {
+            const player = data.top_3[i];
+            const avatar = await fetchAvatar(player.name);
+            const rank = i + 1;
+            const suffix = getRankSuffix(rank);
+
             leaderboardHTML += `
-                <div class="top-player ${rankClass}">
-                    <div class="rank-number">${i + 1}${getRankSuffix(i + 1)}</div>
+                <div class="top-player">
                     <div class="leaderboard-avatar">${avatar}</div>
-                    <p>${medalIcons[i]} ${player.name} - ${player.coins} <i class="fas fa-star"></i></p>
+                    <div class="rank-number">${rank}${suffix}</div>
+                    <p>${player.name}</p>
+                    <p style="opacity: 0.8; font-size: 0.9em;">
+                        ${player.coins} <i class="fas fa-star"></i>
+                    </p>
                 </div>`;
         }
 
-        leaderboardHTML += `</div><h3></h3><ul class="leaderboard-list">`;
+        leaderboardHTML += `</div><ul class="leaderboard-list">`;
+        const colors = ['#ffa500', '#ff8c00', '#f39c12', '#e74c3c', '#c0392b'];
         let rank = 4;
-        for (let player of data.others) {
-            let avatar = await fetchAvatar(player.name);
+
+        for (let i = 0; i < data.others.length; i++) {
+            const player = data.others[i];
+            const avatar = await fetchAvatar(player.name);
+            const color = colors[i] || '#555';
+            const suffix = getRankSuffix(rank);
+
             leaderboardHTML += `
                 <li class="leaderboard-item">
                     <div class="leaderboard-avatar">${avatar}</div>
-                    <span class="leaderboard-name">${player.name}</span> 
-                    <span class="rank-badge">${rank}${getRankSuffix(rank)}</span>
+                    <span class="leaderboard-name">${player.name}</span>
+                    <span class="rank-badge" style="background:${color}">${rank}${suffix}</span>
                     <span class="leaderboard-rank">${player.coins} <i class="fas fa-star"></i></span>
                 </li>`;
             rank++;
         }
 
-        leaderboardHTML += "</ul></div>";
+        leaderboardHTML += `</ul></div>`;
         leaderboardContainer.innerHTML = leaderboardHTML;
-        console.log('Leaderboard HTML updated');
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
         leaderboardContainer.innerHTML = "<p>Error loading leaderboard. Please try again later.</p>";
-        console.log('Fallback error message displayed');
     }
 }
+
+
 
 // Helper function (assuming it exists)
 function getRankSuffix(rank) {
@@ -2387,7 +2513,7 @@ let currentPurchaseData = null;
 
 // === 3. Обработчик покупки с динамической модалкой ===
 card.querySelector('.buy-btn').addEventListener('click', () => {
-  const commissionRate = 0.70;
+  const commissionRate = 0.10;
   const commission = Math.ceil(item.cost * commissionRate);
   const totalCost = item.cost + commission;
 
@@ -3165,6 +3291,7 @@ async function renderTasksSection() {
 // 2. Открытие страницы с вопросами и рендер
 // ----------------------------
 function openTodayTaskPage(title, questions) {
+  initExamSecurity(true);
   hideNavigation();
   showPage('todaytasks');
   document.getElementById('header-today').textContent = title;
@@ -3618,6 +3745,7 @@ function renderSubquestion(sub, container) {
 // 3. Сбор ответов и отправка на сервер с результатом и ошибками
 // ----------------------------
 function finishTodayTasks(title, questions) {
+  initExamSecurity(false);
   showNavigation();
   const answers = {};
   const errors = [];
@@ -3947,90 +4075,112 @@ function formatTimeBlock(seconds) {
 // Функция для запуска таймера блокировки
 function startBlockTimer(username, duration, userState, timerElement) {
   let timeLeft = duration;
-  timerElement.textContent = formatTimeBlock(timeLeft);
+  let intervalId = null;
+  let musicTriggered = false;
 
-  userState.timerInterval = setInterval(() => {
-    timeLeft--;
+  // Начальное сообщение на таймере
+  timerElement.textContent = "Click here to start timer";
+  timerElement.style.cursor = 'pointer';
+  timerElement.classList.add('pulse-timer');
+
+  // Обработчик клика
+  const handleClick = () => {
+    if (musicTriggered) return; // защита от повторного запуска
+    musicTriggered = true;
+
+    playSpecialMusic(); // запускаем музыку
+
+    // Показываем сразу первый тик
     timerElement.textContent = formatTimeBlock(timeLeft);
+    timerElement.classList.remove('pulse-timer');
+    timerElement.style.cursor = 'default';
 
-    // Если время истекло, разблокируем пользователя
-    if (timeLeft <= 0) {
-      clearInterval(userState.timerInterval);
-      userState.timerInterval = null;
-      unblockUsername(username);
-      blockStates.delete(username);
-      try {
-        localStorage.removeItem(`blockEndTime_${username}`);
-      } catch (err) {
-        console.error(`Failed to remove blockEndTime from localStorage for ${username}: ${err.message}`);
+    // Запускаем таймер только при клике
+    intervalId = setInterval(() => {
+      timeLeft--;
+      timerElement.textContent = formatTimeBlock(timeLeft);
+
+      if (timeLeft <= 0) {
+        clearInterval(intervalId);
+        unblockUsername(username);
+        blockStates.delete(username);
+        try {
+          localStorage.removeItem(`blockEndTime_${username}`);
+        } catch (err) {
+          console.error(`Failed to remove blockEndTime from localStorage for ${username}: ${err.message}`);
+        }
       }
-    }
-  }, 1000);
+    }, 1000);
+    userState.timerInterval = intervalId;
+  };
+
+  // Удаляем старый обработчик, если он есть
+  timerElement.removeEventListener('click', userState.clickHandler);
+  // Сохраняем новый обработчик
+  userState.clickHandler = handleClick;
+  // Вешаем новый обработчик
+  timerElement.addEventListener('click', handleClick);
 
   blockStates.set(username, userState);
 }
 
-// Функция для блокировки пользователя по username
+// Функция для блокировки пользователя
 function blockUser(username, duration) {
-  // Проверяем валидность duration
+  stopSpecialMusic();
   if (!Number.isInteger(duration) || duration <= 0) {
     console.log(`Invalid duration: ${duration}. Duration must be a positive integer.`);
     return;
   }
 
-  // Получаем текущего пользователя
   const currentUser = getCurrentUser();
-  if (username !== currentUser) {
-    return;
-  }
+  if (username !== currentUser) return;
 
-  // Инициализируем или получаем состояние блокировки
-  const userState = blockStates.get(username) || { isBlocked: false, timerInterval: null, blockEndTime: null };
+  const userState = blockStates.get(username) || {
+    isBlocked: false,
+    timerInterval: null,
+    blockEndTime: null,
+    clickHandler: null
+  };
+
+  // Очищаем существующий таймер, если он есть
+  if (userState.timerInterval) {
+    clearInterval(userState.timerInterval);
+    userState.timerInterval = null;
+  }
 
   // Показываем экран блокировки
   blockScreen.classList.remove('hidden');
   blockScreen.classList.add('visible');
-  
-  playSpecialMusic();
 
-  // Если пользователь уже заблокирован, сбрасываем таймер с задержкой
-  if (userState.isBlocked) {
-    clearInterval(userState.timerInterval);
-    userState.timerInterval = null;
-    timerElement.textContent = '00:00'; // Сбрасываем таймер до 00:00
-    timerElement.classList.add('timer-pulse'); // Добавляем анимацию пульсации
+  const warningText = `${username} has violated the rules. ChatGPT ishlatmoqchimiding.
+This behavior is strictly prohibited. 
+You are now temporarily blocked. 
+Further violations will result in a permanent ban.`;
 
-    // Задержка 1 секунда перед установкой нового времени
-    setTimeout(() => {
-      timerElement.classList.remove('timer-pulse'); // Удаляем анимацию
-      const blockEndTime = Date.now() + duration * 1000;
-      userState.isBlocked = true;
-      userState.blockEndTime = blockEndTime;
-      try {
-        localStorage.setItem(`blockEndTime_${username}`, blockEndTime);
-      } catch (err) {
-       // console.error(`Failed to save blockEndTime to localStorage for ${username}: ${err.message}`);
-      }
-      startBlockTimer(username, duration, userState, timerElement);
-    }, 3000);
-    return;
-  }
-  // Блокируем взаимодействие с элементами страницы
-  document.body.style.pointerEvents = 'none';
-
-  // Обновляем состояние блокировки
-  userState.isBlocked = true;
+  // Устанавливаем новое время окончания блокировки
   const blockEndTime = Date.now() + duration * 1000;
+  userState.isBlocked = true;
   userState.blockEndTime = blockEndTime;
+
   try {
     localStorage.setItem(`blockEndTime_${username}`, blockEndTime);
   } catch (err) {
-    console.error(`Failed to save blockEndTime to localStorage for ${username}: ${err.message}`);
+    console.error(`Failed to save blockEndTime for ${username}: ${err.message}`);
   }
 
-  // Запускаем таймер
-  startBlockTimer(username, duration, userState, timerElement);
+  // Блокируем взаимодействие
+  document.body.style.pointerEvents = 'none';
+
+  // Озвучиваем предупреждение и затем настраиваем таймер
+  speak(warningText, () => {
+    startBlockTimer(username, duration, userState, timerElement);
+  });
+
+  blockStates.set(username, userState);
 }
+
+
+
 
 const blockScreen = document.getElementById("block-screen");
 const timerElement = document.getElementById("timer");
@@ -4058,6 +4208,7 @@ function unblockUsername(username) {
 
   // Удаляем данные из localStorage
   localStorage.removeItem(`blockEndTime_${username}`);
+  stopSpecialMusic();
 
   // Скрываем экран блокировки
   blockScreen.classList.remove("visible");
@@ -4069,26 +4220,45 @@ function unblockUsername(username) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const currentUser = getCurrentUser(); // Предполагается, что эта функция возвращает имя текущего пользователя
-    if (!currentUser) {
-        console.log("No current user found on page load.");
-        return;
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    console.log("No current user found on page load.");
+    return;
+  }
+
+  const blockEndTimeKey = `blockEndTime_${currentUser}`;
+  const blockEndTimeRaw = localStorage.getItem(blockEndTimeKey);
+
+  if (blockEndTimeRaw) {
+    const blockEndTime = parseInt(blockEndTimeRaw, 10);
+    const now = Date.now();
+    const remainingTime = Math.floor((blockEndTime - now) / 1000);
+
+    if (remainingTime > 0) {
+      console.log(`🔒 User is still blocked for ${remainingTime} seconds`);
+      // Восстанавливаем блокировку без озвучки
+      const userState = {
+        isBlocked: true,
+        timerInterval: null,
+        blockEndTime: blockEndTime
+      };
+
+      blockScreen.classList.remove('hidden');
+      blockScreen.classList.add('visible');
+
+      document.body.style.pointerEvents = 'none';
+
+      startBlockTimer(currentUser, remainingTime, userState, timerElement);
+      blockStates.set(currentUser, userState);
+    } else {
+      // Время блокировки истекло
+      localStorage.removeItem(blockEndTimeKey);
+      blockStates.delete(currentUser);
+      console.log("✅ Block expired. Cleaned up.");
     }
-
-    const blockEndTimeKey = `blockEndTime_${currentUser}`;
-    const blockEndTime = localStorage.getItem(blockEndTimeKey);
-
-    if (blockEndTime) {
-        const remainingTime = Math.max(0, Math.floor((blockEndTime - Date.now()) / 1000));
-
-        if (remainingTime > 0) {
-            blockUser(currentUser, remainingTime); // Продолжить блокировку для конкретного пользователя
-        } else {
-            localStorage.removeItem(blockEndTimeKey); // Если время истекло, очистить запись
-            blockStates.delete(currentUser); // Удаляем состояние из Map
-        }
-    }
+  }
 });
+
 
 document.getElementById('upload-file-input').addEventListener('change', async function (e) {
   // 🚫 Проверка статуса аккаунта
@@ -4216,39 +4386,76 @@ submitBtn.onclick = async () => {
 };
 
 let audioContext;
-let sourceNode;
-let gainNode;
+let sourceNode = null;
+let gainNode = null;
+let isMusicPlaying = false;
 
-async function playSpecialMusic() {
+const tracks = [
+  '/static/music/Masha.mp3',
+  '/static/music/JAVA - Gaz yoq.mp3',
+  '/static/music/Argus.mp3',
+];
+
+let currentTrackIndex = 0;
+
+// 🔁 Функция для запуска бесконечного плейлиста
+async function playNextTrack() {
+  stopSpecialMusic(); // остановим предыдущую, если была
+
   if (!audioContext) audioContext = new AudioContext();
 
-  const response = await fetch('/static/music/JAVA - Gaz yoq.mp3');
-  const arrayBuffer = await response.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  try {
+    const trackUrl = tracks[currentTrackIndex];
+    const response = await fetch(trackUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-  // Создаем узел громкости
-  gainNode = audioContext.createGain();
-  gainNode.gain.value = 1.0; // 100% громкость
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = 1.0; // 100% громкость
 
-  sourceNode = audioContext.createBufferSource();
-  sourceNode.buffer = audioBuffer;
+    sourceNode = audioContext.createBufferSource();
+    sourceNode.buffer = audioBuffer;
+    sourceNode.connect(gainNode).connect(audioContext.destination);
 
-  // Соединяем цепочку: источник → громкость → выход
-  sourceNode.connect(gainNode).connect(audioContext.destination);
+    sourceNode.start();
+    isMusicPlaying = true;
 
-  sourceNode.start();
+    console.log(`🎵 Now playing: ${trackUrl}`);
 
-  console.log('Music started at 100% volume without media controls');
-}
+    sourceNode.onended = () => {
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      playNextTrack(); // запускаем следующий
+    };
 
-function stopSpecialMusic() {
-  if (sourceNode) {
-    sourceNode.stop();
-    sourceNode.disconnect();
-    sourceNode = null;
-    console.log('Music stopped');
+  } catch (err) {
+    console.error('❌ Failed to play track:', err);
   }
 }
+
+// 🔈 Основная функция, которую ты вызываешь
+function playSpecialMusic() {
+  if (isMusicPlaying) return; // уже играет — не запускаем заново
+  playNextTrack();
+}
+
+// ⛔ Остановка музыки
+function stopSpecialMusic() {
+  if (sourceNode) {
+    try {
+      sourceNode.onended = null; // ❗ отключаем автозапуск следующего трека
+      sourceNode.stop();
+      sourceNode.disconnect();
+    } catch (e) {
+      console.warn("⚠️ Already stopped or failed to stop source");
+    }
+    sourceNode = null;
+  }
+  isMusicPlaying = false;
+}
+
+
+
+
 
 const animationCache = {}; // Кеш JSON-данных
 let currentAnim = null;
@@ -4604,3 +4811,488 @@ function stopUpdateStatusText() {
     statusText.classList.remove("status-fallback");
   }
 }
+
+  async function submitTransfer() {
+    const sender = currentUser;
+    const receiver = document.getElementById("receiver").value.trim();
+    const amount = parseFloat(document.getElementById("amount").value);
+
+    if (!receiver || isNaN(amount) || amount <= 0) {
+      showModalStatus("Please enter a valid receiver and a positive amount.", "failed");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender, receiver, amount })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showModalStatus(` ${amount} points sent to ${receiver}`, "success");
+        document.getElementById("receiver").value = "";
+        document.getElementById("amount").value = "";
+      } else {
+        showModalStatus(` ${result.error || "Something went wrong."}`, "failed");
+      }
+    } catch (err) {
+      showModalStatus("Network error. Please try again later.", "failed");
+    }
+  }
+  
+const spinSfx = new Audio('/static/music/Bang Bang starter audio.mp3');
+const winSfx = new Audio('/static/music/Coins_Rewarded.mp3');
+const ballSfx = new Audio('/static/sfx/ball.mp3');
+
+function saveBoxStateLocally(data) {
+  localStorage.setItem('lucky_spin_state', JSON.stringify(data));
+}
+
+function loadBoxStateLocally() {
+  try {
+    return JSON.parse(localStorage.getItem('lucky_spin_state')) || null;
+  } catch {
+    return null;
+  }
+}
+
+function renderBoxState(state) {
+  ['A', 'B', 'C'].forEach(box => {
+    const container = document.querySelector(`#box-${box} .balls`);
+    const boxEl = document.getElementById(`box-${box}`);
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < (state.current_boxes[box] || 0); i++) {
+      const ball = document.createElement('img');
+      ball.classList.add('ball');
+      ball.src = '/static/icons/ball.png';
+      container.appendChild(ball);
+    }
+    boxEl.classList.toggle('LuckyBox', state.winning_box === box);
+  });
+
+  const spinCounter = document.getElementById("spin-counter");
+  if (spinCounter) {
+    spinCounter.textContent = `Spins: ${state.spin_count} / 10`;
+  }
+}
+
+async function preloadBoxState(username) {
+  const res = await fetch(`/api/lucky_progress?username=${username}`);
+  const data = await res.json();
+  saveBoxStateLocally(data);
+  renderBoxState(data);
+}
+
+function saveRewardHistory(entry) {
+  const history = loadRewardHistory();
+  history.unshift(entry);
+  if (history.length > 20) history.pop();
+  localStorage.setItem("lucky_spin_history", JSON.stringify(history));
+}
+
+function loadRewardHistory() {
+  try {
+    return JSON.parse(localStorage.getItem("lucky_spin_history")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function renderRewardHistory() {
+  const history = loadRewardHistory();
+  const list = document.getElementById("history-list");
+  if (!list) return;
+  list.innerHTML = "";
+
+  history.forEach(entry => {
+    const li = document.createElement("li");
+    if (entry.type === "LuckyBox") {
+      li.textContent = `🎉 ${entry.time}: Lucky Box ${entry.amount} pts from box ${entry.box}`;
+    } else if (entry.type === "Ball") {
+      li.textContent = `🎯 ${entry.time}: Ball in box ${entry.box}`;
+    } else if (entry.type === "Small Win") {
+      li.textContent = `💰 ${entry.time}: Won ${entry.amount} pts`;
+    } else {
+      li.textContent = `❌ ${entry.time}: Nothing`;
+    }
+    list.appendChild(li);
+  });
+}
+
+function formatTime(ts = Date.now()) {
+  const d = new Date(ts);
+  return d.toLocaleString(undefined, {
+    day: "2-digit", month: "2-digit", year: "2-digit",
+    hour: "2-digit", minute: "2-digit"
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = loadBoxStateLocally();
+  if (saved) renderBoxState(saved);
+  if (typeof currentUser !== 'undefined') {
+    preloadBoxState(currentUser);
+  }
+  renderRewardHistory();
+});
+
+document.getElementById("luckySpinBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("luckySpinBtn");
+  try {
+    btn.disabled = true;
+    btn.classList.add('spinning');
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Spinning...`;
+    spinSfx.play();
+
+    const res = await fetch('/api/lucky_event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: currentUser })
+    });
+
+    const data = await res.json();
+    saveBoxStateLocally(data);
+    renderBoxState(data);
+
+    const now = formatTime();
+
+    // Обновление баланса
+    const balanceElement = document.getElementById("balance");
+    if (balanceElement && data.new_balance !== undefined) {
+      balanceElement.textContent = `${data.new_balance.toFixed(0)} pts`;
+    }
+
+    // Эффекты
+    if (data.won > 0 && data.winning_box) {
+      winSfx.play();
+      showModalStatus(`🎉 You won ${data.won} points from box ${data.winning_box}!`, "success");
+
+      saveRewardHistory({
+        type: "LuckyBox",
+        time: now,
+        amount: data.won,
+        box: data.winning_box
+      });
+
+    } else if (data.got_ball && data.ball_box) {
+      const container = document.querySelector(`#box-${data.ball_box} .balls`);
+      const falling = document.createElement('img');
+      falling.src = '/static/icons/ball.png';
+      falling.className = 'ball-falling';
+      container.appendChild(falling);
+      ballSfx.play();
+
+      setTimeout(() => {
+        container.removeChild(falling);
+        const ball = document.createElement('img');
+        ball.src = '/static/icons/ball.png';
+        ball.className = 'ball';
+        container.appendChild(ball);
+      }, 600);
+
+      showModalStatus("🎯 You got a ball!", "success");
+
+      saveRewardHistory({
+        type: "Ball",
+        time: now,
+        box: data.ball_box
+      });
+
+    } else if (data.won > 0) {
+      winSfx.play();
+      showModalStatus(`💰 You won ${data.won} points!`, "success");
+
+      saveRewardHistory({
+        type: "Small Win",
+        time: now,
+        amount: data.won
+      });
+
+    } else {
+      showModalStatus("❌ No reward this time.", "neutral");
+      saveRewardHistory({
+        type: "Nothing",
+        time: now
+      });
+    }
+
+    renderRewardHistory();
+
+  } catch (err) {
+    console.error("Lucky spin error:", err);
+    showModalStatus("Something went wrong!", "failed");
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+    btn.innerHTML = `<i class="fas fa-magic"></i> Spin Now`;
+  }
+});
+
+const carouselItems = document.querySelectorAll('.carousel-item');
+let currentIndex = 0;
+const totalItems = carouselItems.length;
+
+function showNextItem() {
+  const current = carouselItems[currentIndex];
+  const nextIndex = (currentIndex + 1) % totalItems;
+  const next = carouselItems[nextIndex];
+
+  current.classList.add('exiting');
+  next.classList.add('active');
+
+  setTimeout(() => {
+    current.classList.remove('active', 'exiting');
+    currentIndex = nextIndex;
+  }, 600); // Совпадает с CSS transition
+}
+
+setInterval(showNextItem, 3000);
+carouselItems[currentIndex].classList.add('active');
+/*
+Event
+*/
+
+function initExamSecurity(enable = true) {
+
+    if (enable) {
+		showModalStatus("Tizim anti-cheating ishga tushirdi");
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleWindowBlur);
+        window.addEventListener('focus', handleWindowFocus);
+        window.addEventListener('mouseleave', handleMouseLeave);
+        window.addEventListener('mouseenter', handleMouseEnter);
+        document.addEventListener('copy', onCopy);
+        document.addEventListener('paste', onPaste);
+        document.addEventListener('contextmenu', onContextMenu);
+    } else {
+		showToastNotification("Tizim anti-cheating ochirdi");
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('blur', handleWindowBlur);
+        window.removeEventListener('focus', handleWindowFocus);
+        window.removeEventListener('mouseleave', handleMouseLeave);
+        window.removeEventListener('mouseenter', handleMouseEnter);
+        document.removeEventListener('copy', onCopy);
+        document.removeEventListener('paste', onPaste);
+        document.removeEventListener('contextmenu', onContextMenu);
+    }
+}
+
+function speak(text, onEnd = null) {
+  if (!window.speechSynthesis) {
+    console.warn("Speech synthesis not supported.");
+    if (onEnd) onEnd(); // fallback
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US"; // или "uz-UZ", "ru-RU"
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  if (typeof onEnd === 'function') {
+    utterance.onend = onEnd;
+  }
+
+  window.speechSynthesis.cancel(); // остановить другие фразы
+  window.speechSynthesis.speak(utterance);
+}
+
+
+
+function handleVisibilityChange() {
+    if (document.hidden) {
+        showToastNotification("Tab hidden",'info');
+    }
+}
+
+function handleWindowBlur() {
+    // может быть вызван при сворачивании окна
+    setTimeout(() => {
+        if (!document.hasFocus()) {
+            incrementViolation("Window lost focus");
+        }
+    }, 200);
+}
+
+function handleWindowFocus() {
+    // Можно использовать для сброса каких-то флагов
+}
+
+function handleMouseLeave(event) {
+    if (event.clientY <= 0) {
+        incrementViolation("Mouse left window (possibly tab switch)");
+    }
+}
+
+function handleMouseEnter(event) {
+    // optional: log return
+}
+
+function onCopy(event) {
+    event.preventDefault();
+    incrementViolation("Copy attempt");
+}
+
+function onPaste(event) {
+    event.preventDefault();
+    incrementViolation("Paste attempt");
+}
+
+function onContextMenu(event) {
+    event.preventDefault();
+    incrementViolation("Right-click attempt");
+}
+
+let violationCount = 0;
+const maxViolations = 1;
+
+function incrementViolation(reason = "Violation") {
+	  // ГОЛОСОВОЕ ПРЕДУПРЕЖДЕНИЕ → запуск музыки по завершении речи
+  const warningText = `${username} has violated the rules. ChatGPT ishlatmoqchimiding.
+This behavior is strictly prohibited. 
+You are now temporarily blocked. 
+Further violations will result in a permanent ban.`;
+
+  speak(warningText, () => {
+    
+  });
+    violationCount++;
+    showToastNotification(`${reason}: ${violationCount}/${maxViolations}`,'info');
+    if (violationCount >= maxViolations) {
+        blockUser(currentUser, 900);
+        violationCount = 0;
+    }
+}
+
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active', 'animate__animated', 'animate__fadeIn'));
+    const sectionId = item.getAttribute('data-section');
+    if (sectionId) {
+      const section = document.getElementById(sectionId);
+      section.classList.add('active', 'animate__animated', 'animate__fadeIn');
+    }
+  });
+});
+
+function openPasswordModal() {
+  document.getElementById('change-passwords-modal').classList.add('active');
+}
+
+function closePasswordModal() {
+  document.getElementById('change-passwords-modal').classList.remove('active');
+  document.getElementById('change-password-form').reset();
+  document.getElementById('password-message').textContent = '';
+  resetPasswordRequirements();
+}
+
+function togglePassword(inputId) {
+  const input = document.getElementById(inputId);
+  const icon = input.nextElementSibling;
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.replace('fa-eye', 'fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.replace('fa-eye-slash', 'fa-eye');
+  }
+}
+
+function checkPasswordStrength() {
+  const password = document.getElementById('newPassword').value;
+  const strengthBar = document.getElementById('strength-bar');
+  const strengthText = document.getElementById('strength-text');
+  let strengthScore = 0;
+
+  // Check requirements
+  document.getElementById('lowercase').children[0].className = password.match(/[a-z]/) ? 'fas fa-check text-green' : 'fas fa-times text-red';
+  document.getElementById('uppercase').children[0].className = password.match(/[A-Z]/) ? 'fas fa-check text-green' : 'fas fa-times text-red';
+  document.getElementById('number').children[0].className = password.match(/[0-9]/) ? 'fas fa-check text-green' : 'fas fa-times text-red';
+  document.getElementById('special').children[0].className = password.match(/[^A-Za-z0-9]/) ? 'fas fa-check text-green' : 'fas fa-times text-red';
+  document.getElementById('length').children[0].className = password.length >= 8 ? 'fas fa-check text-green' : 'fas fa-times text-red';
+
+  // Calculate strength
+  if (password.match(/[a-z]/)) strengthScore++;
+  if (password.match(/[A-Z]/)) strengthScore++;
+  if (password.match(/[0-9]/)) strengthScore++;
+  if (password.match(/[^A-Za-z0-9]/)) strengthScore++;
+  if (password.length >= 8) strengthScore++;
+
+  // Update strength bar and text
+  strengthBar.className = 'strength-bar';
+  if (strengthScore <= 2) {
+    strengthBar.classList.add('weak');
+    strengthText.textContent = 'Weak';
+  } else if (strengthScore <= 4) {
+    strengthBar.classList.add('medium');
+    strengthText.textContent = 'Medium';
+  } else {
+    strengthBar.classList.add('strong');
+    strengthText.textContent = 'Strong';
+  }
+}
+
+function resetPasswordRequirements() {
+  const requirements = ['lowercase', 'uppercase', 'number', 'special', 'length'];
+  requirements.forEach(id => {
+    document.getElementById(id).children[0].className = 'fas fa-times text-red';
+  });
+  document.getElementById('strength-bar').className = 'strength-bar';
+  document.getElementById('strength-text').textContent = '';
+}
+
+document.getElementById('change-password-form').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const currentPassword = document.getElementById('currentPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const messageEl = document.getElementById('password-message');
+
+  if (newPassword !== confirmPassword) {
+    messageEl.style.color = 'var(--danger)';
+    messageEl.textContent = 'Passwords do not match.';
+    showModalStatus('Passwords do not match.', 'failed');
+    return;
+  }
+
+  try {
+    const res = await fetch('/change_password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      messageEl.style.color = 'var(--success)';
+      messageEl.textContent = data.message;
+      showModalStatus(data.message, 'success');
+      setTimeout(closePasswordModal, 2000);
+    } else {
+      messageEl.style.color = 'var(--danger)';
+      showModalStatus(data.error, 'failed');
+      messageEl.textContent = data.error;
+    }
+  } catch (error) {
+    messageEl.style.color = 'var(--danger)';
+    showModalStatus('An error occurred. Please try again.', 'failed');
+    messageEl.textContent = 'An error occurred. Please try again.';
+  }
+});
+
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.content-section').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById(this.dataset.section).classList.add('active');
+  });
+});

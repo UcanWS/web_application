@@ -1,0 +1,44 @@
+[
+  {
+    "id": 3,
+    "type": "reading",
+    "text": "<h1>Why Do People Fart?</h1>\n<p>All people fart. It is normal. Farts are gas. This gas comes from your stomach or your intestines. It comes out from your body through your bottom. It can be loud or quiet. It can smell bad or have no smell.</p>\n<p>Why do we fart? We fart because we eat food. When we eat, our body makes gas. Some foods make more gas. For example, beans, eggs, cabbage, and soda make more gas. This gas must go out. That is why we fart.</p>\n<p>Farts are not always bad. They show that your body is working. They also help your stomach feel better. But sometimes, too much gas can make your stomach hurt. If you have a lot of gas every day, it is good to talk to a doctor.</p>\n<p>So, farting is funny, but it is also healthy!</p>",
+    "subquestions": [
+      {
+        "id": "3.1",
+        "type": "multiple_choice",
+        "text": "What are farts?",
+        "options": ["Water", "Gas", "Food"],
+        "correct": "Gas"
+      },
+      {
+        "id": "3.2",
+        "type": "multiple_choice",
+        "text": "Where does the gas come from?",
+        "options": ["Legs", "Stomach", "Arms"],
+        "correct": "Stomach"
+      },
+      {
+        "id": "3.3",
+        "type": "multiple_choice",
+        "text": "Which food can make more gas?",
+        "options": ["Candy", "Beans", "Rice"],
+        "correct": "Beans"
+      },
+      {
+        "id": "3.4",
+        "type": "multiple_choice",
+        "text": "Why do people fart?",
+        "options": ["They are sick", "They eat food", "They run fast"],
+        "correct": "They eat food"
+      },
+      {
+        "id": "3.5",
+        "type": "multiple_choice",
+        "text": "Is farting always bad?",
+        "options": ["Yes", "No", "Sometimes"],
+        "correct": "No"
+      }
+    ]
+  }
+]

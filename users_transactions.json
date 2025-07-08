@@ -1,1520 +1,292 @@
 {
-    "Abdulmalik": [
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-14T16:38:09.656483"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-14T16:38:36.702193"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-14T21:40:37.877158"
-        },
-        {
-            "amount": -1070,
-            "description": "Exchange to coins",
-            "time": "2025-06-14T23:05:09.879753"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-14T23:12:12.771222"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-14T23:25:44.613736"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-14T23:32:02.115176"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-14T23:39:36.499340"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-14T23:49:44.425095"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-14T23:56:05.816651"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:03:19.363723"
-        },
-        {
-            "amount": 170,
-            "description": "Exam between 80 and 100",
-            "time": "2025-06-15T00:10:42.651092"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T00:16:07.029352"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:23:15.032087"
-        },
-        {
-            "amount": -100,
-            "description": "Check single answer",
-            "time": "2025-06-15T00:28:17.193219"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:31:37.883028"
-        },
-        {
-            "amount": -40,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:35:34.834361"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:36:03.082341"
-        },
-        {
-            "amount": -50,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:36:11.073272"
-        },
-        {
-            "amount": -60,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:36:22.475457"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:36:27.741180"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T09:51:54.629554"
-        },
-        {
-            "amount": -20,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T09:51:59.480954"
-        },
-        {
-            "amount": -70,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T09:52:03.603033"
-        },
-        {
-            "amount": -300,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T09:57:50.339593"
-        },
-        {
-            "amount": -210,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:21:24.283502"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:34:13.537940"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:34:17.523505"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:34:20.714475"
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:40:57.910498"
-        },
-        {
-            "amount": -500,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:41:06.321251"
-        },
-        {
-            "amount": -70,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:41:21.960943"
-        },
-        {
-            "amount": 200,
-            "description": "Loan accepted #1",
-            "time": "2025-06-15T17:05:35.741534"
-        },
-        {
-            "amount": -200,
-            "description": "Repayment #1",
-            "time": "2025-06-15T17:06:14.283019"
-        },
-        {
-            "amount": 100,
-            "description": "Loan accepted #2",
-            "time": "2025-06-15T17:13:42.874323"
-        },
-        {
-            "amount": -100,
-            "description": "Repayment #2",
-            "time": "2025-06-15T17:14:27.670699"
-        },
-        {
-            "amount": 1000,
-            "description": "Loan accepted #4",
-            "time": "2025-06-15T17:28:43.681580",
-            "balance_before": 1005.0
-        },
-        {
-            "amount": 150,
-            "description": "Loan accepted #1",
-            "time": "2025-06-15T17:39:50.255315",
-            "balance_before": 2005.0
-        },
-        {
-            "amount": 199,
-            "description": "Loan accepted #3",
-            "time": "2025-06-15T17:44:25.691265",
-            "balance_before": 2155.0
-        },
-        {
-            "amount": -248.75,
-            "description": "Repayment #3",
-            "time": "2025-06-15T17:47:34.875466",
-            "balance_before": 2354.0
-        },
-        {
-            "amount": -150,
-            "description": "Repayment #1",
-            "time": "2025-06-15T17:47:37.844024",
-            "balance_before": 2105.25
-        },
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:48:22.788044",
-            "balance_before": 1955.25
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:48:26.521549",
-            "balance_before": 1855.25
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T17:56:56.033882",
-            "balance_before": 855.25
-        },
-        {
-            "amount": -10,
-            "description": "Debt proposed #2",
-            "time": "2025-06-15T18:12:19.589589",
-            "balance_before": -700.0
-        },
-        {
-            "amount": 10,
-            "description": "Debt declined #2",
-            "time": "2025-06-15T18:12:43.374161",
-            "balance_before": -710.0
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T21:39:50.460088",
-            "balance_before": -700.0
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T23:07:40.139315",
-            "balance_before": -650.0
-        },
-        {
-            "amount": 1000,
-            "description": "Loan accepted #3",
-            "time": "2025-06-15T23:08:03.296164",
-            "balance_before": -800.0
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T23:20:20.153620",
-            "balance_before": 200.0
-        },
-        {
-            "amount": -10,
-            "description": "Debt proposed #6",
-            "time": "2025-06-15T23:29:34.917706",
-            "balance_before": 250.0
-        },
-        {
-            "amount": 11.0,
-            "description": "Repayment received #6",
-            "time": "2025-06-15T23:32:58.188731",
-            "balance_before": 240.0
-        },
-        {
-            "amount": -1000,
-            "description": "Repayment #3",
-            "time": "2025-06-17T10:41:57.126746",
-            "balance_before": -1251.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 83%",
-            "time": "2025-06-17T13:03:32.759245",
-            "balance_before": -2251.0
-        },
-        {
-            "amount": 400,
-            "description": "Today 400 points rewarded",
-            "time": "2025-06-17T17:18:16.602116",
-            "balance_before": -2151.0
-        },
-        {
-            "amount": 7000,
-            "description": "Baseyn+otin+yana nmadur",
-            "time": "2025-06-17T23:21:49.078662",
-            "balance_before": -1751.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'MLBB Super Questions' with 100%",
-            "time": "2025-06-18T01:00:51.383825",
-            "balance_before": 5249.0
-        },
-        {
-            "amount": -600,
-            "description": "Exchange to coins",
-            "time": "2025-06-18T13:31:17.064385",
-            "balance_before": 7349.0
-        },
-        {
-            "amount": -700,
-            "description": "Exchange to coins",
-            "time": "2025-06-18T13:31:39.060199",
-            "balance_before": 6749.0
-        },
-        {
-            "amount": -9,
-            "description": "Debt proposed #9",
-            "time": "2025-06-18T13:33:16.402547",
-            "balance_before": 6049.0
-        },
-        {
-            "amount": 9,
-            "description": "Debt auto-declined #9",
-            "time": "2025-06-18T13:33:16.429027",
-            "balance_before": 6040.0
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-18T13:42:01.272179",
-            "balance_before": 6049.0
-        },
-        {
-            "amount": -5000,
-            "description": "Exchange to coins",
-            "time": "2025-06-18T13:42:04.883273",
-            "balance_before": 5049.0
-        },
-        {
-            "amount": -40,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T11:30:54.985928",
-            "balance_before": 49.0
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T11:32:43.327792",
-            "balance_before": 10.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 100%",
-            "time": "2025-06-19T12:42:36.725533",
-            "balance_before": 0.0
-        },
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T12:43:30.381987",
-            "balance_before": 100.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Grammar Tasks' with 100%",
-            "time": "2025-06-19T16:33:24.433741",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-19T16:35:16.621756",
-            "balance_before": 100.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-19T17:01:17.762647",
-            "balance_before": 200.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 80%",
-            "time": "2025-06-19T17:04:24.147447",
-            "balance_before": 300.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Grammar Tasks' with 100%",
-            "time": "2025-06-19T17:10:15.222532",
-            "balance_before": 400.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 80%",
-            "time": "2025-06-19T17:15:39.581216",
-            "balance_before": 500.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-19T17:16:12.352331",
-            "balance_before": 600.0
-        },
-        {
-            "amount": -700,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T19:58:37.882448",
-            "balance_before": 700.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Basseyn Ticket",
-            "time": "2025-06-19T21:30:18.086351",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Muhamadali zapalllar To\u02bbplami",
-            "time": "2025-06-19T23:20:30.540965",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:25:14.648785",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 10000,
-            "description": "Kaf",
-            "time": "2025-06-20T14:34:59.338858",
-            "balance_before": 0.0
-        },
-        {
-            "amount": -5000,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:41:24.020019",
-            "balance_before": 10000.0
-        },
-        {
-            "amount": -4000,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T17:51:13.232367",
-            "balance_before": 5000.0
-        },
-        {
-            "amount": -900,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T17:51:25.876224",
-            "balance_before": 1000.0
-        },
-        {
-            "amount": -90,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T17:51:36.734508",
-            "balance_before": 100.0
-        },
-        {
-            "amount": -2000,
-            "description": "Namozda gapirish",
-            "time": "2025-06-20T18:11:12.745664",
-            "balance_before": 10.0
-        }
-    ],
     "Muhammadali": [
         {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-14T23:18:57.260789"
-        },
-        {
-            "amount": 50,
-            "description": "Notugri xisoblash",
-            "time": "2025-06-14T23:32:42.893047"
-        },
-        {
-            "amount": 170,
-            "description": "Exam between 80 and 100",
-            "time": "2025-06-14T23:41:53.490857"
-        },
-        {
-            "amount": 170,
-            "description": "Exam between 80 and 100",
-            "time": "2025-06-14T23:53:53.432867"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:02:53.531453"
-        },
-        {
-            "amount": 170,
-            "description": "Exam between 80 and 100",
-            "time": "2025-06-15T00:08:51.706263"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:15:20.115794"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:23:14.971888"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:28:08.844766"
-        },
-        {
-            "amount": -150,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:32:41.516907"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T00:33:00.047159"
-        },
-        {
-            "amount": 700,
-            "description": "Zapal Pack Shared.",
-            "time": "2025-06-15T11:11:36.506980"
-        },
-        {
-            "amount": -200,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:13:35.246080"
-        },
-        {
-            "amount": -60,
-            "description": "Legenda transfering 60 points",
-            "time": "2025-06-15T11:48:51.018305"
-        },
-        {
-            "amount": 400,
-            "description": "Zapal Pack",
-            "time": "2025-06-15T11:50:13.158427"
-        },
-        {
             "amount": 100,
-            "description": "Zapal Pack",
-            "time": "2025-06-15T11:50:34.208164"
-        },
-        {
-            "amount": 70,
-            "description": "Zapal Pack",
-            "time": "2025-06-15T11:54:46.516855"
-        },
-        {
-            "amount": -100,
-            "description": "Debt proposed #2",
-            "time": "2025-06-15T17:07:20.687299"
-        },
-        {
-            "amount": -500,
-            "description": "Debt proposed #3",
-            "time": "2025-06-15T17:10:01.301044"
-        },
-        {
-            "amount": 500,
-            "description": "Repayment received #3",
-            "time": "2025-06-15T17:13:45.058866"
-        },
-        {
-            "amount": 100,
-            "description": "Repayment received #2",
-            "time": "2025-06-15T17:14:27.676755"
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T17:56:16.367512",
-            "balance_before": 1010.0
-        },
-        {
-            "amount": -200,
-            "description": "Debt proposed #1",
-            "time": "2025-06-15T17:59:17.084043",
-            "balance_before": 860.0
-        },
-        {
-            "amount": 200,
-            "description": "Repayment received #1",
-            "time": "2025-06-15T18:00:05.227624",
-            "balance_before": 660.0
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T21:38:44.758670",
-            "balance_before": 860.0
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T23:05:01.746861",
-            "balance_before": 710.0
-        },
-        {
-            "amount": 170,
-            "description": "Exam between 80 and 100",
-            "time": "2025-06-15T23:19:07.192743",
-            "balance_before": 560.0
-        },
-        {
-            "amount": 1000,
-            "description": "Shop Photo & Exam 80+",
-            "time": "2025-06-15T23:23:49.396662",
-            "balance_before": 730.0
-        },
-        {
-            "amount": -24,
-            "description": "Debt proposed #4",
-            "time": "2025-06-15T23:28:03.037180",
-            "balance_before": 1730.0
-        },
-        {
-            "amount": 24,
-            "description": "Debt auto-declined #4",
-            "time": "2025-06-15T23:28:03.071665",
-            "balance_before": 1706.0
-        },
-        {
-            "amount": -24,
-            "description": "Debt proposed #5",
-            "time": "2025-06-15T23:28:30.784022",
-            "balance_before": 1730.0
-        },
-        {
-            "amount": 48.0,
-            "description": "Repayment received #5",
-            "time": "2025-06-15T23:31:47.321444",
-            "balance_before": 1706.0
-        },
-        {
-            "amount": -50,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T23:32:18.819298",
-            "balance_before": 1754.0
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T23:32:23.046738",
-            "balance_before": 1704.0
-        },
-        {
-            "amount": 300,
-            "description": "Today 300 points rewarded",
-            "time": "2025-06-17T17:10:01.186980",
-            "balance_before": 694.0
-        },
-        {
-            "amount": 7700,
-            "description": "Baseyn+otin+yana nmadur",
-            "time": "2025-06-17T23:21:30.911272",
-            "balance_before": 994.0
-        },
-        {
-            "amount": 10,
-            "description": "Pochaq karochi",
-            "time": "2025-06-17T23:22:54.914559",
-            "balance_before": 8694.0
-        },
-        {
-            "amount": -700,
-            "description": "Exchange to coins",
-            "time": "2025-06-18T00:30:44.788573",
-            "balance_before": 8704.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-18T00:56:51.038054",
-            "balance_before": 8004.0
-        },
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-18T01:06:45.912404",
-            "balance_before": 8104.0
-        },
-        {
-            "amount": -10000,
-            "description": "Debt proposed #7",
-            "time": "2025-06-18T13:29:57.959954",
-            "balance_before": 10004.0
-        },
-        {
-            "amount": 10000,
-            "description": "Repayment received #7",
-            "time": "2025-06-19T11:31:24.537286",
-            "balance_before": 4.0
-        },
-        {
-            "amount": -10010,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T11:32:40.313116",
-            "balance_before": 10010.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Grammar Tasks' with 100%",
-            "time": "2025-06-19T16:25:33.638040",
+            "description": "Reward for completing 'Grammar Tasks' with 80%",
+            "time": "2025-07-08T10:44:57.295646",
             "balance_before": 0.0
         },
         {
             "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 100%",
-            "time": "2025-06-19T16:37:25.662466",
+            "description": "Reward for completing 'Listening Tasks' with 100%",
+            "time": "2025-07-08T10:50:10.758138",
             "balance_before": 100.0
         },
         {
             "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 100%",
-            "time": "2025-06-19T16:38:06.441442",
+            "description": "Reward for completing 'Grammar Tasks' with 100%",
+            "time": "2025-07-08T11:48:46.842588",
             "balance_before": 200.0
         },
         {
             "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-19T17:00:44.437587",
+            "description": "Reward for completing 'Reading Tasks' with 100%",
+            "time": "2025-07-08T11:50:05.282949",
             "balance_before": 300.0
         },
         {
             "amount": 100,
             "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-19T17:08:29.776280",
+            "time": "2025-07-08T11:53:39.207432",
             "balance_before": 400.0
         },
         {
             "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-06-19T17:10:37.883359",
+            "description": "Reward for completing 'Grammar Tasks' with 100%",
+            "time": "2025-07-08T11:56:29.636718",
             "balance_before": 500.0
         },
         {
             "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 100%",
-            "time": "2025-06-19T17:22:30.730746",
+            "description": "Reward for completing 'Reading Tasks' with 100%",
+            "time": "2025-07-08T11:57:19.695734",
             "balance_before": 600.0
         },
         {
-            "amount": -200,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T19:55:35.123484",
+            "amount": 100,
+            "description": "Reward for completing 'Grammar Tasks' with 100%",
+            "time": "2025-07-08T18:02:03.531168",
             "balance_before": 700.0
         },
         {
+            "amount": 100,
+            "description": "Reward for completing 'Listening Tasks' with 100%",
+            "time": "2025-07-08T18:02:33.899602",
+            "balance_before": 800.0
+        },
+        {
+            "id": "fec72162-e6bd-42df-a992-478bc667b3c0",
             "amount": -500,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T19:59:24.894298",
-            "balance_before": 500.0
-        },
-        {
-            "amount": -87,
-            "description": "Purchased from shop with coins : MLBB Ranked x1",
-            "time": "2025-06-19T20:02:09.045363",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Basseyn Ticket",
-            "time": "2025-06-19T21:30:23.152730",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Muhamadali zapalllar To\u02bbplami",
-            "time": "2025-06-19T23:10:10.521456",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 1110,
-            "description": "Nimadur",
-            "time": "2025-06-19T23:15:20.632691",
-            "balance_before": 0.0
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T23:15:47.201086",
-            "balance_before": 1110.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Muhamadali zapalllar To\u02bbplami",
-            "time": "2025-06-19T23:16:17.002537",
-            "balance_before": 110.0
-        },
-        {
-            "amount": -110,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T23:16:25.064411",
-            "balance_before": 110.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:25:15.674635",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 15000,
-            "description": "Kaf,Super montaj",
-            "time": "2025-06-20T14:34:22.981566",
-            "balance_before": 0.0
-        },
-        {
-            "amount": -4000,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:39:15.454174",
-            "balance_before": 15000.0
-        },
-        {
-            "amount": -4000,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:39:15.532797",
-            "balance_before": 11000.0
-        },
-        {
-            "amount": -7000,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:39:34.721604",
-            "balance_before": 7000.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Zakariyo Voice Zapalar To'plami",
-            "time": "2025-06-20T15:06:57.007443",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Basseyn Ticket",
-            "time": "2025-06-20T17:48:38.390397",
-            "balance_before": 0.0
-        },
-        {
-            "amount": -2000,
-            "description": "Namozda gapirish",
-            "time": "2025-06-20T18:11:03.468568",
-            "balance_before": 0.0
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:17:02.668542",
+            "balance_before": 900.0,
+            "can_cancel": false
         }
     ],
     "Muhammadiso": [
         {
-            "amount": -100,
-            "description": "Check single answer",
-            "time": "2025-06-15T00:21:04.625699"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T00:23:14.828697"
-        },
-        {
-            "amount": 300,
-            "description": "Transfer from Muhammadali",
-            "time": "2025-06-15T16:57:59.985290"
-        },
-        {
-            "amount": -200,
-            "description": "Debt proposed #1",
-            "time": "2025-06-15T17:04:58.825895"
-        },
-        {
-            "amount": 200,
-            "description": "Repayment received #1",
-            "time": "2025-06-15T17:06:14.286101"
-        },
-        {
-            "amount": 500,
-            "description": "Loan accepted #3",
-            "time": "2025-06-15T17:13:19.995812"
-        },
-        {
+            "id": "9edf496d-f689-4393-a24c-9964b66cabde",
             "amount": -500,
-            "description": "Repayment #3",
-            "time": "2025-06-15T17:13:45.054877"
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:36:42.077585",
+            "balance_before": 99455.0,
+            "can_cancel": false
         },
-        {
-            "amount": -150,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:15:05.766491"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:16:05.162449"
-        },
-        {
-            "amount": 300,
-            "description": "Test 2",
-            "time": "2025-06-15T17:16:38.233526",
-            "balance_before": 150050.0
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:18:04.899950",
-            "balance_before": 150350.0
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:23:36.713120",
-            "balance_before": 150340.0
-        },
-        {
-            "amount": -1000,
-            "description": "Debt proposed #4",
-            "time": "2025-06-15T17:24:28.330699",
-            "balance_before": 150330.0
-        },
-        {
-            "amount": -100,
-            "description": "Debt proposed #5",
-            "time": "2025-06-15T17:34:38.032888",
-            "balance_before": 149330.0
-        },
-        {
-            "amount": -150,
-            "description": "Debt proposed #1",
-            "time": "2025-06-15T17:39:31.675123",
-            "balance_before": 149230.0
-        },
-        {
-            "amount": -199,
-            "description": "Debt proposed #2",
-            "time": "2025-06-15T17:43:57.640429",
-            "balance_before": 149080.0
-        },
-        {
-            "amount": 199,
-            "description": "Debt auto-declined #2",
-            "time": "2025-06-15T17:44:00.387909",
-            "balance_before": 148881.0
-        },
-        {
-            "amount": -199,
-            "description": "Debt proposed #3",
-            "time": "2025-06-15T17:44:17.641721",
-            "balance_before": 149080.0
-        },
-        {
-            "amount": 248.75,
-            "description": "Repayment received #3",
-            "time": "2025-06-15T17:47:34.894574",
-            "balance_before": 148881.0
-        },
-        {
-            "amount": 150,
-            "description": "Repayment received #1",
-            "time": "2025-06-15T17:47:37.856694",
-            "balance_before": 149129.75
-        },
-        {
-            "amount": -1000,
-            "description": "Debt proposed #3",
-            "time": "2025-06-15T22:53:01.975157",
-            "balance_before": 149279.75
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-15T23:04:04.890651",
-            "balance_before": 148279.75
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T23:18:19.676347",
-            "balance_before": 148129.75
-        },
-        {
-            "amount": 24,
-            "description": "Loan accepted #5",
-            "time": "2025-06-15T23:28:37.989121",
-            "balance_before": 148179.75
-        },
-        {
-            "amount": 10,
-            "description": "Loan accepted #6",
-            "time": "2025-06-15T23:30:52.150963",
-            "balance_before": 148203.75
-        },
-        {
-            "amount": -48.0,
-            "description": "Repayment #5",
-            "time": "2025-06-15T23:31:47.316898",
-            "balance_before": 148213.75
-        },
-        {
-            "amount": -11.0,
-            "description": "Repayment #6",
-            "time": "2025-06-15T23:32:58.184327",
-            "balance_before": 148165.75
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-16T21:33:53.621294",
-            "balance_before": 148154.75
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-16T21:45:18.187612",
-            "balance_before": 148004.75
-        },
-        {
-            "amount": 1000,
-            "description": "Repayment received #3",
-            "time": "2025-06-17T10:41:57.138680",
-            "balance_before": 147854.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks 2' with 100%",
-            "time": "2025-06-17T12:32:44.161266",
-            "balance_before": 148854.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks 2' with 100%",
-            "time": "2025-06-17T12:36:20.407745",
-            "balance_before": 148954.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks 2' with 100%",
-            "time": "2025-06-17T17:16:07.552546",
-            "balance_before": 149054.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 100%",
-            "time": "2025-06-17T23:45:38.830969",
-            "balance_before": 149154.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Grammar Tasks' with 90%",
-            "time": "2025-06-17T23:46:40.079761",
-            "balance_before": 149254.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 80%",
-            "time": "2025-06-17T23:49:16.745507",
-            "balance_before": 149354.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 100%",
-            "time": "2025-06-17T23:50:38.267415",
-            "balance_before": 149454.75
-        },
-        {
-            "amount": -149550,
-            "description": "Debt proposed #10",
-            "time": "2025-06-18T13:38:43.747923",
-            "balance_before": 149554.75
-        },
-        {
-            "amount": 149550,
-            "description": "Repayment received #10",
-            "time": "2025-06-19T11:30:30.294197",
-            "balance_before": 4.75
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T11:38:48.621728",
-            "balance_before": 149554.75
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T11:38:57.830140",
-            "balance_before": 148554.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 100%",
-            "time": "2025-06-28T18:28:49.519038",
-            "balance_before": 147074.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 100%",
-            "time": "2025-06-29T21:21:23.053322",
-            "balance_before": 147174.75
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 80%",
-            "time": "2025-06-29T22:05:54.662532",
-            "balance_before": 147274.75
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-30T06:48:07.973206",
-            "balance_before": 147374.0
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-30T06:58:10.411943",
-            "balance_before": 147224.0
-        },
-        {
-            "amount": -150,
-            "description": "Fail the exam",
-            "time": "2025-06-30T07:27:51.814959",
-            "balance_before": 147074.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 85%",
-            "time": "2025-06-30T08:10:15.593771",
-            "balance_before": 146924.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 100%",
-            "time": "2025-06-30T08:13:25.881078",
-            "balance_before": 147024.0
-        },
-        {
-            "amount": -1230,
-            "description": "Exchange to coins",
-            "time": "2025-07-04T01:22:24.713604",
-            "balance_before": 147124.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-07-04T16:22:30.618193",
-            "balance_before": 145894.0
-        },
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 80%",
-            "time": "2025-07-04T16:35:47.354662",
-            "balance_before": 145994.0
-        }
-    ],
-    "Zakariyo": [
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:01:25.728719"
-        },
-        {
-            "amount": -20,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:02:48.504493"
-        },
-        {
-            "amount": -20,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:02:57.880828"
-        },
-        {
-            "amount": -200,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:03:04.667422"
-        },
-        {
-            "amount": 1000,
-            "description": "Ish basen ochish",
-            "time": "2025-06-17T19:46:16.367468",
-            "balance_before": 0.0
-        }
-    ],
-    "Legenda": [
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:19:57.083915"
-        },
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:20:41.616572"
-        },
-        {
-            "amount": -700,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:20:50.213026"
-        },
-        {
-            "amount": -2260,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T10:23:50.862966"
-        },
-        {
-            "amount": 60,
-            "description": "Transfer from Muhammadali",
-            "time": "2025-06-15T11:49:24.804257"
-        },
-        {
-            "amount": -60,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:49:34.703698"
-        },
-        {
-            "amount": 300,
-            "description": "Transfer from Muhammadali",
-            "time": "2025-06-15T11:52:22.462187"
-        },
-        {
-            "amount": -200,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:53:22.614688"
-        },
-        {
-            "amount": -50,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:53:31.070102"
-        },
-        {
-            "amount": -20,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:53:38.894843"
-        },
-        {
-            "amount": -20,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:53:44.876971"
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T11:53:49.440100"
-        },
-        {
-            "amount": 50,
-            "description": "Exam between 50 and 79",
-            "time": "2025-06-15T17:55:49.506353",
-            "balance_before": 0.0
+        {
+            "id": "568fe07b-8782-4a10-82f0-95148f2183b6",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:36:44.101509",
+            "balance_before": 98955.0,
+            "can_cancel": false
         },
-        {
-            "amount": 200,
-            "description": "Loan accepted #1",
-            "time": "2025-06-15T17:59:30.626070",
-            "balance_before": 50.0
-        },
-        {
-            "amount": -10,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T17:59:56.347861",
-            "balance_before": 250.0
-        },
-        {
-            "amount": -40,
-            "description": "Exchange to coins",
-            "time": "2025-06-15T18:00:03.380353",
-            "balance_before": 240.0
-        },
-        {
-            "amount": -200,
-            "description": "Repayment #1",
-            "time": "2025-06-15T18:00:05.224499",
-            "balance_before": 200.0
-        },
-        {
-            "amount": 10000,
-            "description": "Loan accepted #7",
-            "time": "2025-06-18T13:30:01.550061",
-            "balance_before": -4000.0
-        },
-        {
-            "amount": -10000,
-            "description": "Unban Account",
-            "time": "2025-06-18T13:30:40.074829",
-            "balance_before": 6000.0
-        },
-        {
-            "amount": 2000,
-            "description": "Loan accepted #8",
-            "time": "2025-06-18T13:33:01.056488",
-            "balance_before": -4000.0
-        },
-        {
-            "amount": -10000,
-            "description": "Repayment #7",
-            "time": "2025-06-19T11:31:24.532496",
-            "balance_before": -2000.0
-        },
-        {
-            "amount": -2000,
-            "description": "Repayment #8",
-            "time": "2025-06-19T11:31:25.572922",
-            "balance_before": -12000.0
-        },
-        {
-            "amount": 25000,
-            "description": "Kaf",
-            "time": "2025-06-20T14:35:11.675422",
-            "balance_before": -14000.0
-        },
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:51:24.622944",
-            "balance_before": 11000.0
+        {
+            "id": "7d5107a4-9983-4c3c-9521-47477f3d66f5",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:36:45.855166",
+            "balance_before": 98455.0,
+            "can_cancel": false
         },
-        {
-            "amount": -200,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:51:31.111178",
-            "balance_before": 10900.0
-        },
-        {
-            "amount": -1000,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:51:35.473411",
-            "balance_before": 10700.0
-        },
-        {
-            "amount": -20,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:52:00.147047",
-            "balance_before": 9700.0
+        {
+            "id": "722ed606-1286-436c-9727-b594236171e2",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:36:47.796382",
+            "balance_before": 97955.0,
+            "can_cancel": false
         },
-        {
-            "amount": -9680,
-            "description": "Exchange to coins",
-            "time": "2025-06-20T14:52:19.400670",
-            "balance_before": 9680.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Basseyn Ticket",
-            "time": "2025-06-20T14:52:38.012403",
-            "balance_before": 0.0
-        },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:52:44.078081",
-            "balance_before": 0.0
+        {
+            "id": "1d3219d5-42b4-4aa1-8c4c-d46f905a10cc",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:36:54.728209",
+            "balance_before": 97455.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:52:49.294306",
-            "balance_before": 0.0
+        {
+            "id": "ec85f49b-c252-4447-a95b-56247f4ebc73",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:14.135499",
+            "balance_before": 96955.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:52:54.471065",
-            "balance_before": 0.0
+        {
+            "id": "4260a579-63bc-4144-adad-09ccf116d79a",
+            "amount": 2,
+            "description": "\ud83d\udcab Lucky Spin Reward",
+            "time": "2025-07-08T19:37:14.138127",
+            "balance_before": 96455.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:52:59.371864",
-            "balance_before": 0.0
+        {
+            "id": "79afbf55-065f-4836-b6be-f6113b011ea0",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:17.292692",
+            "balance_before": 96457.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:53:04.290874",
-            "balance_before": 0.0
+        {
+            "id": "7a2b18fa-3771-4355-b942-1c5e2b879ea9",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:19.681952",
+            "balance_before": 95957.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : WiFi 1 day Access 5Ghz",
-            "time": "2025-06-20T14:53:11.116154",
-            "balance_before": 0.0
+        {
+            "id": "77347631-11c5-4270-bbd4-36037d281e6d",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:21.819749",
+            "balance_before": 95457.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Elbek Zapalar toplami",
-            "time": "2025-06-20T14:53:15.360656",
-            "balance_before": 0.0
+        {
+            "id": "6e2eeec7-5da2-4385-9793-54468142132d",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:23.818213",
+            "balance_before": 94957.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Abdulmalik Zaparil Pack.",
-            "time": "2025-06-20T14:53:27.781541",
-            "balance_before": 0.0
-        }
-    ],
-    "Elbek": [
-        {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 80%",
-            "time": "2025-06-17T14:30:49.206458",
-            "balance_before": 0.0
+        {
+            "id": "1f478667-44cd-407a-b26b-410b234703ed",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:26.084376",
+            "balance_before": 94457.0,
+            "can_cancel": false
         },
-        {
-            "amount": -100,
-            "description": "Exchange to coins",
-            "time": "2025-06-17T14:31:37.900447",
-            "balance_before": 100.0
+        {
+            "id": "524814ae-7fce-4758-997d-e92fb7740d73",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:28.306279",
+            "balance_before": 93957.0,
+            "can_cancel": false
         },
         {
-            "amount": 500,
-            "description": "Pochaxni obchiqib berding",
-            "time": "2025-06-17T17:19:05.017028",
-            "balance_before": 0.0
+            "id": "ee8f71b0-9186-4075-807a-4832bc171b4b",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:32.446194",
+            "balance_before": 93457.0,
+            "can_cancel": false
         },
         {
-            "amount": 100,
-            "description": "Reward for completing 'Grammar Tasks' with 90%",
-            "time": "2025-06-17T19:02:13.362746",
-            "balance_before": 500.0
+            "id": "f7dc312d-9eaf-4fab-ad24-d135e8cd3505",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:34.924019",
+            "balance_before": 92957.0,
+            "can_cancel": false
         },
         {
-            "amount": 100,
-            "description": "Reward for completing 'Listening Tasks' with 83%",
-            "time": "2025-06-17T19:22:31.127812",
-            "balance_before": 600.0
+            "id": "9ec96f8c-9da9-4953-91b3-ebba410e6c50",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:48.561694",
+            "balance_before": 92457.0,
+            "can_cancel": false
         },
         {
-            "amount": -700,
-            "description": "Exchange to coins",
-            "time": "2025-06-17T19:25:03.054483",
-            "balance_before": 700.0
+            "id": "ac45b5dc-8912-4518-9684-aac0a22bd0f2",
+            "amount": 66,
+            "description": "\ud83d\udcab Lucky Spin Reward",
+            "time": "2025-07-08T19:37:48.561834",
+            "balance_before": 91957.0,
+            "can_cancel": false
         },
         {
-            "amount": 1000,
-            "description": "Ish basen ochish",
-            "time": "2025-06-17T19:44:54.186200",
-            "balance_before": 0.0
+            "id": "3cc966f3-471e-423a-9cf8-7917a46d4b9b",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:50.906205",
+            "balance_before": 92023.0,
+            "can_cancel": false
         },
         {
-            "amount": 4990,
-            "description": "Basseyn + Exclusive Pochoq tasash 500 points.",
-            "time": "2025-06-17T23:24:49.885885",
-            "balance_before": 1000.0
+            "id": "535d5343-6901-44fe-9331-20e5bb622d70",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:52.769170",
+            "balance_before": 91523.0,
+            "can_cancel": false
         },
         {
-            "amount": -2000,
-            "description": "Debt proposed #8",
-            "time": "2025-06-18T13:32:26.148596",
-            "balance_before": 5990.0
+            "id": "aaee9371-61cf-449a-a924-e23805587547",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:54.478977",
+            "balance_before": 91023.0,
+            "can_cancel": false
         },
         {
-            "amount": 149550,
-            "description": "Loan accepted #10",
-            "time": "2025-06-18T13:39:27.267238",
-            "balance_before": 3990.0
+            "id": "0770f99a-6fca-40c1-bdd0-200270509bfc",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:56.516522",
+            "balance_before": 90523.0,
+            "can_cancel": false
         },
         {
-            "amount": -149550,
-            "description": "Repayment #10",
-            "time": "2025-06-19T11:30:30.274108",
-            "balance_before": 153540.0
+            "id": "186e8aed-5a5a-4773-a1d5-4572389cde23",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:37:58.770434",
+            "balance_before": 90023.0,
+            "can_cancel": false
         },
         {
-            "amount": 2000,
-            "description": "Repayment received #8",
-            "time": "2025-06-19T11:31:25.583959",
-            "balance_before": 3990.0
+            "id": "901f9215-8362-4c44-97e5-c5ea0d6e6877",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:38:00.992376",
+            "balance_before": 89523.0,
+            "can_cancel": false
         },
         {
-            "amount": -5990,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T11:34:03.223397",
-            "balance_before": 5990.0
+            "id": "64678b4b-f114-402e-9e39-bcf6d28c5c40",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:38:03.022352",
+            "balance_before": 89023.0,
+            "can_cancel": false
         },
         {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Basseyn Ticket",
-            "time": "2025-06-19T21:30:55.195401",
-            "balance_before": 0.0
+            "id": "5682617b-c9e7-44c8-b39a-25925c02312a",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:38:05.401838",
+            "balance_before": 88523.0,
+            "can_cancel": false
         },
-        {
-            "amount": 0,
-            "description": "Purchased from shop with coins : Basseyn Ticket",
-            "time": "2025-06-20T17:49:11.911317",
-            "balance_before": 0.0
-        }
-    ],
-    "Behruz": [
-        {
-            "amount": -5000,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T12:02:14.043969",
-            "balance_before": 5000.0
-        }
-    ],
-    "071-BKK": [
         {
-            "amount": 100,
-            "description": "Reward for completing 'Grammar Tasks' with 80%",
-            "time": "2025-06-19T12:26:20.058235",
-            "balance_before": 0.0
+            "id": "09e18d1b-bca7-47dd-ad27-e36a30a48e89",
+            "amount": 94,
+            "description": "\ud83d\udcab Lucky Spin Reward",
+            "time": "2025-07-08T19:38:05.401916",
+            "balance_before": 88023.0,
+            "can_cancel": false
         },
         {
-            "amount": 100,
-            "description": "Reward for completing 'Reading Tasks' with 80%",
-            "time": "2025-06-19T12:32:21.169153",
-            "balance_before": 100.0
+            "id": "7542b8b0-e5ae-4444-9a76-8a98ac03431a",
+            "amount": -500,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-08T19:38:08.143323",
+            "balance_before": 88117.0,
+            "can_cancel": false
         },
         {
-            "amount": -200,
-            "description": "Exchange to coins",
-            "time": "2025-06-19T12:59:03.571449",
-            "balance_before": 200.0
+            "id": "8e9207d5-05d2-465b-bba2-4d43be40ab79",
+            "amount": 26191,
+            "description": "\ud83c\udf81 Lucky Box Win (C)",
+            "time": "2025-07-08T19:38:08.145879",
+            "balance_before": 87617.0,
+            "can_cancel": false
         }
     ]
 }

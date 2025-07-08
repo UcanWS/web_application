@@ -1,20 +1,20 @@
 {
     "Muhammadiso": {
         "level": "Beginner",
-        "progress": 0.0,
-        "start_date": "2025-06-05",
+        "progress": 0,
+        "start_date": "2025-07-02",
         "study_days": "odd"
     },
     "Abdulmalik": {
         "level": "Beginner",
         "progress": 0.0,
-        "start_date": "2025-06-30",
+        "start_date": "2025-07-02",
         "study_days": "odd"
     },
     "Muhammadali": {
         "level": "Beginner",
         "progress": 0.0,
-        "start_date": "2025-06-30",
+        "start_date": "2025-07-02",
         "study_days": "odd"
     }
 }

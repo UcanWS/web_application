@@ -87,35 +87,34 @@
       </div>
 	  
 <!-- Progress Skeleton -->
-<div id="progress-card-skeleton" class="progress-card skeleton">
-  <div class="progress-item skeleton-level"></div>
-  <div class="tools-card">
-    <div class="progress-item skeleton-block"></div>
-    <div class="progress-item skeleton-block"></div>
-    <div class="progress-item skeleton-block"></div>
-    <div class="progress-item skeleton-block"></div>
+<div id="progress-card-skeleton" class="progress-card">
+  <div class="skeleton-level"></div>
+  <div class="progress-metrics">
+    <div class="skeleton-block"></div>
+    <div class="skeleton-block"></div>
+    <div class="skeleton-block"></div>
   </div>
 </div>
 
+
 <!-- Actual Progress Content (initially hidden) -->
-<div id="progress-card" class="progress-card" style="display: none;">
-  <div class="progress-item level">
-    <div class="value" id="current-level-value"></div>
-    <div class="label" id="next-level-label"></div>
+  <div id="progress-card" class="progress-card">
+    <div class="progress-view level">
+      <div class="value" id="current-level-value">Level</div>
+      <div class="label" id="next-level-label">Next Level: </div>
+    </div>
+    <div class="progress-metrics">
+      <div class="progress-view">
+        <div class="value" id="current-unit-value">Unit</div>
+      </div>
+      <div class="progress-view">
+        <div class="value" id="current-week-value">Week</div>
+      </div>
+      <div class="progress-view">
+        <div class="value" id="completion-value">% Completed</div>
+      </div>
+    </div>
   </div>
-  <div class="progress-item">
-    <div class="value" id="current-unit-value"></div>
-    <div class="label"></div>
-  </div>
-  <div class="progress-item">
-    <div class="value" id="current-week-value"></div>
-    <div class="label"></div>
-  </div>
-  <div class="progress-item">
-    <div class="value" id="completion-value"></div>
-    <div class="label">Completed</div>
-  </div>
-</div>
     </div>
 	
 	  <div class="tools-card">
@@ -138,33 +137,225 @@
     </div>
   </div>
   
-  <div class="coin-shop-card" onclick="showPage('shop')">
-  <div class="coin-shop-text">
-    <div class="shop-title-main">Shop with Coins</div>
-    <div class="shop-subtext">To buy items, first earn points<br>and exchange to coins</div>
+  <div class="informations-blocks">
+    <div class="carousel">
+      <div class="carousel-item active">
+        <div class="coin-shop-card" onclick="showPage('shop')">
+          <div class="coin-shop-text">
+            <div class="shop-title-main">Shop with Coins</div>
+            <div class="shop-subtext">To buy items, first earn points<br>and exchange to coins</div>
+          </div>
+          <div class="coin-shop-image">
+            <img src="/static/icons/chest-image.png" alt="Chest Image">
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item">
+<div class="lucky-spin-card" onclick="showPage('points-page')">
+  <div class="lucky-spin-text">
+    <div class="lucky-spin-title">Lucky Spin</div>
+    <div class="lucky-spin-subtext">Win up to <strong>30,000 points</strong> instantly!</div>
   </div>
-  <div class="coin-shop-image">
-    <img src="/static/icons/chest-image.png" alt="Chest Image">
+  <div class="lucky-spin-image">
+    <img src="/static/icons/gift.png" alt="Lucky Wheel">
+  </div>
+
+      </div>
+	  </div>
+      <div class="carousel-item">
+<div class="double-points-card" onclick="showPage('shop')">
+  <div class="double-points-text">
+    <div class="double-points-title">Double Points</div>
+    <div class="double-points-subtext">Earn <strong>2× more points</strong><br>on every action today!</div>
+  </div>
+  <div class="double-points-image">
+    <img src="/static/icons/star.png" alt="Double Points Icon">
   </div>
 </div>
+
+      </div>
+    </div>
+  </div>
 
 	
   </div>
 
 <div id="leaderboard" class="page">
-  <button id="leaderboard-back" class="back-btn">
-    <i class="fas fa-arrow-left"></i> Back
-  </button>
 
   <div id="leaderboard-container"></div>
 </div>
 
-<div id="settings" class="page" style="display: none;">
-  <h1>Settings</h1>
-  <div class="settings-content">
-    <button class="logout-btn" onclick="logout()">
-      <i class="fas fa-sign-out-alt"></i> Logout
+<div id="strikes-page" class="page hidden">
+  <div class="strike-summary">
+    <div class="strike-info">
+      <div id="strike-total" class="strike-count">0</div>
+      <div class="strike-label">Strikes in total</div>
+    </div>
+    <div class="strike-fire">
+      <img src="/static/icons/fire.png" alt="Fire Icon" />
+    </div>
+  </div>
+
+  <div class="history-strikes-container">
+    <h3 class="history-title">Strike History by Unit</h3>
+    <div id="unit-strike-list" class="unit-strike-grid"></div>
+  </div>
+</div>
+
+
+
+
+<div id="points-page" class="page">
+
+<div class="transfer-glass-card">
+  <h2 class="transfer-title"><i class="fas fa-paper-plane"></i> Transfer Points</h2>
+
+  <div class="input-group">
+    <label for="receiver"><i class="fas fa-user"></i> Receiver</label>
+    <input type="text" id="receiver" placeholder="Enter username" />
+  </div>
+
+  <div class="input-group">
+    <label for="amount"><i class="fas fa-coins"></i> Amount</label>
+    <input type="number" id="amount" placeholder="Enter amount" />
+  </div>
+
+  <button class="transfer-btn" onclick="submitTransfer()">
+    <i class="fas fa-arrow-right"></i> Send Points
+  </button>
+</div>
+
+<div id="lucky-spin-wrapper" class="lucky-glass-wrapper">
+  <div class="glass-card">
+    <h2 class="spin-title"><i class="fas fa-gift"></i> Lucky Spin</h2>
+    <p class="cost-text"><i class="fas fa-coins"></i> Each spin costs <strong class="highlight">500 pts</strong></p>
+
+    <button id="luckySpinBtn" class="glass-btn">
+      <i class="fas fa-magic"></i> Spin Now
     </button>
+    <p id="spin-counter" class="spin-info"><i class="fas fa-undo"></i> Spins: 0 / 10</p>
+    <p class="reward-hint"><i class="fas fa-info-circle"></i> Normal spin reward: <strong>0 - 100 pts</strong> (15% chance)</p>
+
+    <div class="box-container">
+      <div class="box glass-box" id="box-A">
+        <div class="box-label"><i class="fas fa-box"></i> Box A</div>
+        <div class="balls"></div>
+      </div>
+      <div class="box glass-box" id="box-B">
+        <div class="box-label"><i class="fas fa-box"></i> Box B</div>
+        <div class="balls"></div>
+      </div>
+      <div class="box glass-box" id="box-C">
+        <div class="box-label"><i class="fas fa-box"></i> Box C</div>
+        <div class="balls"></div>
+      </div>
+    </div>
+	
+	<div class="reward-history glass-card">
+  <h3><i class="fas fa-history"></i> Recent Spin History</h3>
+  <ul id="history-list" class="history-list">
+    <!-- История будет сюда добавляться -->
+  </ul>
+</div>
+
+
+    <div class="faq-section">
+      <h3><i class="fas fa-question-circle"></i> How It Works</h3>
+      <ul>
+        <li><strong>Each spin costs 500 points.</strong></li>
+        <li>Every 10 spins → 1 ball is given to a random box (A, B, or C).</li>
+        <li>First box to reach 3 balls gives a big prize: <strong>7,000 – 30,000 pts</strong></li>
+        <li>Normal spins may randomly give up to <strong>100 pts</strong> (15% chance).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+</div>
+
+<div id="settings" class="page">
+  <!-- Password Modal -->
+  <div id="change-passwords-modal" class="password-modal">
+    <div class="password-modal-content animate__animated animate__zoomIn">
+      <span class="close-modal" onclick="closePasswordModal()">×</span>
+      <h3><i class="fas fa-lock"></i> Change Password</h3>
+      <form id="change-password-form">
+        <div class="form-group">
+          <span class="input-label">Current Password</span>
+          <div class="input-wrapper">
+            <input type="password" id="currentPassword" required placeholder="Enter your current password" />
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('currentPassword')"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="input-label">New Password</span>
+          <div class="input-wrapper">
+            <input type="password" id="newPassword" required placeholder="Enter your new password" oninput="checkPasswordStrength()" />
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('newPassword')"></i>
+          </div>
+          <div class="password-strength">
+            <span id="strength-bar" class="strength-bar"></span>
+            <span id="strength-text" class="strength-text"></span>
+          </div>
+          <ul class="password-requirements">
+            <li id="lowercase"><i class="fas fa-times text-red"></i> Lowercase</li>
+            <li id="uppercase"><i class="fas fa-times text-red"></i> Uppercase</li>
+            <li id="number"><i class="fas fa-times text-red"></i> Number</li>
+            <li id="special"><i class="fas fa-times text-red"></i> Special character</li>
+            <li id="length"><i class="fas fa-times text-red"></i> 8+ characters</li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <span class="input-label">Confirm New Password</span>
+          <div class="input-wrapper">
+            <input type="password" id="confirmPassword" required placeholder="Confirm your new password" />
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-check-circle"></i> Update Password
+        </button>
+        <div id="password-message" class="message"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings Container -->
+  <div class="settings-container animate__animated animate__fadeIn">
+    <h1 class="settings-title"><i class="fas fa-cog"></i> Settings</h1>
+    <div class="settings-menu">
+      <ul class="menu-list">
+        <li class="menu-item active" data-section="appearance">
+          <i class="fas fa-palette"></i> Appearance
+        </li>
+        <li class="menu-item" data-section="system">
+          <i class="fas fa-tools"></i> System
+        </li>
+      </ul>
+      <div class="settings-content">
+        <div id="appearance" class="content-section active">
+          <h2><i class="fas fa-palette"></i> Appearance Settings</h2>
+          <p>Customize your theme, colors, and layout preferences here.</p>
+        </div>
+        <div id="system" class="content-section">
+          <h2><i class="fas fa-tools"></i> System Settings</h2>
+          <p>Manage system preferences, notifications, and updates.</p>
+          <div class="settings-actions">
+            <button class="logout-btn" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <button class="open-password-modal-btn" onclick="openPasswordModal()">
+              <i class="fas fa-key"></i> Change Password
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+	  <div class="app-version">Version o2.1</div>
   </div>
 </div>
 
