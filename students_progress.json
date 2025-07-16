@@ -2,17 +2,29 @@
     "Muhammadiso": {
         "level": "Beginner",
         "progress": 0,
-        "start_date": "2025-07-02",
+        "start_date": "2025-07-04",
         "study_days": "odd"
     },
     "Abdulmalik": {
         "level": "Beginner",
-        "progress": 0.0,
-        "start_date": "2025-07-02",
+        "progress": 6.0,
+        "start_date": "2025-07-04",
         "study_days": "odd"
     },
     "Muhammadali": {
         "level": "Beginner",
+        "progress": 6.0,
+        "start_date": "2025-07-04",
+        "study_days": "odd"
+    },
+    "Elbek": {
+        "level": "Beginner",
+        "progress": 6.0,
+        "start_date": "2025-07-02",
+        "study_days": "odd"
+    },
+    "Legenda": {
+        "level": "IELTS L1",
         "progress": 0.0,
         "start_date": "2025-07-02",
         "study_days": "odd"

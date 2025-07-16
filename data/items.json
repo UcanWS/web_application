@@ -3,7 +3,7 @@
     "id": 1,
     "name": "Elbek Zapalar toplami",
     "cost": 120,
-    "items_left": 9,
+    "items_left": 8,
     "type": "Zapal",
     "image": "/static/images/Elbek.png"
   },
@@ -43,7 +43,7 @@
     "id": 6,
     "name": "Muhamadali zapalllar Toʻplami",
     "cost": 90,
-    "items_left": 9,
+    "items_left": 7,
     "type": "video",
     "image": "/static/images/Ali.jpg"
   },
@@ -59,7 +59,7 @@
     "id": 8,
     "name": "MLBB Weekly Diamond Pass",
     "cost": 19990,
-    "items_left": 1,
+    "items_left": 0,
     "type": "MLBB",
     "image": "/static/images/MLBB Weekly.png"
   },
@@ -67,15 +67,15 @@
     "id": 9,
     "name": "Change Nickname",
     "cost": 50,
-    "items_left": 4,
+    "items_left": 3,
     "type": "System",
     "image": "/static/images/nickname-change.jpg"
   },
   {
     "id": 10,
-    "name": "MLBB Custom da Apex Nova jamoasida bolish.",
-    "cost": 150,
-    "items_left": 0,
+    "name": "MLBB Custom Bobr kurbo Max Pro",
+    "cost": 45000,
+    "items_left": 100,
     "type": "MLBB",
     "image": "/static/images/MLBB.png"
   },
@@ -115,7 +115,7 @@
     "id": 15,
     "name": "Doubled points for Today section 3 Units ",
     "cost": 1990,
-    "items_left": 10,
+    "items_left": 9,
     "type": "System",
     "image": "/static/icons/star.png"
   },

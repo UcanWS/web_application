@@ -1,89 +1,183 @@
 [
-  {
-    "id": 3,
-    "type": "reading",
-    "text": "<h1>Why Do People Fart?</h1>\n<p>All people fart. It is normal. Farts are gas. This gas comes from your stomach or your intestines. It comes out from your body through your bottom. It can be loud or quiet. It can smell bad or have no smell.</p>\n<p>Why do we fart? We fart because we eat food. When we eat, our body makes gas. Some foods make more gas. For example, beans, eggs, cabbage, and soda make more gas. This gas must go out. That is why we fart.</p>\n<p>Farts are not always bad. They show that your body is working. They also help your stomach feel better. But sometimes, too much gas can make your stomach hurt. If you have a lot of gas every day, it is good to talk to a doctor.</p>\n<p>So, farting is funny, but it is also healthy!</p>",
-    "subquestions": [
-      {
-        "id": "3.1",
-        "type": "multiple_choice",
-        "text": "What are farts?",
-        "options": ["Water", "Gas", "Food"],
-        "correct": "Gas"
-      },
-      {
-        "id": "3.2",
-        "type": "multiple_choice",
-        "text": "Where does the gas come from?",
-        "options": ["Legs", "Stomach", "Arms"],
-        "correct": "Stomach"
-      },
-      {
-        "id": "3.3",
-        "type": "multiple_choice",
-        "text": "Which food can make more gas?",
-        "options": ["Candy", "Beans", "Rice"],
-        "correct": "Beans"
-      },
-      {
-        "id": "3.4",
-        "type": "multiple_choice",
-        "text": "Why do people fart?",
-        "options": ["They are sick", "They eat food", "They run fast"],
-        "correct": "They eat food"
-      },
-      {
-        "id": "3.5",
-        "type": "multiple_choice",
-        "text": "Is farting always bad?",
-        "options": ["Yes", "No", "Sometimes"],
-        "correct": "No"
-      }
-    ]
-  },
 {
-  "id": 4,
-  "type": "picture",
-  "text": "Look at the images and answer the following question:",
-  "images": [
-    "/static/exam/picture1.png",
-    "/static/exam/picture2.png",
-    "/static/exam/picture3.png",
-    "/static/exam/picture4.png"
+  "id": 0,
+  "text": "Match the words to the correct information (So‘zlarni to‘g‘ri ma’lumot bilan moslashtiring)",
+  "type": "box-choose",
+  "options": [
+    "Eva",
+    "Sanz",
+    "Spain",
+    "Avenida Lusitana, 13, Granada",
+    "0034 758 3902281",
+    "Eva Sanz"
   ],
   "subquestions": [
     {
-      "id": "4.1",
-      "type": "unscramble",
-      "text": "Dunyo",
-      "correct": "Dunyo"
+      "id": "0.1",
+      "type": "box-choose",
+      "text": "First name ____",
+      "correct": "Eva"
     },
-	    {
-      "id": "4.2",
-      "type": "unscramble",
-      "text": "Dunyo",
-      "correct": "D2nyo"
+    {
+      "id": "0.2",
+      "type": "box-choose",
+      "text": "Last name ____",
+      "correct": "Sanz"
+    },
+    {
+      "id": "0.3",
+      "type": "box-choose",
+      "text": "Country ____",
+      "correct": "Spain"
+    },
+    {
+      "id": "0.4",
+      "type": "box-choose",
+      "text": "Home address ____",
+      "correct": "Avenida Lusitana, 13, Granada"
+    },
+    {
+      "id": "0.5",
+      "type": "box-choose",
+      "text": "Phone number ____",
+      "correct": "0034 758 3902281"
+    },
+    {
+      "id": "0.6",
+      "type": "box-choose",
+      "text": "Signature ____",
+      "correct": "Eva Sanz"
     }
   ]
 },
+  {
+    "id": 1,
+    "type": "multiple_choice",
+    "text": "Choose correct option",
+    "subquestions": [
+      {
+        "id": "1.1",
+        "type": "multiple_choice",
+        "text": "___'s your name?",
+        "options": ["What", "How", "Where"],
+        "correct": "What"
+      },
+      {
+        "id": "1.2",
+        "type": "multiple_choice",
+        "text": "____ do you spell that?",
+        "options": ["What", "How", "Where"],
+        "correct": "How"
+      },
+      {
+        "id": "1.3",
+        "type": "multiple_choice",
+        "text": "_____ are you from?",
+        "options": ["What", "How", "Where"],
+        "correct": "Where"
+      },
+      {
+        "id": "1.4",
+        "type": "multiple_choice",
+        "text": "___ in Russia?",
+        "options": ["What", "How", "Where"],
+        "correct": "Where"
+      },
+      {
+        "id": "1.5",
+        "type": "multiple_choice",
+        "text": "____'s your phone number?",
+        "options": ["What", "How", "Where","Is","Are","Am"],
+        "correct": "What"
+      }
+    ]
+  },
+
 {
-                "id": 5,
-                "text": "Read the interview about the Hollywood film Captain Phillips. Complete the questions with words/phrases from the box.",
-                "type": "box-choose",
-                "options": ["plot", "stars", "effects", "set", "performance", "character", "cast"],
-                "subquestions": [
-                    {
-                        "id": "5.1",
-                        "type": "box-choose",
-                        "text": "So, what is Captain Phillips about? What’s the ____ special of the film? Well, it tells the story of what happens when Somali pirates go on board an American ship. It’s a true story, and the idea for the film came from a book written by the real Captain Phillips.",
-                        "correct": "plot"
-                    },
-                    {
-                        "id": "5.2",
-                        "type": "box-choose",
-                        "text": "And where the film ____? It’s on a ship, of course, but we also filmed some scenes in other places to show the pirates’ lives on land.",
-                        "correct": "set"
-                    }
-                ]
+  "id": 2,
+  "text": "Complete the dialogue with subject pronouns",
+  "type": "listening",
+  "audio": "/static/workbook-audio/Beginner-units1-5/1-07 Navigate A1 Workbook.mp3",
+  "subquestions": [
+    {
+      "id": "2.1",
+      "type": "write-in-blank",
+      "text": "Hi, Chris. Louise here. How are ___?",
+      "correct": "you"
+    },
+    {
+      "id": "2.2",
+      "type": "write-in-blank",
+      "text": "___’m fine, thanks.",
+      "correct": "I"
+    },
+    {
+      "id": "2.3",
+      "type": "write-in-blank",
+      "text": "And ___?",
+      "correct": "you"
+    },
+    {
+      "id": "2.4",
+      "type": "write-in-blank",
+      "text": "Great, thanks. Are ___ at home?",
+      "correct": "you"
+    },
+    {
+      "id": "2.5",
+      "type": "write-in-blank",
+      "text": "No, ___’m on business in the USA with Jack.",
+      "correct": "I"
+    },
+    {
+      "id": "2.6",
+      "type": "write-in-blank",
+      "text": "___’re in New York.",
+      "correct": "We"
+    },
+    {
+      "id": "2.7",
+      "type": "write-in-blank",
+      "text": "No, ___ isn’t.",
+      "correct": "she"
+    },
+    {
+      "id": "2.8",
+      "type": "write-in-blank",
+      "text": "___’s on holiday with friends.",
+      "correct": "She"
+    },
+    {
+      "id": "2.9",
+      "type": "write-in-blank",
+      "text": "Really? Where are ___?",
+      "correct": "they"
+    },
+    {
+      "id": "2.10",
+      "type": "write-in-blank",
+      "text": "___’re in Izmir.",
+      "correct": "They"
+    },
+    {
+      "id": "2.11",
+      "type": "write-in-blank",
+      "text": "___’s in Turkey.",
+      "correct": "It"
+    },
+    {
+      "id": "2.12",
+      "type": "write-in-blank",
+      "text": "No, ___ isn’t.",
+      "correct": "he"
+    },
+    {
+      "id": "2.13",
+      "type": "write-in-blank",
+      "text": "___’s at home with my mother.",
+      "correct": "He"
+    }
+  ]
 }
+
 ]

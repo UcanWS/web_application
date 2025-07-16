@@ -90,5 +90,22 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
   <script src="/static/js/loginv2.js"></script>
+  <script>
+if (navigator.userAgentData) {
+  navigator.userAgentData.getHighEntropyValues(["platform", "model", "brands", "mobile"]).then(ua => {
+    fetch('/log-client-device', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        platform: ua.platform,
+        model: ua.model,
+        brands: ua.brands,
+        isMobile: ua.mobile
+      })
+    });
+  });
+}
+</script>
+
 </body>
 </html>

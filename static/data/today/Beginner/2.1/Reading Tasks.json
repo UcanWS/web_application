@@ -1,44 +1,45 @@
 [
-  {
-    "id": 3,
-    "type": "reading",
-    "text": "<h1>Why Do People Fart?</h1>\n<p>All people fart. It is normal. Farts are gas. This gas comes from your stomach or your intestines. It comes out from your body through your bottom. It can be loud or quiet. It can smell bad or have no smell.</p>\n<p>Why do we fart? We fart because we eat food. When we eat, our body makes gas. Some foods make more gas. For example, beans, eggs, cabbage, and soda make more gas. This gas must go out. That is why we fart.</p>\n<p>Farts are not always bad. They show that your body is working. They also help your stomach feel better. But sometimes, too much gas can make your stomach hurt. If you have a lot of gas every day, it is good to talk to a doctor.</p>\n<p>So, farting is funny, but it is also healthy!</p>",
-    "subquestions": [
-      {
-        "id": "3.1",
-        "type": "multiple_choice",
-        "text": "What are farts?",
-        "options": ["Water", "Gas", "Food"],
-        "correct": "Gas"
-      },
-      {
-        "id": "3.2",
-        "type": "multiple_choice",
-        "text": "Where does the gas come from?",
-        "options": ["Legs", "Stomach", "Arms"],
-        "correct": "Stomach"
-      },
-      {
-        "id": "3.3",
-        "type": "multiple_choice",
-        "text": "Which food can make more gas?",
-        "options": ["Candy", "Beans", "Rice"],
-        "correct": "Beans"
-      },
-      {
-        "id": "3.4",
-        "type": "multiple_choice",
-        "text": "Why do people fart?",
-        "options": ["They are sick", "They eat food", "They run fast"],
-        "correct": "They eat food"
-      },
-      {
-        "id": "3.5",
-        "type": "multiple_choice",
-        "text": "Is farting always bad?",
-        "options": ["Yes", "No", "Sometimes"],
-        "correct": "No"
-      }
-    ]
-  }
+{
+  "id": 3,
+  "type": "reading",
+  "text": "<h1>Why Do People Sneeze?</h1>\n<p>All people sneeze. It is normal. A sneeze is a strong air burst that comes out of your nose and mouth. It happens when something tickles the inside of your nose. This could be dust, pollen, smoke, or even strong smells.</p>\n<p>When you sneeze, your body is trying to clean your nose. It pushes out the bad things. That is why sneezing is healthy. It protects your lungs and keeps your nose clean.</p>\n<p>Some people sneeze many times in a row. Some people make loud sneezes, others quiet ones. If you sneeze a lot every day, you might have allergies. Then it is good to talk to a doctor.</p>\n<p>So, sneezing is funny, but it is also important for your health!</p>",
+  "subquestions": [
+    {
+      "id": "3.1",
+      "type": "multiple_choice",
+      "text": "What is a sneeze?",
+      "options": ["A cough", "A strong air burst", "A whisper"],
+      "correct": "A strong air burst"
+    },
+    {
+      "id": "3.2",
+      "type": "multiple_choice",
+      "text": "What can make you sneeze?",
+      "options": ["Water", "Sunlight", "Dust"],
+      "correct": "Dust"
+    },
+    {
+      "id": "3.3",
+      "type": "multiple_choice",
+      "text": "Why do people sneeze?",
+      "options": ["To speak louder", "To clean the nose", "To make noise"],
+      "correct": "To clean the nose"
+    },
+    {
+      "id": "3.4",
+      "type": "multiple_choice",
+      "text": "Is sneezing always bad?",
+      "options": ["Yes", "No", "Sometimes"],
+      "correct": "No"
+    },
+    {
+      "id": "3.5",
+      "type": "multiple_choice",
+      "text": "What should you do if you sneeze a lot every day?",
+      "options": ["Ignore it", "Drink water", "Talk to a doctor"],
+      "correct": "Talk to a doctor"
+    }
+  ]
+}
+
 ]

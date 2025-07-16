@@ -2,42 +2,62 @@
   {
     "id": 3,
     "type": "reading",
-    "text": "<h1>Why Do People Fart?</h1>\n<p>All people fart. It is normal. Farts are gas. This gas comes from your stomach or your intestines. It comes out from your body through your bottom. It can be loud or quiet. It can smell bad or have no smell.</p>\n<p>Why do we fart? We fart because we eat food. When we eat, our body makes gas. Some foods make more gas. For example, beans, eggs, cabbage, and soda make more gas. This gas must go out. That is why we fart.</p>\n<p>Farts are not always bad. They show that your body is working. They also help your stomach feel better. But sometimes, too much gas can make your stomach hurt. If you have a lot of gas every day, it is good to talk to a doctor.</p>\n<p>So, farting is funny, but it is also healthy!</p>",
+    "text": "<h1>Why Do People Sleep?</h1>\n<p>Everyone needs sleep. It is important for the body and the brain. When we sleep, our body rests and gets energy. Sleep helps us stay healthy, think better, and feel good.</p>\n<p>Most people sleep at night. Adults need about 7 to 9 hours of sleep. Children and babies need more. If we don’t sleep enough, we feel tired, sad, or sick.</p>\n<p>Good sleep means going to bed at the same time every night. It also helps to turn off lights and phones. Drinking warm milk or reading a book can help you relax before bed.</p>\n<p>So remember — sleep is not just rest. It’s part of staying strong and happy!</p>",
     "subquestions": [
       {
         "id": "3.1",
         "type": "multiple_choice",
-        "text": "What are farts?",
-        "options": ["Water", "Gas", "Food"],
-        "correct": "Gas"
+        "text": "Why do people need sleep?",
+        "options": [
+          "To eat more food",
+          "To help the body and brain rest",
+          "To run faster"
+        ],
+        "correct": "To help the body and brain rest"
       },
       {
         "id": "3.2",
         "type": "multiple_choice",
-        "text": "Where does the gas come from?",
-        "options": ["Legs", "Stomach", "Arms"],
-        "correct": "Stomach"
+        "text": "When do most people sleep?",
+        "options": [
+          "In the afternoon",
+          "At night",
+          "In the morning"
+        ],
+        "correct": "At night"
       },
       {
         "id": "3.3",
         "type": "multiple_choice",
-        "text": "Which food can make more gas?",
-        "options": ["Candy", "Beans", "Rice"],
-        "correct": "Beans"
+        "text": "How many hours of sleep do adults need?",
+        "options": [
+          "5 to 6 hours",
+          "3 to 4 hours",
+          "7 to 9 hours"
+        ],
+        "correct": "7 to 9 hours"
       },
       {
         "id": "3.4",
         "type": "multiple_choice",
-        "text": "Why do people fart?",
-        "options": ["They are sick", "They eat food", "They run fast"],
-        "correct": "They eat food"
+        "text": "What can help you relax before bed?",
+        "options": [
+          "Using your phone",
+          "Reading a book",
+          "Watching TV"
+        ],
+        "correct": "Reading a book"
       },
       {
         "id": "3.5",
         "type": "multiple_choice",
-        "text": "Is farting always bad?",
-        "options": ["Yes", "No", "Sometimes"],
-        "correct": "No"
+        "text": "What can happen if you don’t sleep enough?",
+        "options": [
+          "You feel happy",
+          "You feel tired or sick",
+          "You become taller"
+        ],
+        "correct": "You feel tired or sick"
       }
     ]
   }

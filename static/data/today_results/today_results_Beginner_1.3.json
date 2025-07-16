@@ -1,0 +1,492 @@
+{
+    "Muhammadali": {
+        "Reading Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 15:21:47",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "2.1",
+                    "text": "The person isn’t from ____.",
+                    "user_answer": "Madrid",
+                    "correct_answer": "Madrid",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "The flat is not in a modern ____.",
+                    "user_answer": "Building",
+                    "correct_answer": "building",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "All the rooms have got a ____.",
+                    "user_answer": "Balcony",
+                    "correct_answer": "balcony",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "The person loves ____ and parks.",
+                    "user_answer": "Art",
+                    "correct_answer": "art",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.5",
+                    "text": "The flat hasn’t got a ____.",
+                    "user_answer": "Lift",
+                    "correct_answer": "lift",
+                    "is_correct": true
+                }
+            ]
+        },
+        "MLBB Quest": {
+            "submitted": true,
+            "time": "2025-07-10 15:22:32",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 120.0,
+            "details": [
+                {
+                    "question_id": "3.1",
+                    "text": "Ali’s favorite game is ____. ",
+                    "user_answer": "MLBB",
+                    "correct_answer": "MLBB",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.2",
+                    "text": "Ali’s favorite hero is ____. ",
+                    "user_answer": "Layla",
+                    "correct_answer": "Layla",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.3",
+                    "text": "MLBB teams have ____ players. ",
+                    "user_answer": "five",
+                    "correct_answer": "five",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.4",
+                    "text": "Layla uses a big ____. ",
+                    "user_answer": "Cannon",
+                    "correct_answer": "cannon",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.5",
+                    "text": "Ali plays MLBB in the ____. ",
+                    "user_answer": "Evening",
+                    "correct_answer": "evening",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 17:11:18",
+            "correct": 5,
+            "incorrect": 5,
+            "skipped": 0,
+            "total": 10,
+            "percent": 50.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "He ___ to school every day.",
+                    "user_answer": "go",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "She ___ a book now.",
+                    "user_answer": "is reading",
+                    "correct_answer": "is reading",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "We ___ breakfast at 8 a.m.",
+                    "user_answer": "eat",
+                    "correct_answer": "eat",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "I ___ TV at the moment.",
+                    "user_answer": "am watching",
+                    "correct_answer": "am watching",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "She ___ coffee every morning.",
+                    "user_answer": "is drinking",
+                    "correct_answer": "drinks",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "They ___ football now.",
+                    "user_answer": "are playing",
+                    "correct_answer": "are playing",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.7",
+                    "text": "My dad ___ to work by car.",
+                    "user_answer": "go",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.8",
+                    "text": "Listen! The birds ___.",
+                    "user_answer": "sings",
+                    "correct_answer": "are singing",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.9",
+                    "text": "You ___ English very well.",
+                    "user_answer": "are speaking",
+                    "correct_answer": "speak",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.10",
+                    "text": "Look! It ___ now.",
+                    "user_answer": "is snowing",
+                    "correct_answer": "is snowing",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 17:12:11",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "4.1",
+                    "text": "What does 'right' mean?",
+                    "user_answer": "b) write",
+                    "correct_answer": "b) write",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "What does 'you're' mean?",
+                    "user_answer": "a) you're",
+                    "correct_answer": "a) you're",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "What does 'new' mean?",
+                    "user_answer": "b) knew",
+                    "correct_answer": "b) knew",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.4",
+                    "text": "What does 'bye' mean?",
+                    "user_answer": "b) buy",
+                    "correct_answer": "b) buy",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.5",
+                    "text": "What does 'our' mean?",
+                    "user_answer": "a) our",
+                    "correct_answer": "a) our",
+                    "is_correct": true
+                }
+            ]
+        }
+    },
+    "Abdulmalik": {
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 15:19:03",
+            "correct": 7,
+            "incorrect": 3,
+            "skipped": 0,
+            "total": 10,
+            "percent": 70.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "He ___ to school every day.",
+                    "user_answer": "goes",
+                    "correct_answer": "goes",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "She ___ a book now.",
+                    "user_answer": "is reading",
+                    "correct_answer": "is reading",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "We ___ breakfast at 8 a.m.",
+                    "user_answer": "eat",
+                    "correct_answer": "eat",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "I ___ TV at the moment.",
+                    "user_answer": "watch",
+                    "correct_answer": "am watching",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "She ___ coffee every morning.",
+                    "user_answer": "drinks",
+                    "correct_answer": "drinks",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "They ___ football now.",
+                    "user_answer": "are playing",
+                    "correct_answer": "are playing",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.7",
+                    "text": "My dad ___ to work by car.",
+                    "user_answer": "go",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.8",
+                    "text": "Listen! The birds ___.",
+                    "user_answer": "sing",
+                    "correct_answer": "are singing",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.9",
+                    "text": "You ___ English very well.",
+                    "user_answer": "speak",
+                    "correct_answer": "speak",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.10",
+                    "text": "Look! It ___ now.",
+                    "user_answer": "is snowing",
+                    "correct_answer": "is snowing",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 15:21:36",
+            "correct": 4,
+            "incorrect": 1,
+            "skipped": 0,
+            "total": 5,
+            "percent": 80.0,
+            "details": [
+                {
+                    "question_id": "4.1",
+                    "text": "What does 'right' mean?",
+                    "user_answer": "b) write",
+                    "correct_answer": "b) write",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "What does 'you're' mean?",
+                    "user_answer": "a) you're",
+                    "correct_answer": "a) you're",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "What does 'new' mean?",
+                    "user_answer": "a) new",
+                    "correct_answer": "b) knew",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.4",
+                    "text": "What does 'bye' mean?",
+                    "user_answer": "b) buy",
+                    "correct_answer": "b) buy",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.5",
+                    "text": "What does 'our' mean?",
+                    "user_answer": "a) our",
+                    "correct_answer": "a) our",
+                    "is_correct": true
+                }
+            ]
+        },
+        "MLBB Quest": {
+            "submitted": true,
+            "time": "2025-07-10 17:11:30",
+            "correct": 4,
+            "incorrect": 1,
+            "skipped": 0,
+            "total": 5,
+            "percent": 80.0,
+            "details": [
+                {
+                    "question_id": "3.1",
+                    "text": "Ali’s favorite game is ____. ",
+                    "user_answer": "Mlbb",
+                    "correct_answer": "MLBB",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.2",
+                    "text": "Ali’s favorite hero is ____. ",
+                    "user_answer": "Layla",
+                    "correct_answer": "Layla",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.3",
+                    "text": "MLBB teams have ____ players. ",
+                    "user_answer": "Five",
+                    "correct_answer": "five",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.4",
+                    "text": "Layla uses a big ____. ",
+                    "user_answer": "Cannon",
+                    "correct_answer": "cannon",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.5",
+                    "text": "Ali plays MLBB in the ____. ",
+                    "user_answer": "Friends",
+                    "correct_answer": "evening",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Reading Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 17:23:20",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 120.0,
+            "details": [
+                {
+                    "question_id": "2.1",
+                    "text": "The person isn’t from ____.",
+                    "user_answer": "Madrid",
+                    "correct_answer": "Madrid",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "The flat is not in a modern ____.",
+                    "user_answer": "Building",
+                    "correct_answer": "building",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "All the rooms have got a ____.",
+                    "user_answer": "Balcony",
+                    "correct_answer": "balcony",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "The person loves ____ and parks.",
+                    "user_answer": "Art",
+                    "correct_answer": "art",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.5",
+                    "text": "The flat hasn’t got a ____.",
+                    "user_answer": "Lift",
+                    "correct_answer": "lift",
+                    "is_correct": true
+                }
+            ]
+        }
+    },
+    "Muhammadiso": {
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-11 18:50:17",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "4.1",
+                    "text": "What does 'right' mean?",
+                    "user_answer": "b) write",
+                    "correct_answer": "b) write",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "What does 'you're' mean?",
+                    "user_answer": "a) you're",
+                    "correct_answer": "a) you're",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "What does 'new' mean?",
+                    "user_answer": "b) knew",
+                    "correct_answer": "b) knew",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.4",
+                    "text": "What does 'bye' mean?",
+                    "user_answer": "b) buy",
+                    "correct_answer": "b) buy",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.5",
+                    "text": "What does 'our' mean?",
+                    "user_answer": "a) our",
+                    "correct_answer": "a) our",
+                    "is_correct": true
+                }
+            ]
+        }
+    }
+}

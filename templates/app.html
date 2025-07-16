@@ -10,6 +10,8 @@
 </head>
 <body>
 
+<div id="screamerOverlay" style="display: none;"></div>
+
 <div id="block-screen" class="block-screen hidden">
     <div class="block-modal">
         <img src="/static/icons/timer.svg" alt="Timer Icon" id="timer-icon" />
@@ -73,6 +75,12 @@
 
   <!-- Main Section -->
   <div id="main" class="page active">
+
+<div class="story-modal" id="storyModal">
+  <div class="story-content" id="storyContent"></div>
+</div>
+
+
     <div class="main-header">
 	      <a href="/login" class="login-btn" id="login-btn" style="display: none;">Login</a>
       <div class="user-info">
@@ -85,6 +93,10 @@
 
 	  
       </div>
+	  
+	    <div class="exclusive-stories-container">
+  <div id="storiesList" class="stories-list"></div>
+</div>
 	  
 <!-- Progress Skeleton -->
 <div id="progress-card-skeleton" class="progress-card">
@@ -234,7 +246,7 @@
       <i class="fas fa-magic"></i> Spin Now
     </button>
     <p id="spin-counter" class="spin-info"><i class="fas fa-undo"></i> Spins: 0 / 10</p>
-    <p class="reward-hint"><i class="fas fa-info-circle"></i> Normal spin reward: <strong>0 - 100 pts</strong> (15% chance)</p>
+    <p class="reward-hint"><i class="fas fa-info-circle"></i> Rewards vary from <strong>0 – 15,000 pts</strong>. Mega spins possible!</p>
 
     <div class="box-container">
       <div class="box glass-box" id="box-A">
@@ -250,27 +262,68 @@
         <div class="balls"></div>
       </div>
     </div>
-	
-	<div class="reward-history glass-card">
-  <h3><i class="fas fa-history"></i> Recent Spin History</h3>
-  <ul id="history-list" class="history-list">
-    <!-- История будет сюда добавляться -->
-  </ul>
-</div>
 
+    <div class="reward-history glass-card">
+      <h3><i class="fas fa-history"></i> Recent Spin History</h3>
+      <ul id="history-list" class="history-list"></ul>
+    </div>
 
     <div class="faq-section">
       <h3><i class="fas fa-question-circle"></i> How It Works</h3>
       <ul>
-        <li><strong>Each spin costs 500 points.</strong></li>
-        <li>Every 10 spins → 1 ball is given to a random box (A, B, or C).</li>
-        <li>First box to reach 3 balls gives a big prize: <strong>7,000 – 30,000 pts</strong></li>
-        <li>Normal spins may randomly give up to <strong>100 pts</strong> (15% chance).</li>
+        <li><strong>500 pts per spin</strong></li>
+        <li>Every 10 spins = 1 ball in a random box</li>
+        <li>3 balls in one box = Jackpot (10,000–30,000 pts)</li>
+        <li>Other prizes: small, mid, big, mega spins</li>
+        <li>Watch out for fake "almost won" moments 😬</li>
       </ul>
     </div>
   </div>
 </div>
 
+ <div class="risk-ladder glass-card">
+    <h2><i class="fas fa-rocket"></i> Cosmic Risk Ladder</h2>
+    <p class="cost-text"><i class="fas fa-coins"></i> Entry cost: <strong>2000 pts</strong></p>
+
+    <div id="ladder-status">
+      <p>Star Level: <span id="ladderLevel">1</span> / 7</p>
+      <p>Galactic Reward: <span id="ladderReward">?</span></p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="ladder-controls">
+      <button id="startLadderBtn" class="glass-btn">🌌 Launch Journey</button>
+      <button id="nextLadderBtn" class="glass-btn danger" style="display:none;">🚀 Venture Deeper</button>
+      <button id="takeRewardBtn" class="glass-btn success" style="display:none;">💫 Claim Treasure</button>
+    </div>
+
+    <div id="ladderMessage" class="message"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+  
+<div class="horror-event glass-card">
+  <h2><i class="fas fa-skull-crossbones"></i> Horror Games</h2>
+  <p class="cost-text"><i class="fas fa-coins"></i> Entry cost: <strong>571 pts</strong></p>
+
+  <div id="horror-status">
+    <p>Level: <span id="horrorLevel">0</span> / 5</p>
+    <p>Potential Reward: <span id="horrorReward">?</span></p>
+    <div class="progress-bar-horror">
+      <div class="progress-fill-horror" id="horrorProgressFill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div class="ladder-controls">
+    <button id="horrorStartBtn" class="glass-btn">🩸 Enter the Mansion</button>
+    <button id="horrorNextBtn" class="glass-btn danger" style="display:none;">☠️ Next Room</button>
+    <button id="horrorClaimBtn" class="glass-btn success" style="display:none;">🎁 Escape with Reward</button>
+  </div>
+
+  <div id="horrorMessage" class="message"></div>
+  <div class="particles" id="horrorParticles"></div>
+</div>
 
 
 
@@ -278,6 +331,18 @@
 </div>
 
 <div id="settings" class="page">
+
+<div id="confirmTerminateModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Confirm Termination</h3>
+    <p>To terminate this session, enter your account password:</p>
+    <input type="password" id="terminatePasswordInput" placeholder="Your password" />
+    <button id="confirmTerminateBtn">Confirm</button>
+    <button id="cancelTerminateBtn">Cancel</button>
+  </div>
+</div>
+
+
   <!-- Password Modal -->
   <div id="change-passwords-modal" class="password-modal">
     <div class="password-modal-content animate__animated animate__zoomIn">
@@ -329,17 +394,25 @@
     <h1 class="settings-title"><i class="fas fa-cog"></i> Settings</h1>
     <div class="settings-menu">
       <ul class="menu-list">
-        <li class="menu-item active" data-section="appearance">
-          <i class="fas fa-palette"></i> Appearance
-        </li>
+<li class="menu-item active" data-section="appearance">
+  <i class="fas fa-laptop-code"></i> Active Sessions
+
+</li>
+
         <li class="menu-item" data-section="system">
           <i class="fas fa-tools"></i> System
         </li>
       </ul>
       <div class="settings-content">
         <div id="appearance" class="content-section active">
-          <h2><i class="fas fa-palette"></i> Appearance Settings</h2>
-          <p>Customize your theme, colors, and layout preferences here.</p>
+          <h2>Active Sessions</h2>
+          <div class="active-sessions">
+  <div id="sessions-list" class="sessions-list">
+    <!-- Сессии будут загружены через JS -->
+    <p>Loading active sessions...</p>
+  </div>
+</div>
+
         </div>
         <div id="system" class="content-section">
           <h2><i class="fas fa-tools"></i> System Settings</h2>
@@ -355,7 +428,7 @@
         </div>
       </div>
     </div>
-	  <div class="app-version">Version o2.1</div>
+	  <div class="app-version">Version o2.2</div>
   </div>
 </div>
 
@@ -470,7 +543,8 @@
   <div class="exchange-box">
     <p class="exchange-rate">
       <i class="fas fa-sync-alt"></i>
-      Exchange rate: <strong>10 points = 1 coin</strong>
+      Exchange rate: <strong>1000 points = 1 coin</strong>
+	  <p1> High Service Fee </p1>
     </p>
     <input type="number" id="exchange-input" placeholder="Enter points to exchange (min 10)">
     <button id="exchange-btn">
@@ -610,11 +684,12 @@
 <!-- Private Chats -->
 <div class="chat-private-item" onclick="showPage('private-chatlist')">
   <div class="chat-icon"><i class="fas fa-comments"></i></div>
-  <div>
-    <strong>Private Chats</strong>
+  <div class="chat-text">
+    <strong>Private Chats <span class="beta-badge">BETA</span></strong>
     <p>View available users</p>
   </div>
 </div>
+
 
 
   </div>
@@ -717,7 +792,6 @@
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script src="/static/js/app.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.11/lottie.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
 </body>
 </html>

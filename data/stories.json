@@ -1,0 +1,17 @@
+[
+  {
+    "title": "New Update",
+    "thumbnail": "images/update.png",
+    "imageUrl": "images/NEW UPDATE o2.2.png"
+  },
+  {
+    "title": "Coming soon",
+    "thumbnail": "images/likes.png",
+    "videoUrl": "horror/2.mp4"
+  },
+  {
+    "title": "Welcome Story",
+    "thumbnail": "images/likes.png",
+    "imageUrl": "horror/1.jpg"
+  }
+]

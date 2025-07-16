@@ -1,0 +1,33 @@
+{
+  "Abdulmalik": {
+    "items": {
+      "6": {
+        "status": "Delivered",
+        "link": "/view/6"
+      },
+      "15": {
+        "status": "Product in packaging"
+      }
+    }
+  },
+  "Legenda": {
+    "items": {
+      "9": {
+        "status": "Product in packaging"
+      },
+      "6": {
+        "status": "Product in packaging"
+      },
+      "1": {
+        "status": "Product in packaging"
+      }
+    }
+  },
+  "Muhammadiso": {
+    "items": {
+      "8": {
+        "status": "Product in packaging"
+      }
+    }
+  }
+}

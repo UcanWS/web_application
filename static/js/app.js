@@ -223,6 +223,9 @@ function showPage(id) {
 	case 'chat-ui-private':
       hideNavigation();
       break;
+	case 'settings':
+    fetchSessions();
+      break;
   }
 }
 
@@ -949,22 +952,23 @@ document.getElementById("exchange-btn").addEventListener("click", async () => {
 
     const result = await res.json();
 
-    if (res.ok) {
-      const coinsReceived = pointsToExchange / 10;
+if (res.ok) {
+  const coinsReceived = result.coins_added;
 
-      loadPointsHistory(username);
-      loadUserCoins(username);
-      loadUserPoints(username);
-      updateCoinsValue();
+  loadPointsHistory(username);
+  loadUserCoins(username);
+  loadUserPoints(username);
+  updateCoinsValue();
 
-      sessionStorage.removeItem("userPoints");
+  sessionStorage.removeItem("userPoints");
 
-      statusEl.textContent = `✅ Exchanged successfully! You received ${coinsReceived} coins`;
-      statusEl.className = "exchange-success flash";
-      showModalStatus(`You received ${coinsReceived} coins`, "success");
+  statusEl.textContent = `✅ Exchanged successfully! You received ${coinsReceived} coin${coinsReceived !== 1 ? 's' : ''}`;
+  statusEl.className = "exchange-success flash";
+  showModalStatus(`You received ${coinsReceived} coin${coinsReceived !== 1 ? 's' : ''}`, "success");
 
-      document.getElementById("exchange-input").value = "";
-    } else {
+  document.getElementById("exchange-input").value = "";
+}
+ else {
       statusEl.textContent = `❌ Error: ${result.error}`;
       statusEl.className = "exchange-error";
       showModalStatus(`Error: ${result.error}`, "failed");
@@ -3121,22 +3125,61 @@ async function renderTasksSection() {
   container.appendChild(section);
 
   try {
-    const [tasksRes, resultsRes] = await Promise.all([
+    const [tasksRes, resultsRes, avgRes] = await Promise.all([
       fetch(`/api/get-today-questions?level=${encodeURIComponent(currentLevel)}&unit=${encodeURIComponent(currentUnit)}`),
-      fetch(`/api/get-results?level=${encodeURIComponent(currentLevel)}&unit=${encodeURIComponent(currentUnit)}`)
+      fetch(`/api/get-results?level=${encodeURIComponent(currentLevel)}&unit=${encodeURIComponent(currentUnit)}`),
+      fetch(`/api/get-results/average?level=${encodeURIComponent(currentLevel)}&unit=${encodeURIComponent(currentUnit)}&username=${encodeURIComponent(currentUser)}`)
     ]);
-    if (!tasksRes.ok || !resultsRes.ok) throw new Error('Ошибка запроса');
+    if (!tasksRes.ok || !resultsRes.ok || !avgRes.ok) throw new Error('Ошибка запроса');
 
     const { today_tasks } = await tasksRes.json();
     const resultsData = await resultsRes.json();
     const userResult = resultsData[currentUser] || {};
+    const avgData = await avgRes.json();
+    const userAvg = avgData[currentUser] || { average_percent: 0, submitted_count: 0, total_tasks: today_tasks.length };
 
+    // Remove loading state after all data is fetched
     section.classList.remove('loading');
-    section.innerHTML = `<h2 id="task-count">Today's Tasks</h2>`;
+    section.innerHTML = ''; // Clear spinner
+
+    // Add average progress bar at the top
+    const avgContainer = document.createElement('div');
+    avgContainer.className = 'average-progress-container';
+    if (typeof activeCurrentUnit !== 'undefined' && currentUnit !== activeCurrentUnit) {
+      avgContainer.classList.add('disabled');
+    }
+    const avgPercent = Math.min(Math.round(userAvg.average_percent), 100);
+    const submittedCount = userAvg.submitted_count || 0;
+    const totalTasks = userAvg.total_tasks || 8;
+
+    const title = document.createElement('span');
+    title.className = 'average-progress-title';
+    title.textContent = "Today's Tasks";
+
+    const taskCount = document.createElement('span');
+    taskCount.className = 'average-progress-count';
+    taskCount.textContent = `${submittedCount}/${totalTasks} tasks`;
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'average-progress-bar';
+    progressBar.style.setProperty('--progress-width', `${avgPercent}%`);
+
+    // Add strike icon on top of the progress bar
+    const strikeIcon = document.createElement('i');
+    strikeIcon.className = 'fas fa-fire strike-icon';
+    progressBar.appendChild(strikeIcon);
+
+    const progressText = document.createElement('span');
+    progressText.className = 'average-progress-percent';
+    progressText.textContent = `${avgPercent}%`;
+
+    avgContainer.append(title, taskCount, progressBar, progressText);
+    section.appendChild(avgContainer);
+
+    section.innerHTML += `<h2 id="task-count" style="display:none;">Today's Tasks</h2>`;
 
     const typePriority = ['homework', 'grammar', 'vocabulary', 'listening', 'reading'];
 
-    // Отдельно обрабатываем экзамен
     let examTask = null;
     let filteredTasks = today_tasks.filter(block => {
       const lowerTitle = block.title.toLowerCase();
@@ -3149,7 +3192,7 @@ async function renderTasksSection() {
 
     const showExam = typeof remainingTime === 'number' && remainingTime >= 0;
 
-    if ((!filteredTasks.length && !examTask && !showExam)) {
+    if (!filteredTasks.length && !examTask && !showExam) {
       renderNoTasksPlaceholder(container);
       return;
     }
@@ -3252,7 +3295,6 @@ async function renderTasksSection() {
       section.appendChild(card);
     });
 
-    // Показываем экзамен (Final Exam / Weekly Exam)
     if (examTask || showExam) {
       window.examTaskTitle = examTask?.title || 'Exam';
 
@@ -3274,12 +3316,12 @@ async function renderTasksSection() {
 
     updateTaskCount();
   } catch (err) {
+    section.classList.remove('loading');
     section.style.display = 'none';
     console.error('[Tasks] ❌ Ошибка загрузки заданий:', err);
     renderNoTasksPlaceholder(container);
   }
 }
-
 
 
 
@@ -3746,6 +3788,7 @@ function renderSubquestion(sub, container) {
 // ----------------------------
 function finishTodayTasks(title, questions) {
   initExamSecurity(false);
+  updateStrikes();
   showNavigation();
   const answers = {};
   const errors = [];
@@ -3901,6 +3944,9 @@ function finishTodayTasks(title, questions) {
       }
 
       content.innerHTML = resultHTML.join('');
+	  if (percent >= 80) {
+	  new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
+      }
 
       // Кнопки
       document.getElementById('finish-tasks-btn').style.display = 'none';
@@ -4391,9 +4437,7 @@ let gainNode = null;
 let isMusicPlaying = false;
 
 const tracks = [
-  '/static/music/Masha.mp3',
-  '/static/music/JAVA - Gaz yoq.mp3',
-  '/static/music/Argus.mp3',
+  ''
 ];
 
 let currentTrackIndex = 0;
@@ -4942,12 +4986,12 @@ window.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("luckySpinBtn").addEventListener("click", async () => {
   const btn = document.getElementById("luckySpinBtn");
-  try {
-    btn.disabled = true;
-    btn.classList.add('spinning');
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Spinning...`;
-    spinSfx.play();
+  const wrapper = document.getElementById("lucky-spin-wrapper");
+  btn.disabled = true;
+  wrapper.className = "lucky-glass-wrapper";
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Spinning...`;
 
+  try {
     const res = await fetch('/api/lucky_event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -4955,37 +4999,39 @@ document.getElementById("luckySpinBtn").addEventListener("click", async () => {
     });
 
     const data = await res.json();
-    saveBoxStateLocally(data);
-    renderBoxState(data);
+    const now = new Date().toLocaleTimeString();
 
-    const now = formatTime();
-
-    // Обновление баланса
-    const balanceElement = document.getElementById("balance");
-    if (balanceElement && data.new_balance !== undefined) {
-      balanceElement.textContent = `${data.new_balance.toFixed(0)} pts`;
+    // Обновление UI
+    if (data.new_balance !== undefined) {
+      const balanceElement = document.getElementById("balance");
+      if (balanceElement) balanceElement.textContent = `${Math.floor(data.new_balance)} pts`;
     }
 
-    // Эффекты
-    if (data.won > 0 && data.winning_box) {
-      winSfx.play();
-      showModalStatus(`🎉 You won ${data.won} points from box ${data.winning_box}!`, "success");
+    if (data.spin_count !== undefined) {
+      document.getElementById("spin-counter").textContent = `Spins: ${data.spin_count} / 10`;
+    }
 
-      saveRewardHistory({
-        type: "LuckyBox",
-        time: now,
-        amount: data.won,
-        box: data.winning_box
+    // Обновление коробок
+    if (data.current_boxes) {
+      ['A', 'B', 'C'].forEach(boxId => {
+        const container = document.querySelector(`#box-${boxId} .balls`);
+        container.innerHTML = "";
+        for (let i = 0; i < data.current_boxes[boxId]; i++) {
+          const ball = document.createElement('img');
+          ball.src = '/static/icons/ball.png';
+          ball.className = 'ball';
+          container.appendChild(ball);
+        }
       });
+    }
 
-    } else if (data.got_ball && data.ball_box) {
+    // Анимация шарика
+    if (data.got_ball && data.ball_box) {
       const container = document.querySelector(`#box-${data.ball_box} .balls`);
       const falling = document.createElement('img');
       falling.src = '/static/icons/ball.png';
       falling.className = 'ball-falling';
       container.appendChild(falling);
-      ballSfx.play();
-
       setTimeout(() => {
         container.removeChild(falling);
         const ball = document.createElement('img');
@@ -4993,41 +5039,55 @@ document.getElementById("luckySpinBtn").addEventListener("click", async () => {
         ball.className = 'ball';
         container.appendChild(ball);
       }, 600);
-
-      showModalStatus("🎯 You got a ball!", "success");
-
-      saveRewardHistory({
-        type: "Ball",
-        time: now,
-        box: data.ball_box
-      });
-
-    } else if (data.won > 0) {
-      winSfx.play();
-      showModalStatus(`💰 You won ${data.won} points!`, "success");
-
-      saveRewardHistory({
-        type: "Small Win",
-        time: now,
-        amount: data.won
-      });
-
-    } else {
-      showModalStatus("❌ No reward this time.", "neutral");
-      saveRewardHistory({
-        type: "Nothing",
-        time: now
-      });
     }
+
+    // Эффекты по типу награды
+    const type = data.reward_type || "none";
+    wrapper.classList.add(type); // для CSS-эффектов
+
+    switch (type) {
+      case "jackpot":
+        showModalStatus(`🎉 JACKPOT! ${data.won} pts from box ${data.winning_box}!`, "success");
+        winSfx.play();
+        break;
+      case "mega":
+        showModalStatus(`🔥 MEGA WIN! ${data.won} pts!`, "success");
+        megaSfx?.play?.();
+        break;
+      case "big":
+        showModalStatus(`💥 Big win! You got ${data.won} pts!`, "success");
+        winSfx.play();
+        break;
+      case "mid":
+        showModalStatus(`✨ You won ${data.won} pts`, "success");
+        break;
+      case "small":
+        showModalStatus(`✅ Small win: ${data.won} pts`, "success");
+        break;
+      case "almost":
+        showModalStatus(`😫 Almost hit a big prize...`, "neutral");
+        break;
+      case "none":
+      default:
+        showModalStatus("❌ No reward this time", "neutral");
+        break;
+    }
+
+    // Сохраняем историю
+    saveRewardHistory({
+      type: type.charAt(0).toUpperCase() + type.slice(1),
+      amount: data.won,
+      time: now,
+      box: data.winning_box || data.ball_box || null
+    });
 
     renderRewardHistory();
 
   } catch (err) {
-    console.error("Lucky spin error:", err);
-    showModalStatus("Something went wrong!", "failed");
+    console.error("Spin error:", err);
+    showModalStatus("❗ Something went wrong.", "failed");
   } finally {
     btn.disabled = false;
-    btn.classList.remove('spinning');
     btn.innerHTML = `<i class="fas fa-magic"></i> Spin Now`;
   }
 });
@@ -5066,7 +5126,6 @@ function initExamSecurity(enable = true) {
         window.addEventListener('mouseleave', handleMouseLeave);
         window.addEventListener('mouseenter', handleMouseEnter);
         document.addEventListener('copy', onCopy);
-        document.addEventListener('paste', onPaste);
         document.addEventListener('contextmenu', onContextMenu);
     } else {
 		showToastNotification("Tizim anti-cheating ochirdi");
@@ -5076,7 +5135,6 @@ function initExamSecurity(enable = true) {
         window.removeEventListener('mouseleave', handleMouseLeave);
         window.removeEventListener('mouseenter', handleMouseEnter);
         document.removeEventListener('copy', onCopy);
-        document.removeEventListener('paste', onPaste);
         document.removeEventListener('contextmenu', onContextMenu);
     }
 }
@@ -5296,3 +5354,548 @@ document.querySelectorAll('.menu-item').forEach(item => {
     document.getElementById(this.dataset.section).classList.add('active');
   });
 });
+
+  let riskLadderLevel = 0;
+    let potentialReward = 0;
+
+    const ladderLevelEl = document.getElementById("ladderLevel");
+    const ladderRewardEl = document.getElementById("ladderReward");
+    const ladderMessageEl = document.getElementById("ladderMessage");
+    const progressFill = document.getElementById("progressFill");
+    const particlesEl = document.getElementById("particles");
+
+    const startBtn = document.getElementById("startLadderBtn");
+    const nextBtn = document.getElementById("nextLadderBtn");
+    const takeBtn = document.getElementById("takeRewardBtn");
+
+    // Sound effects
+    const winSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-game-over-213.mp3');
+    const loseSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-2759.mp3');
+    const startSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-229.mp3');
+
+    // Update UI
+    function updateLadderUI() {
+      ladderLevelEl.textContent = riskLadderLevel;
+      ladderRewardEl.textContent = potentialReward > 0 ? potentialReward + " pts" : "?";
+      progressFill.style.width = `${(riskLadderLevel / 7) * 100}%`;
+    }
+
+    // Show message with animation
+    function showMessage(msg, success = true) {
+      ladderMessageEl.textContent = msg;
+      ladderMessageEl.style.color = success ? "#90ee90" : "#ff6666";
+      ladderMessageEl.style.animation = "fadeIn 0.5s ease";
+      setTimeout(() => ladderMessageEl.style.animation = "", 500);
+      createParticles(success);
+      if (success) winSound.play();
+      else loseSound.play();
+    }
+
+    // Create particle effects
+    function createParticles(success) {
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.style.width = `${Math.random() * 5 + 3}px`;
+        particle.style.height = particle.style.width;
+        particle.style.background = success ? "#ffd700" : "#ff6666";
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.setProperty('--x', `${(Math.random() - 0.5) * 200}px`);
+        particle.style.setProperty('--y', `${(Math.random() - 0.5) * 200}px`);
+        particlesEl.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+      }
+    }
+
+    // Start ladder
+    startBtn.addEventListener("click", () => {
+      startSound.play();
+      fetch('/api/risk_ladder', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, level: 1 })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === "success") {
+          riskLadderLevel = data.level;
+          potentialReward = data.reward;
+          updateLadderUI();
+          showMessage(data.message);
+          startBtn.style.display = "none";
+          nextBtn.style.display = "inline-block";
+          takeBtn.style.display = "inline-block";
+        } else {
+          showMessage(data.message, false);
+        }
+      })
+      .catch(err => showMessage("Error: Cosmic interference detected!", false));
+    });
+
+    // Next level
+    nextBtn.addEventListener("click", () => {
+      startSound.play();
+      fetch('/api/risk_ladder', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, level: riskLadderLevel + 1 })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === "success") {
+          riskLadderLevel = data.level;
+          potentialReward = data.reward;
+          updateLadderUI();
+          showMessage(data.message);
+          if (riskLadderLevel === 7) {
+            nextBtn.style.display = "none";
+          }
+        } else {
+          riskLadderLevel = 0;
+          potentialReward = 0;
+          updateLadderUI();
+          showMessage(data.message, false);
+          startBtn.style.display = "inline-block";
+          nextBtn.style.display = "none";
+          takeBtn.style.display = "none";
+        }
+      })
+      .catch(err => showMessage("Error: Cosmic interference detected!", false));
+    });
+
+    // Claim reward
+    takeBtn.addEventListener("click", () => {
+      if (potentialReward > 0) {
+        winSound.play();
+        fetch('/api/risk_ladder_take', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ username, reward: potentialReward })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showMessage(`🎉 Cosmic Treasure Claimed: ${potentialReward} pts`);
+          } else {
+            showMessage("Error: Treasure lost in the void!", false);
+          }
+          riskLadderLevel = 0;
+          potentialReward = 0;
+          updateLadderUI();
+          startBtn.style.display = "inline-block";
+          nextBtn.style.display = "none";
+          takeBtn.style.display = "none";
+        })
+        .catch(err => showMessage("Error: Cosmic interference during claim!", false));
+      }
+    });
+
+    updateLadderUI();
+	
+	let horrorLevel = 0;
+let horrorReward = 0;
+
+const horrorLevelEl = document.getElementById("horrorLevel");
+const horrorRewardEl = document.getElementById("horrorReward");
+const horrorMessageEl = document.getElementById("horrorMessage");
+const horrorProgressFill = document.getElementById("horrorProgressFill");
+const horrorParticles = document.getElementById("horrorParticles");
+
+const horrorStartBtn = document.getElementById("horrorStartBtn");
+const horrorNextBtn = document.getElementById("horrorNextBtn");
+const horrorClaimBtn = document.getElementById("horrorClaimBtn");
+
+const horrorWinSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-game-over-213.mp3');
+const horrorLoseSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-2759.mp3');
+const horrorStartSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-229.mp3');
+
+// 🩸 Начать Horror Games
+horrorStartBtn.addEventListener("click", () => {
+  horrorStartSound.play();
+  fetch("/api/horror_event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: currentUser, level: 1 })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === "survived") {
+        horrorLevel = data.level;
+        horrorReward = data.reward;
+        updateHorrorUI(data.message);
+        updateHorrorProgress();
+        toggleHorrorButtons();
+        playParticles(true);
+      } else {
+        updateHorrorUI(data.error || data.message);
+        playParticles(false);
+      }
+    });
+});
+
+// ☠️ Следующий уровень
+horrorNextBtn.addEventListener("click", () => {
+  horrorStartSound.play();
+  fetch("/api/horror_event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: currentUser, level: horrorLevel + 1 })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === "survived") {
+        horrorLevel = data.level;
+        horrorReward = data.reward;
+        updateHorrorUI(data.message);
+        updateHorrorProgress();
+        toggleHorrorButtons();
+        playParticles(true);
+      } else if (data.result === "screamer") {
+        horrorLevel = 0;
+        horrorReward = 0;
+        updateHorrorProgress();
+        toggleHorrorButtons(true);
+        updateHorrorUI(data.message);
+        triggerScreamerEffect();
+        playParticles(false);
+      } else {
+        updateHorrorUI(data.error || "Something went wrong...");
+      }
+    });
+});
+
+// 🎁 Забрать награду
+horrorClaimBtn.addEventListener("click", () => {
+  fetch("/api/horror_event_take", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: currentUser, reward: horrorReward })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        updateHorrorUI(`🎁 You escaped with ${horrorReward} pts!`);
+        horrorLevel = 0;
+        horrorReward = 0;
+        updateHorrorProgress();
+        toggleHorrorButtons(true);
+        horrorWinSound.play();
+      } else {
+        updateHorrorUI(data.error || "Couldn't claim reward.");
+      }
+    });
+});
+
+// 👁‍🗨 UI и анимации
+function updateHorrorUI(message) {
+  horrorLevelEl.textContent = horrorLevel || 0;
+  horrorRewardEl.textContent = horrorReward || "?";
+  horrorMessageEl.textContent = message || "";
+}
+
+function updateHorrorProgress() {
+  const percent = (horrorLevel / 5) * 100;
+  horrorProgressFill.style.width = percent + "%";
+}
+
+function toggleHorrorButtons(reset = false) {
+  if (reset || horrorLevel === 0) {
+    horrorStartBtn.style.display = "inline-block";
+    horrorNextBtn.style.display = "none";
+    horrorClaimBtn.style.display = "none";
+  } else if (horrorLevel < 5) {
+    horrorStartBtn.style.display = "none";
+    horrorNextBtn.style.display = "inline-block";
+    horrorClaimBtn.style.display = "inline-block";
+  } else {
+    horrorStartBtn.style.display = "none";
+    horrorNextBtn.style.display = "none";
+    horrorClaimBtn.style.display = "inline-block";
+  }
+}
+
+function triggerScreamerEffect() {
+  const mediaList = [
+    "/static/horror/1.jpg"
+  ];
+  const media = mediaList[Math.floor(Math.random() * mediaList.length)];
+
+  const overlay = document.getElementById("screamerOverlay");
+  overlay.innerHTML = ""; // Очищаем прошлый контент
+
+  let element;
+
+  // Отдельно проигрываем скример-звук (всегда)
+  const screamAudio = new Audio('/static/horror/screamer-sound.mp3');
+  screamAudio.play();
+
+  if (media.endsWith(".mp4") || media.endsWith(".webm")) {
+    element = document.createElement("video");
+    element.src = media;
+    element.autoplay = true;
+    element.playsInline = true;
+    element.muted = false; // можно сделать true, если autoplay блокируется
+    element.onended = () => overlay.style.display = "none";
+    element.style.maxHeight = "100%";
+    element.style.maxWidth = "100%";
+  } else {
+    element = document.createElement("img");
+    element.src = media;
+    setTimeout(() => {
+      overlay.style.display = "none";
+    }, 3000); // Фото показываем 3 сек
+  }
+
+  overlay.appendChild(element);
+  overlay.style.display = "flex";
+}
+
+
+
+function playParticles(success = true) {
+  if (!horrorParticles) return;
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    const size = `${Math.random() * 4 + 2}px`;
+    p.style.width = size;
+    p.style.height = size;
+    p.style.background = success ? "#66ff66" : "#ff3333";
+    p.style.left = `${Math.random() * 100}%`;
+    p.style.top = `${Math.random() * 100}%`;
+    p.style.setProperty("--x", `${(Math.random() - 0.5) * 200}px`);
+    p.style.setProperty("--y", `${(Math.random() - 0.5) * 200}px`);
+    horrorParticles.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+function fetchSessions() {
+  fetch('/api/sessions/')
+    .then(res => res.json())
+    .then(data => {
+      const sessionsList = document.getElementById('sessions-list');
+      sessionsList.innerHTML = '';
+
+      if (!data.sessions.length) {
+        sessionsList.innerHTML = '<p>No active sessions found.</p>';
+        return;
+      }
+
+      data.sessions.forEach(session => {
+        const div = document.createElement('div');
+        div.className = 'session-card';
+
+        const isCurrent = session.isCurrent;
+        const isNew = session.isNew;
+
+        const currentBadge = isCurrent ? `<span class="badge badge-current">Current Session</span>` : '';
+        const newBadge = isNew ? `<span class="badge badge-new">NEW</span>` : '';
+        const country = session.country && session.country !== 'Unknown' ? ` (${session.country})` : '';
+        const loginTime = session.loginTime || 'Unknown';
+        const deviceName = `${session.deviceBrand || 'Device'} - ${session.deviceModel || session.deviceType}`;
+
+        const terminateButton = document.createElement('button');
+        terminateButton.className = 'terminate-btn' + (isCurrent ? ' disabled' : '');
+        terminateButton.innerHTML = `<i class="fas fa-times-circle"></i> Terminate`;
+
+        if (isCurrent) {
+          terminateButton.disabled = true;
+          terminateButton.title = "Cannot terminate current session";
+        } else {
+          terminateButton.onclick = () => terminateSession(session.sessionId);
+        }
+
+        div.innerHTML = `
+          <h4>${deviceName} ${currentBadge} ${newBadge}</h4>
+          <div class="info">OS: ${session.os}</div>
+          <div class="info">Browser: ${session.browser}</div>
+          <div class="info">IP: ${session.ipAddress}${country}</div>
+          <div class="info">Language: ${session.language}</div>
+          <div class="info">Login Time: ${loginTime}</div>
+        `;
+
+        div.appendChild(terminateButton);
+        sessionsList.appendChild(div);
+      });
+    })
+    .catch(err => {
+      console.error("Failed to fetch sessions:", err);
+      document.getElementById('sessions-list').innerHTML = '<p>Error loading sessions.</p>';
+    });
+}
+
+
+let pendingSessionId = null;
+
+function terminateSession(sessionId) {
+  // Сохраняем сессию, которую надо удалить, в ожидании пароля
+  pendingSessionId = sessionId;
+
+  // Показываем модалку
+  document.getElementById("confirmTerminateModal").style.display = "flex";
+}
+
+document.getElementById("cancelTerminateBtn").onclick = () => {
+  pendingSessionId = null;
+  document.getElementById("terminatePasswordInput").value = '';
+  document.getElementById("confirmTerminateModal").style.display = "none";
+};
+
+document.getElementById("confirmTerminateBtn").onclick = () => {
+  const password = document.getElementById("terminatePasswordInput").value.trim();
+  if (!password || !pendingSessionId) return;
+
+  // Проверяем пароль
+  fetch('/api/verify-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password })
+  })
+  .then(res => res.json().then(data => ({ status: res.status, body: data })))
+  .then(({ status, body }) => {
+    if (status === 200) {
+      // Успешная проверка — теперь удаляем сессию
+      fetch(`/api/terminate-session/${pendingSessionId}`, {
+        method: 'DELETE'
+      })
+      .then(res => res.json().then(data => ({ status: res.status, body: data })))
+      .then(({ status, body }) => {
+        if (status === 200) {
+          showModalStatus("Session terminated successfully.");
+          fetchSessions();
+        } else {
+          showModalStatus(body.error || "Failed to terminate session.", "failed");
+        }
+      });
+    } else {
+      showModalStatus(body.error || "Incorrect password", "failed");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    showModalStatus("Server error.", "failed");
+  })
+  .finally(() => {
+    document.getElementById("terminatePasswordInput").value = '';
+    document.getElementById("confirmTerminateModal").style.display = "none";
+    pendingSessionId = null;
+  });
+};
+
+
+
+socket.on('updated-sessions', (data) => {
+  console.log('[Socket] updated-sessions received for', data.username);
+
+  // Отправим текущий User-Agent на сервер для проверки
+  fetch('/api/check-session', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      userAgent: navigator.userAgent
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.active) {
+      // ⚠️ Нет активной сессии → авто-логаут
+      showToastNotification("You have been logged out because your session was terminated.",'info');
+      window.location.href = '/login';
+    }
+  });
+});
+
+let storiesItemsStories = [];
+let currentIndexStories = 0;
+let timeoutHandleStories = null;
+
+function fetchStoriesStories() {
+  fetch('/api/stories')
+    .then(r => r.json())
+    .then(data => {
+      // Оставляем только те, у которых есть mediaUrl
+      storiesItemsStories = data.filter(s => s.mediaUrl || s.imageUrl);
+      const list = document.getElementById('storiesList');
+      list.innerHTML = '';
+      storiesItemsStories.forEach((story, idx) => {
+        const div = document.createElement('div');
+        div.className = 'story-item';
+        div.innerHTML = `
+          <img src="${story.thumbnail || story.imageUrl}" alt="" />
+          <div class="story-title">${story.title}</div>
+        `;
+        div.addEventListener('click', () => openStoryStories(idx));
+        list.append(div);
+      });
+    });
+}
+
+function openStoryStories(idx) {
+  const story = storiesItemsStories[idx];
+  if (!story) return;
+  currentIndexStories = idx;
+  clearTimeout(timeoutHandleStories);
+
+  const content = document.getElementById('storyContent');
+  content.innerHTML = `
+    <button class="close-btn" onclick="closeStoriesStories()">×</button>
+    <div class="progress-container-stories">
+      ${storiesItemsStories.map((_, i) => `<div class="progress-bar-stories" id="barStories${i}"></div>`).join('')}
+    </div>
+  `;
+
+  if (story.mediaType === 'video' || (story.videoUrl && story.videoUrl.endsWith('.mp4'))) {
+    const vid = document.createElement('video');
+    vid.src = story.videoUrl || story.mediaUrl;
+    vid.autoplay = true;
+    vid.playsInline = true;
+    vid.onloadedmetadata = () => startProgressStories(vid.duration * 1000);
+    vid.onended = nextStoryStories;
+    content.append(vid);
+  } else {
+    const img = document.createElement('img');
+    img.src = story.mediaUrl || story.imageUrl;
+    content.append(img);
+    startProgressStories(7000);
+  }
+
+  document.getElementById('storyModal').style.display = 'flex';
+}
+
+function startProgressStories(duration) {
+  // Сразу сбросить все бары
+  storiesItemsStories.forEach((_, i) => {
+    const b = document.getElementById(`barStories${i}`);
+    if (b) {
+      b.style.transition = 'none';
+      b.style.transform = i < currentIndexStories ? 'scaleX(1)' : 'scaleX(0)';
+    }
+  });
+  // Анимировать текущий
+  const bar = document.getElementById(`barStories${currentIndexStories}`);
+  if (!bar) return;
+  setTimeout(() => {
+    bar.style.transition = `transform ${duration}ms linear`;
+    bar.style.transform = 'scaleX(1)';
+  }, 50);
+
+  timeoutHandleStories = setTimeout(nextStoryStories, duration);
+}
+
+function nextStoryStories() {
+  clearTimeout(timeoutHandleStories);
+  if (currentIndexStories + 1 < storiesItemsStories.length) {
+    openStoryStories(currentIndexStories + 1);
+  } else {
+    closeStoriesStories();
+  }
+}
+
+function closeStoriesStories() {
+  clearTimeout(timeoutHandleStories);
+  document.getElementById('storyModal').style.display = 'none';
+  document.getElementById('storyContent').innerHTML = '';
+}
+
+document.addEventListener('DOMContentLoaded', fetchStoriesStories);

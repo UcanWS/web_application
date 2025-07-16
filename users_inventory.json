@@ -1,0 +1,57 @@
+{
+  "Legenda": [
+    {
+      "id": 9,
+      "name": "Change Nickname",
+      "cost": 55,
+      "type": "System",
+      "image": "/static/images/nickname-change.jpg",
+      "time": "2025-07-09T19:01:34.527779"
+    },
+    {
+      "id": 6,
+      "name": "Muhamadali zapalllar Toʻplami",
+      "cost": 99,
+      "type": "video",
+      "image": "/static/images/Ali.jpg",
+      "time": "2025-07-10T15:02:30.099988"
+    },
+    {
+      "id": 1,
+      "name": "Elbek Zapalar toplami",
+      "cost": 132,
+      "type": "Zapal",
+      "image": "/static/images/Elbek.png",
+      "time": "2025-07-10T15:02:37.895747"
+    }
+  ],
+  "Abdulmalik": [
+    {
+      "id": 6,
+      "name": "Muhamadali zapalllar Toʻplami",
+      "cost": 99,
+      "type": "video",
+      "image": "/static/images/Ali.jpg",
+      "time": "2025-07-09T22:12:50.210442",
+      "quantity": 1
+    },
+    {
+      "id": 15,
+      "name": "Doubled points for Today section 3 Units ",
+      "cost": 2189,
+      "type": "System",
+      "image": "/static/icons/star.png",
+      "time": "2025-07-13T14:23:47.635590"
+    }
+  ],
+  "Muhammadiso": [
+    {
+      "id": 8,
+      "name": "MLBB Weekly Diamond Pass",
+      "cost": 21989,
+      "type": "MLBB",
+      "image": "/static/images/MLBB Weekly.png",
+      "time": "2025-07-11T18:51:28.662758"
+    }
+  ]
+}

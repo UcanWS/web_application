@@ -5,6 +5,7 @@ import json
 import time
 import requests 
 import random
+import uuid  # 🔥 Добавьте в начало файла
 from datetime import datetime , timedelta , timezone
 from user_agents import parse
 from flask_cors import CORS
@@ -17,14 +18,18 @@ app = Flask(__name__)
 app.secret_key = os.urandom(32)
 app.config['DEBUG'] = True
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'txt', 'pdf','mp3','wav'}
-socketio = SocketIO(app)
+app.config['ALLOWED_EXTENSIONS'] = {...}
+
+# Unified SocketIO initialization
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="threading"
+)
+
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 CORS(app)
 
-# Ensure upload folder exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Initialize messages as an empty list, not a dictionary
 messages = []  # Store messages locally
@@ -248,7 +253,6 @@ def get_users():
 @app.route('/api/get-student-progress', methods=['GET'])
 def get_progress():
 
-    time.sleep(2)
     # Получаем имя пользователя из параметров запроса
     current_user = request.args.get("username")
     
@@ -446,9 +450,19 @@ def get_points_history(username):
     transactions = load_transactions()
     user_history = transactions.get(username, [])
 
-    # Безопасная фильтрация и формат
+    # Сортируем по времени (строковое представление ISO‑формата или похожее)
+    sorted_history = sorted(
+        user_history,
+        key=lambda entry: entry.get("time", ""),
+        reverse=True
+    )
+
+    # Берём только 7 самых свежих записей
+    latest_entries = sorted_history[:7]
+
+    # Форматируем для ответа
     formatted_history = []
-    for entry in user_history:
+    for entry in latest_entries:
         amount = entry.get("amount")
         description = entry.get("description", "No description")
         timestamp = entry.get("time", "Unknown time")
@@ -465,6 +479,7 @@ def get_points_history(username):
         "username": username,
         "history": formatted_history
     })
+
     
 import threading
 
@@ -955,10 +970,10 @@ def exchange_points_to_coins():
     username = data.get("username")
     points = data.get("points", 0)
 
-    if not username or points < 10 or points % 10 != 0:
-        return jsonify({"error": "Invalid request. Must send multiples of 10 points."}), 400
+    # Проверка: username должен быть, points ≥ 1000 и кратны 1000
+    if not username or points < 1000 or points % 1000 != 0:
+        return jsonify({"error": "Invalid request. Must send multiples of 1000 points."}), 400
 
-    # Получаем points из баланса (points = баланс)
     balances = load_balances()
     if username not in balances:
         return jsonify({"error": "User not found"}), 404
@@ -972,8 +987,8 @@ def exchange_points_to_coins():
     if "error" in sub_response:
         return jsonify(sub_response), 400
 
-    # Добавляем coins
-    coins_to_add = points // 10
+    # Обмен: 1000 points = 1 coin
+    coins_to_add = points // 1000
     user_coins = load_user_coins()
     user_coins[username] = user_coins.get(username, 0) + coins_to_add
     store_user_coins(user_coins)
@@ -982,11 +997,13 @@ def exchange_points_to_coins():
         "message": "Exchange successful",
         "coins_added": coins_to_add,
         "new_coin_balance": user_coins[username],
-        "remaining_points": balances[username]  # обновлённый баланс
+        "remaining_points": balances[username]
     })
+
     
 @app.route('/api/get_user_coins/<username>', methods=['GET'])
 def get_user_coins(username):
+    time.sleep(5)
     user_coins = load_user_coins()
     coins = user_coins.get(username, 0)
     return jsonify({"username": username, "coins": coins})
@@ -1019,175 +1036,97 @@ current_version = "2025-01-10-v1"
 exam_questions = [ 
 
   {
-  "id": 1,
-  "text": "Section 1. Listen and complete the information about the day trip.",
-  "type": "listening",
-  "audio": "/static/exam-files/Preliminary1_test3_audio3.mp3",
-  "subquestions": [
+    "id": 1,
+    "text": "Section 1. Listen and choose correct answer.",
+    "type": "listening",
+    "audio_Exam": "/static/exam-files/Section1.mp3",
+    "subquestions": [
+      {
+        "id": "1.1",
+        "type": "true_false",
+        "text": "John works at Old Time Toys.",
+        "correct": "False"
+      },
+      {
+        "id": "1.2",
+        "type": "multiple_choice",
+        "text": "Marina wants ...",
+        "options": [
+          "product information, a brochure and prices.",
+          "is warm in summer",
+          "to call John again later."
+        ],
+        "correct": "product information, a brochure and prices."
+      },
+      {
+        "id": "1.3",
+        "type": "multiple_choice",
+        "text": "Marina's number is ...",
+        "options": [
+          "0208 6557621",
+          "0208 6656721",
+          "0208 5718571",
+          "200120969",
+          "992320111"
+        ],
+        "correct": "0208 6557621"
+      },
+      {
+        "id": "1.4",
+        "type": "multiple_choice",
+        "text": "Marina's email address is ...",
+        "options": [
+          "marina.silva@oldtime_toys.com",
+          "marina.silva@oldtime-toys.com"
+        ],
+        "correct": "marina.silva@oldtime-toys.com"
+      }
+    ]
+  },
     {
-      "id": "1.14",
-      "type": "write-in-blank",
-      "text": "Bus leaves at: (14) ____ a.m.",
-      "correct": "8.15"
-    },
-    {
-      "id": "1.15",
-      "type": "write-in-blank",
-      "text": "Meet before trip at: hotel (15) ____",
-      "correct": "entrance"
-    },
-    {
-      "id": "1.16",
-      "type": "write-in-blank",
-      "text": "First stop: ruin of a (16) ____",
-      "correct": "palace"
-    },
-    {
-      "id": "1.17",
-      "type": "write-in-blank",
-      "text": "Lunch at: The (17) ____ Restaurant",
-      "correct": "Wakizi"
-    },
-    {
-      "id": "1.18",
-      "type": "write-in-blank",
-      "text": "Afternoon activity: (18) ____ or beach volleyball",
-      "correct": "diving"
-    },
-    {
-      "id": "1.19",
-      "type": "write-in-blank",
-      "text": "Bring: (19) ____",
-      "correct": "sun cream"
-    }
-  ]
-},
-    {
-  "id": 2,
-  "type": "reading",
-  "text": "<h1>A Town that Lives in One Building</h1>\n<p>Located in the beautiful state of Alaska, a little town called Whittier is tucked away in a picturesque area surrounded by mountains and the ocean. This hidden gem is hard to reach: the only ways to and from Whittier are either by ferry or through a one-lane tunnel that cuts through the mountains. This tunnel is unique because it is shared by both vehicles and trains, necessitating a precisely managed schedule to accommodate both modes of transportation and both directions of traffic.</p>\n\n<p>Whittier’s economy thrives on its port, the town’s main source of employment, where cargo ships drop off their containers for rail transportation across Alaska. The town also has a grocery store, a museum, two hotels, and various other job opportunities for all its citizens: police officers, municipal workers, educators at the local school, and marina staff. Tourism has grown over the last few years to become an alternative source of income, drawing visitors to attractions such as the Anton Anderson Memorial Tunnel, glacier jet ski tours, and scenic boat excursions that offer breathtaking views of marine wildlife and icebergs.</p>\n\n<p>But the most fascinating aspect of Whittier is perhaps the fact that nearly all of its 200-odd residents live under the same roof. The Begich Towers, a 14-story building, is more than just an apartment complex; it’s a self-contained town! The harsh winter weather helps to explain the convenience of this unusual way of living. Whittier’s winter months are known for their heavy snowfalls and fierce winds. By having all the necessary facilities and services in one building, the residents don’t have to brave the cold weather every time they need to run an errand or go to church. Not even the children need to step outside to attend school, which is in an adjacent building connected through a tunnel. It’s an ingenious solution that makes life in such an extreme climate much more manageable.</p>\n\n<p>However, the origins of Whittier’s unique living situation date back to the early last century when the area was chosen for a military base. Shielded by towering mountains and situated by a bay with unfreezing waters, this location offered an ideal strategic position. Initially, wooden camps housed the soldiers, but as the need for more permanent structures grew with the increasing population, two significant buildings were erected: the once largest building in Alaska, the Buckner Building, and the Begich Towers. The construction of the tunnel in the 1940s, intended to provide railway access, marked Whittier’s transformation into an essential cargo and passenger port. After the military left in the 1960s, the Buckner Building was abandoned, and the Begich Towers became the main residential and communal space for the town’s inhabitants.</p>\n\n<p>Nowadays, Whittier’s residents just need to hop on the elevator to go grocery shopping, visit the police station, or eat ‘out’—though in this case, ‘eat in’ might be more accurate. There’s even a health clinic, which is far from being a hospital but more than enough for minor ailments. In essence, everything the residents may need is a few steps away from their homes. Living in Begich Towers offers a sense of community and convenience that is hard to find elsewhere. The close proximity of homes and businesses fosters a strong bond among the residents. Whether they’re sharing a cup of coffee at the café on the ground floor or attending a community meeting, the people of Whittier have created a unique and supportive environment.</p>\n\n<p>Whittier might be small, but it’s a remarkable example of adaptability and community spirit. Its single-building town, surrounded by Alaska’s breathtaking landscape, is a testament to human ingenuity and resilience.</p>",
-  "subquestions": [
-    {
-      "id": "2.1",
-      "type": "multiple_choice",
-      "text": "Which adjective would better describe Whittier?",
-      "options": ["remote", "reachable", "mountainous"],
-      "correct": "remote"
-    },
-    {
-      "id": "2.2",
-      "type": "multiple_choice",
-      "text": "If you are going to Whittier through the tunnel...",
-      "options": [
-        "your only option is to take a train.",
-        "you can't use the tunnel while other people are leaving.",
-        "you can go by car at any time."
-      ],
-      "correct": "you can't use the tunnel while other people are leaving."
-    },
-    {
-      "id": "2.3",
-      "type": "multiple_choice",
-      "text": "Most people in Whittier work in...",
-      "options": ["the shipping industry", "tourism", "services"],
-      "correct": "the shipping industry"
-    },
-    {
-      "id": "2.4",
-      "type": "multiple_choice",
-      "text": "According to the text,...",
-      "options": [
-        "having a town in one building is not ideal.",
-        "the school is in the same building.",
-        "the town's church is in the Begich Towers."
-      ],
-      "correct": "the town's church is in the Begich Towers."
-    },
-    {
-      "id": "2.5",
-      "type": "multiple_choice",
-      "text": "The towers were built...",
-      "options": [
-        "to protect the soldiers from the weather.",
-        "to accommodate an expanding population.",
-        "to mark Whittier's transformation."
-      ],
-      "correct": "to accommodate an expanding population."
-    },
-    {
-      "id": "2.6",
-      "type": "multiple_choice",
-      "text": "Which of these can you NOT find in Begich Towers?",
-      "options": ["a restaurant", "a hospital", "a supermarket"],
-      "correct": "a hospital"
-    }
-  ]
-},
-{
-  "id": 3,
-  "type": "reading",
-  "text": "<h1>Actors who died on set</h1>\n\n<p><strong>Brandon Lee</strong><br>Brandon Lee, son of the famous martial artist and actor Bruce Lee, died in 1993, while filming “The Crow”. He was acting as the main character in a scene where his character gets shot, but no one knew that a small piece of a real bullet got stuck in the gun. When the gun was fired, the piece of the bullet came out and hit Brandon in the stomach. Even though doctors tried to help him, Lee passed away later that day. This accident made people think more about how to keep actors safe on movie sets.</p>\n\n<p><strong>Vic Morrow</strong><br>Vic Morrow’s death happened during the filming of “Twilight Zone: The Movie” in 1982. He portrayed a character in the Vietnam War. In this scene, Morrow was carrying two child actors across a river while being chased by a helicopter. During filming, explosives were used, causing the helicopter to crash in the river. As a result, Morrow and the two young actors lost their lives immediately and six passengers onboard were injured. During the investigation, the film director was found guilty of having children working near explosives illegally.</p>\n\n<p><strong>Jon-Erik Hexum</strong><br>The accidental death of Jon-Erik Hexum occurred on the TV show “Cover Up” in 1984. During a break from filming, the actor was playing with a gun used in one of the scenes pointing it at his head and pulled the trigger as a joke. Even though the gun did not have real bullets, the force was strong enough to hurt him badly. A piece of bone from his head went into his brain. He was taken to the hospital immediately, but despite emergency surgery, he was pronounced brain dead six days later.</p>\n\n<p><strong>Roy Kinnear</strong><br>Roy Kinnear’s tragic accident took place while he was filming “The Return of the Musketeers” in 1989. During a scene with horse riding, Kinnear fell from his horse and broke a bone near one of his hips. Despite the severity of his injury, Kinnear was determined to continue filming and completed his scenes. However, his health conditions got worse and ended up affecting his heart. Sadly, Kinnear passed away from a heart attack caused by these complications.</p>\n\n<p><strong>Steve Irwin</strong><br>Steve Irwin, known as “The Crocodile Hunter,” was working on a documentary called “Ocean’s Deadliest” in 2006 off the coast of Queensland, Australia when tragedy struck. While filming a segment about dangerous fish, Irwin approached a stingray – a type of flat fish with long, sharp tails – in shallow water. The stingray felt it was in danger and attacked the man. The fish had used its sharp tail to poke Steve Irwin in the chest, and the pointy part went into his heart. His crew and emergency services tried to save him, but Irwin didn’t survive. His sudden death shocked the world and left millions of fans upset for the loss of a man who was truly passionate about the natural world.</p>",
-  "subquestions": [
-    {
-      "id": "3.1",
-      "type": "multiple_choice",
-      "text": "_____ kept on working after being badly hurt.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Roy Kinnear"
-    },
-    {
-      "id": "3.2",
-      "type": "multiple_choice",
-      "text": "_____ had a father who was a well-known actor and sportsman.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Brandon Lee"
-    },
-    {
-      "id": "3.3",
-      "type": "multiple_choice",
-      "text": "_____ was famous for his interest in animals and the environment.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Steve Irwin"
-    },
-    {
-      "id": "3.4",
-      "type": "multiple_choice",
-      "text": "_____ died in a tragic accident that affected other actors.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Vic Morrow"
-    },
-    {
-      "id": "3.5",
-      "type": "multiple_choice",
-      "text": "_____ officially died almost a week after his accident.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Jon-Erik Hexum"
-    },
-    {
-      "id": "3.6",
-      "type": "multiple_choice",
-      "text": "_____ died as a result of his careless behavior with a dangerous object.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Jon-Erik Hexum"
-    },
-    {
-      "id": "3.7",
-      "type": "multiple_choice",
-      "text": "_____ had an accident while he was filming in the sea.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Steve Irwin"
-    },
-    {
-      "id": "3.8",
-      "type": "multiple_choice",
-      "text": "_____ was killed in an accident that showed behaviors against the law.",
-      "options": ["Brandon Lee", "Vic Morrow", "Jon-Erik Hexum", "Roy Kinnear", "Steve Irwin"],
-      "correct": "Vic Morrow"
-    }
-  ]
-}
-
-
+    "id": 4,
+    "text": "Section 4. Listen and decide if the statements are true or false.",
+    "type": "listening",
+    "audio_Exam": "/static/exam-files/LE_listening_A1_Meeting_a_new_team_member.mp3",
+    "subquestions": [
+      {
+        "id": "4.1",
+        "type": "true_false",
+        "text": "Peter is new in the company.",
+        "correct": "True"
+      },
+      {
+        "id": "4.2",
+        "type": "true_false",
+        "text": "Peter is a designer.",
+        "correct": "False"
+      },
+      {
+        "id": "4.3",
+        "type": "true_false",
+        "text": "Carla works in marketing.",
+        "correct": "True"
+      },
+      {
+        "id": "4.4",
+        "type": "true_false",
+        "text": "Peter plans events for new products.",
+        "correct": "True"
+      },
+      {
+        "id": "4.5",
+        "type": "true_false",
+        "text": "Carla is Brazilian.",
+        "correct": "False"
+      },
+      {
+        "id": "4.6",
+        "type": "true_false",
+        "text": "Peter started his job five years ago.",
+        "correct": "False"
+      }
+    ]
+  }
 ]
            
 # Путь к файлу с балансами
@@ -1908,14 +1847,13 @@ def submit_exam():
 def handle_submitted_exam():
     emit('update-results', broadcast=True)  # broadcast=True => всем
 
+
 @app.route("/app")
 def app_remake():
+    username = session.get('username')
+    if not username or username not in active_sessions:
+        return redirect('/login')
     return render_template("app.html")
-
-# Custom 404 error handler
-@app.errorhandler(404)
-def page_not_found(e):
-    return redirect(url_for('app_remake'))
     
 @app.route("/chatCRM")
 def crm():
@@ -1946,35 +1884,11 @@ def release_update():
 
     # Возвращаем успешный ответ с новой версией
     return jsonify({"success": True, "version": current_version})
-    
-@app.route('/api/tracks', methods=['GET'])
-def get_tracks():
-    return jsonify(tracks)
 
 @app.route('/')
 def login():
     return render_template('loginv2.html')
     
-ACCEPTED_USERS_FILE = "accepted_users.json"
-
-# Initialize Accepted_users by loading from the JSON file (if it exists)
-def load_accepted_users():
-    if os.path.exists(ACCEPTED_USERS_FILE):
-        with open(ACCEPTED_USERS_FILE, 'r') as f:
-            data = json.load(f)
-            return set(data)  # Convert the loaded list back to a set
-    else:
-        # If the file doesn't exist, start with the default set
-        return {"Admin"}
-
-# Save Accepted_users to the JSON file
-def save_accepted_users(users):
-    with open(ACCEPTED_USERS_FILE, 'w') as f:
-        json.dump(list(users), f)  # Convert set to list for JSON serialization
-
-# Load Accepted_users at startup
-Accepted_users = load_accepted_users()
-
 # File to store banned users
 BANNED_USERS_FILE = 'banned_users.json'
 
@@ -2100,6 +2014,9 @@ def reactivate_user(username):
         return jsonify({'message': f'User {username} reactivated', 'status': 'success'}), 200
     return jsonify({'message': f'User {username} is not banned', 'status': 'error'}), 404
 
+
+from device_detector import DeviceDetector
+
 @app.route('/login', methods=['GET', 'POST'])
 def handle_login():
     banned_users = load_banned_users()
@@ -2109,8 +2026,6 @@ def handle_login():
         data = request.get_json()
         username = data.get('username') if data else None
         password = data.get('password') if data else None
-        
-        time.sleep(2)
 
         if not username or not password:
             return render_template('loginv2.html', error="Please provide username and password.")
@@ -2118,109 +2033,122 @@ def handle_login():
         if username in banned_users:
             ban_end_date = datetime.fromisoformat(banned_users[username]['ban_end_date'])
             banned_at_dt = datetime.fromisoformat(banned_users[username]['banned_at'])
-            
+
             ban_notice = {
                 'title': f'Banned for {int((ban_end_date - banned_at_dt).days)} Day{"s" if (ban_end_date - banned_at_dt).days > 1 else ""}',
-                'reviewed_date': banned_at_dt.strftime('%Y-%m-%d %H:%M:%S'),  # форматируем дату в строку
+                'reviewed_date': banned_at_dt.strftime('%Y-%m-%d %H:%M:%S'),
                 'reason': banned_users[username]['reason'],
                 'offensive_item': banned_users[username].get('offensive_item'),
                 'expired': current_time > ban_end_date,
                 'username': username
             }
-
             return render_template('loginv2.html', ban_notice=ban_notice)
 
         if username in loggedUsers and loggedUsers[username] == password:
             user_agent_str = request.headers.get('User-Agent', '')
-            user_agent = parse(user_agent_str)
+            parsed_device = DeviceDetector(user_agent_str).parse()
+            ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+            country = "Unknown"  # Simplified
 
+            new_session_id = str(uuid.uuid4())
             device_info = {
+                'Session-ID': new_session_id,
                 'Timestamp': datetime.utcnow().isoformat(),
+                'Login-Time': current_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'User-Agent': user_agent_str,
-                'IP-Address': request.headers.get('X-Forwarded-For', request.remote_addr),
+                'IP-Address': ip_address,
+                'Country': country,
                 'Language': request.headers.get('Accept-Language', ''),
-                'Device-Type': (
-                    'Mobile' if user_agent.is_mobile else
-                    'Tablet' if user_agent.is_tablet else
-                    'PC' if user_agent.is_pc else
-                    'Other'
-                ),
-                'Browser': f"{user_agent.browser.family} {user_agent.browser.version_string}",
-                'OS': f"{user_agent.os.family} {user_agent.os.version_string}",
-                'Platform': user_agent.device.family
+                'Device-Type': parsed_device.device_type(),
+                'Device-Brand': parsed_device.device_brand(),
+                'Device-Model': parsed_device.device_model(),
+                'OS': f"{parsed_device.os_name()} {parsed_device.os_version()}",
+                'Browser': f"{parsed_device.client_name()} {parsed_device.client_version()}",
+                'Is-New': True  # Mark as NEW
             }
 
-            if username in active_sessions:
-                active_sessions[username].append(device_info)
-            else:
-                active_sessions[username] = [device_info]
+            active_sessions.setdefault(username, []).append(device_info)
 
             session['username'] = username
+            session['session_id'] = new_session_id  # <- this is crucial
+
             return '', 200
         else:
             return render_template('loginv2.html', error="Invalid username or password")
 
-    # Handle GET requests
     return render_template('loginv2.html')
 
-    
-@app.route('/accept_terms', methods=['POST'])
-def accept_terms():
-    data = request.get_json()
-    username = data.get('username')
-
-    if not username:
-        return jsonify({'success': False, 'message': 'Username is required'}), 400
-
-    # Add the user to Accepted_users
-    Accepted_users.add(username)
-    # Save the updated set to the JSON file
-    save_accepted_users(Accepted_users)
-    return jsonify({'success': True, 'message': f'{username} has accepted the Terms and Conditions'})
-
-@app.route('/check_terms/<username>', methods=['GET'])
-def check_terms(username):
-    # Check if the user has accepted the Terms and Conditions
-    accepted = username in Accepted_users
-    return jsonify({'accepted': accepted})
 
 @app.route('/sessions')
 def get_sessions():
     sessions_data = []
 
-    # Пройдем по всем пользователям и их сессиям
-    for username, devices in active_sessions.items():
+    for devices in active_sessions.values():
         for device in devices:
             sessions_data.append({
                 'deviceType': device.get('Device-Type', 'Unknown'),
-                'platform': device.get('Platform', 'Unknown'),
+                'deviceBrand': device.get('Device-Brand', 'Unknown'),
+                'deviceModel': device.get('Device-Model', 'Unknown'),
                 'os': device.get('OS', 'Unknown'),
-                'browser': device.get('User-Agent', 'Unknown').split(' ')[0],  # Получаем только имя браузера
+                'browser': device.get('Browser', 'Unknown'),
                 'ipAddress': device.get('IP-Address', 'Unknown'),
-                'language': device.get('Language', 'Unknown')
+                'language': device.get('Language', 'Unknown'),
+                'loginTime': device.get('Login-Time', 'Unknown'),
+                'country': device.get('Country', 'Unknown'),
+                'isCurrent': device.get('Is-Current', False)
             })
-    
+
     return jsonify({'sessions': sessions_data})
-    
+
+def is_recent_session(login_time_str):
+    try:
+        login_time = datetime.fromisoformat(login_time_str)
+        return datetime.utcnow() - login_time < timedelta(minutes=1)
+    except:
+        return False
+
 @app.route('/api/sessions/')
 def get_sessions_api():
+    username = session.get('username')
+    current_session_id = session.get('session_id')
+
     sessions_data = []
 
-    # Iterate through all users and their sessions
-    for username, devices in active_sessions.items():
-        for device in devices:
+    if username in active_sessions:
+        now = datetime.utcnow()
+        for device in active_sessions[username]:
+            session_id = device.get('Session-ID')
+            login_time_str = device.get('Timestamp')  # UTC ISO format
+
+            # Parse timestamp and check age
+            try:
+                login_time_dt = datetime.fromisoformat(login_time_str)
+                is_new = (now - login_time_dt) < timedelta(minutes=10)
+            except Exception:
+                is_new = False
+
+            is_current = (session_id == current_session_id)
+
             sessions_data.append({
-                'username': username,  # Include username in the response
+                'username': username,
                 'deviceType': device.get('Device-Type', 'Unknown'),
-                'platform': device.get('Platform', 'Unknown'),
+                'deviceBrand': device.get('Device-Brand', 'Unknown'),
+                'deviceModel': device.get('Device-Model', 'Unknown'),
                 'os': device.get('OS', 'Unknown'),
-                'browser': device.get('User-Agent', 'Unknown').split(' ')[0],  # Get only browser name
+                'browser': device.get('Browser', 'Unknown'),
                 'ipAddress': device.get('IP-Address', 'Unknown'),
-                'language': device.get('Language', 'Unknown')
+                'language': device.get('Language', 'Unknown'),
+                'loginTime': device.get('Login-Time', 'Unknown'),
+                'country': device.get('Country', 'Unknown'),
+                'isCurrent': is_current,
+                'isNew': is_new,
+                'sessionId': session_id
             })
-    
+
     return jsonify({'sessions': sessions_data})
 
+
+    
 @app.route('/chat')
 def chat():
     if 'username' not in session:
@@ -2263,6 +2191,72 @@ def logout():
     # Вместо редиректа возвращаем JSON
     return jsonify({"success": True, "message": "Logged out successfully"}), 200
 
+@app.route('/api/terminate-session/<session_id>', methods=['DELETE'])
+def terminate_session(session_id):
+    username = session.get('username')
+    current_session_id = session.get('session_id')
+
+    if not username or username not in active_sessions:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user_sessions = active_sessions[username]
+
+    # Найти текущую сессию пользователя
+    current_device = next((d for d in user_sessions if d.get('Session-ID') == current_session_id), None)
+
+    if current_device:
+        try:
+            login_time = datetime.fromisoformat(current_device.get('Timestamp'))
+            if datetime.utcnow() - login_time < timedelta(minutes=10):
+                return jsonify({
+                    'error': 'You cannot terminate any sessions while your account is marked as NEW. Wait 10 minutes after login to manage sessions.'
+                }), 403
+        except Exception:
+            return jsonify({'error': 'Session verification failed.'}), 403
+
+    # Найти сессию, которую хотят удалить
+    target_device = next((d for d in user_sessions if d.get('Session-ID') == session_id), None)
+
+    if not target_device:
+        return jsonify({'error': 'Session not found'}), 404
+
+    # Удалить выбранную сессию
+    user_sessions.remove(target_device)
+    socketio.emit('updated-sessions', {'username': username})
+    return jsonify({'message': 'Session terminated'}), 200
+
+    
+@app.route('/api/verify-password', methods=['POST'])
+def verify_password():
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    data = request.get_json()
+    input_password = data.get('password')
+
+    user = loggedUsers.get(username)
+    if not user or user != input_password:
+        return jsonify({'error': 'Invalid password'}), 403
+
+    return jsonify({'status': 'ok'}), 200
+        
+@app.route('/api/check-session', methods=['POST'])
+def check_session():
+    username = session.get('username')
+    data = request.get_json()
+    user_agent = data.get('userAgent')
+
+    if not username or username not in active_sessions:
+        return jsonify({'active': False})
+
+    for device in active_sessions[username]:
+        if device.get('User-Agent') == user_agent:
+            return jsonify({'active': True})
+
+    return jsonify({'active': False})
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'username' not in session:
@@ -2278,8 +2272,7 @@ def upload():
     if file and allowed_file(file.filename):
         # Use original filename or generate a unique name without timestamp prefix
         filename = secure_filename(file.filename)  # Use original filename with security
-        # Optionally, add a unique identifier to avoid overwriting (e.g., UUID)
-        import uuid
+
         unique_filename = f"{uuid.uuid4()}_{filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(filepath)
@@ -2779,27 +2772,47 @@ def list_debts():
         return jsonify({'error': 'Unauthorized'}), 401
 
     store = load_debts()
-    now = datetime.now(timezone.utc)  # timezone-aware datetime
+    now = datetime.now(timezone.utc)
     updated = False
 
-    # Автоматическое отклонение просроченных долгов
     for d in store['debts']:
         try:
             due_dt = datetime.fromisoformat(d['due_date'])
             if due_dt.tzinfo is None:
                 due_dt = due_dt.replace(tzinfo=timezone.utc)
         except ValueError:
-            continue  # skip malformed dates
+            continue
 
+        # Автоматическое отклонение просроченных "pending"
         if d['status'] == 'pending' and now > due_dt:
             d['status'] = 'declined'
             add_transaction_internal(d['proposer'], d['amount'], f'Debt auto-declined #{d["id"]}')
             updated = True
+            continue
+
+        # Автоматическое погашение просроченного "accepted"
+        if d['status'] == 'accepted' and now > due_dt:
+            try:
+                interest_multiplier = 1 + (d['interest'] / 100)
+                total_due = round(d['amount'] * interest_multiplier, 2)
+
+                add_transaction_internal(
+                    d['proposee'], -total_due,
+                    f'Debt auto-repay to {d["proposer"]} (#{d["id"]})'
+                )
+                add_transaction_internal(
+                    d['proposer'], total_due,
+                    f'Debt repaid by {d["proposee"]} (#{d["id"]})'
+                )
+                d['status'] = 'repaid_automatically'  # 👈 Новый статус
+                updated = True
+            except Exception as e:
+                print(f"[Auto-Repay Error] Debt #{d['id']}: {e}")
+                continue
 
     if updated:
         save_debts(store)
 
-    # Формируем список входящих и исходящих долгов
     user = session['username']
     incoming, outgoing = [], []
 
@@ -2809,12 +2822,17 @@ def list_debts():
             if due_dt.tzinfo is None:
                 due_dt = due_dt.replace(tzinfo=timezone.utc)
         except ValueError:
-            continue  # skip malformed
+            continue
 
         overdue = now > due_dt
-        label = d['status'].capitalize()
 
-        if d['status'] == 'accepted':
+        # 👇 Человеческий label
+        if d['status'] == 'repaid_automatically':
+            label = 'Repaid Automatically'
+        else:
+            label = d['status'].capitalize()
+
+        if d['status'] in ('accepted', 'repaid_automatically'):
             total_due = round(d['amount'] * (1 + (d['interest'] / 100 if overdue else 0)), 2)
         else:
             total_due = d['amount']
@@ -2921,7 +2939,7 @@ def create_today():
 
 @app.route('/api/submit-tasks', methods=['POST'])
 def submit_tasks():
-    time.sleep(6)
+    time.sleep(1)
     data     = request.get_json(force=True)
     level    = data.get('level')
     unit     = data.get('unit')
@@ -3063,7 +3081,6 @@ def get_results_today():
 
 @app.route('/api/get-today-questions', methods=['GET'])
 def get_today_questions():
-    time.sleep(1)  # simulate delay
     level = request.args.get('level')
     unit  = request.args.get('unit')
 
@@ -3119,12 +3136,10 @@ def get_room_id(user1, user2):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Отдача медиафайлов
 @app.route('/private_uploads/<filename>')
 def serve_private_upload(filename):
     return send_from_directory(app.config['PRIVATE_UPLOAD_FOLDER'], filename)
 
-# Получение истории переписки между двумя пользователями
 @app.route('/chat/<user1>/<user2>', methods=['GET'])
 def get_chat(user1, user2):
     room_id = get_room_id(user1, user2)
@@ -3132,7 +3147,6 @@ def get_chat(user1, user2):
         chats = json.load(f)
     return jsonify(chats.get(room_id, []))
 
-# Загрузка медиафайла через fetch
 @app.route('/chat/send_media', methods=['POST'])
 def send_media_file():
     sender = request.form.get('sender')
@@ -3151,7 +3165,6 @@ def send_media_file():
 
     return jsonify({'media_url': f"/private_uploads/{filename}"}), 200
 
-# Socket: Присоединение к комнате
 @socketio.on('join_private')
 def handle_join_private(data):
     sender = data['sender']
@@ -3160,7 +3173,6 @@ def handle_join_private(data):
     join_room(room)
     print(f"{sender} joined private room: {room}")
 
-# Socket: Отправка текстового или медиа сообщения
 @socketio.on('send_private_message')
 def handle_private_message(data):
     sender = data['sender']
@@ -3182,7 +3194,6 @@ def handle_private_message(data):
     if media_url:
         msg['media_url'] = media_url
 
-    # Сохраняем
     if os.path.exists(CHAT_FILE):
         with open(CHAT_FILE, 'r') as f:
             chats = json.load(f)
@@ -3235,7 +3246,6 @@ def mark_messages_as_read(user1, user2):
         with open(CHAT_FILE, 'w') as f:
             json.dump(chats, f, indent=2)
 
-        # Уведомить отправителя, что сообщение прочитано
         socketio.emit('messages_read', {
             'reader': user1,
             'sender': user2
@@ -3243,26 +3253,21 @@ def mark_messages_as_read(user1, user2):
 
     return jsonify({'status': 'ok', 'updated': updated})
 
-import uuid  # 🔥 Добавьте в начало файла
-
 @app.route('/api/lucky_event', methods=['POST'])
 def lucky_event():
-    import uuid
-    import random
+    import numpy as np
+
     data = request.json
     username = data.get("username")
     if not username:
         return jsonify({"error": "Username is required"}), 400
 
-    SPIN_COST = 500
-
-    # Load data
+    SPIN_COST = 1000
     spins = load_json("spins.json")
     boxes = load_json("boxes.json")
     balances = load_balances()
     transactions = load_transactions()
 
-    # Ensure defaults
     spins.setdefault(username, 0)
     boxes.setdefault(username, {"A": 0, "B": 0, "C": 0})
     balances.setdefault(username, 0.0)
@@ -3271,64 +3276,65 @@ def lucky_event():
     if balances[username] < SPIN_COST:
         return jsonify({"error": "Insufficient points for a spin."}), 403
 
-    balance_before_spin = balances[username]
+    # Update spin
     balances[username] -= SPIN_COST
-
-    transactions[username].append({
-        "id": str(uuid.uuid4()),
-        "amount": -SPIN_COST,
-        "description": "🎰 Lucky Spin",
-        "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
-        "balance_before": balance_before_spin,
-        "can_cancel": False
-    })
-
     spins[username] += 1
-    got_ball = False
+    spin_number = spins[username]
+
+    def add_tx(amount, desc):
+        transactions[username].append({
+            "id": str(uuid.uuid4()),
+            "amount": amount,
+            "description": desc,
+            "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+            "balance_before": balances[username] + (abs(amount) if amount < 0 else 0),
+            "can_cancel": False
+        })
+
+    add_tx(-SPIN_COST, "🎰 Lucky Spin")
+
+    # ⚙️ Псевдослучайная таблица шансов
+    reward_pool = [
+        {"type": "mega",   "chance": 1.5,  "min": 5000, "max": 15000},  # редкий эпик
+        {"type": "big",    "chance": 4.0,  "min": 1000, "max": 4000},   # мощный выигрыш
+        {"type": "mid",    "chance": 10.0, "min": 200,  "max": 900},    # средний
+        {"type": "small",  "chance": 16.0, "min": 20,   "max": 199},    # часто
+        {"type": "almost", "chance": 20.0, "min": 0,    "max": 0},      # почти выиграл
+        {"type": "none",   "chance": 48.5, "min": 0,    "max": 0}       # ничего
+    ]
+
+    choices = [r["type"] for r in reward_pool]
+    probs = [r["chance"] for r in reward_pool]
+    reward_type = np.random.choice(choices, p=np.array(probs) / sum(probs))
     won = 0
-    reward = 0
+    got_ball = False
     winning_box = None
 
-    # Every 10th spin gives a ball
-    if spins[username] >= 10:
-        spins[username] = 0
+    if reward_type in ("mega", "big", "mid", "small"):
+        reward_range = next(r for r in reward_pool if r["type"] == reward_type)
+        won = random.randint(reward_range["min"], reward_range["max"])
+        balances[username] += won
+        add_tx(won, f"💥 Spin Win ({reward_type.upper()})")
+
+    # 🎯 "Почти выиграл" — можно показывать визуализацию почти-выпавшего приза
+    elif reward_type == "almost":
+        pass  # Ничего не добавляем — будет просто эффект на фронте
+
+    # 💎 Каждые 10 спинов — шанс на шар
+    if spin_number % 10 == 0:
         got_ball = True
         box = random.choice(["A", "B", "C"])
         boxes[username][box] += 1
-
         if boxes[username][box] >= 3:
-            # Big win
-            won = random.randint(7000, 30000)
-            balance_before = balances[username]
-            balances[username] += won
-
-            transactions[username].append({
-                "id": str(uuid.uuid4()),
-                "amount": won,
-                "description": f"🎁 Lucky Box Win ({box})",
-                "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
-                "balance_before": balance_before,
-                "can_cancel": False
-            })
-
+            jackpot = random.randint(10000, 30000)
+            balances[username] += jackpot
+            add_tx(jackpot, f"🎁 Lucky Box Win ({box})")
             boxes[username] = {"A": 0, "B": 0, "C": 0}
+            reward_type = "jackpot"
+            won = jackpot
             winning_box = box
-    else:
-        # Normal spin: small chance of up to 100 pts
-        if random.random() < 0.15:  # 15% chance
-            reward = random.randint(1, 100)
-            balance_before = balances[username]
-            balances[username] += reward
 
-            transactions[username].append({
-                "id": str(uuid.uuid4()),
-                "amount": reward,
-                "description": "💫 Lucky Spin Reward",
-                "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
-                "balance_before": balance_before,
-                "can_cancel": False
-            })
-
+    # Save
     store_json("spins.json", spins)
     store_json("boxes.json", boxes)
     store_balances(balances)
@@ -3337,11 +3343,14 @@ def lucky_event():
     return jsonify({
         "spin_count": spins[username],
         "got_ball": got_ball,
+        "ball_box": box if got_ball else None,
         "current_boxes": boxes[username],
-        "won": won or reward,
+        "won": won,
+        "reward_type": reward_type,
         "winning_box": winning_box,
         "new_balance": balances[username]
     })
+
     
 @app.route('/api/spin_state', methods=['POST'])
 def get_spin_state():
@@ -3359,6 +3368,240 @@ def get_spin_state():
         "spin_count": spins[username],
         "current_boxes": boxes[username]
     })
+    
+@app.route('/api/risk_ladder', methods=['POST'])
+def risk_ladder():
+    data = request.json
+    username = data.get("username")
+    level = data.get("level", 1)
+
+    if not username:
+        return jsonify({"error": "Username required for cosmic journey!"}), 400
+    if not (1 <= level <= 7):
+        return jsonify({"error": "Invalid star level!"}), 400
+
+    ENTRY_COST = 3500
+    RISK_LEVELS = {
+        1: {"chance": 0.95, "reward": 800, "message": "Orbit achieved! Proceed or claim?"},
+        2: {"chance": 0.80, "reward": 2000, "message": "Nebula crossed! Risk more?"},
+        3: {"chance": 0.70, "reward": 3500, "message": "Star cluster reached! Continue?"},
+        4: {"chance": 0.60, "reward": 6000, "message": "Galactic core in sight! Dare to go on?"},
+        5: {"chance": 0.50, "reward": 10000, "message": "Black hole proximity! Risk or retreat?"},
+        6: {"chance": 0.40, "reward": 20000, "message": "Cosmic vault unlocked! One last leap?"},
+        7: {"chance": 0.30, "reward": 50000, "message": "Cosmic apex reached! Claim your treasure!"}
+    }
+
+    balances = load_balances()
+    transactions = load_transactions()
+    sessions = load_json("risk_ladder_sessions.json")
+
+    balances.setdefault(username, 0.0)
+    transactions.setdefault(username, [])
+    sessions.setdefault(username, {"level": 0, "potential_reward": 0, "active": False})
+
+    if level == 1:
+        if balances[username] < ENTRY_COST:
+            return jsonify({"error": "Not enough cosmic credits! Need 700 pts."}), 403
+        balances[username] -= ENTRY_COST
+        transactions[username].append({
+            "id": str(uuid.uuid4()),
+            "amount": -ENTRY_COST,
+            "description": "🌌 Cosmic Ladder Entry",
+            "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+            "balance_before": balances[username] + ENTRY_COST,
+            "can_cancel": False
+        })
+        sessions[username] = {"level": 1, "potential_reward": 0, "active": True}
+
+    elif not sessions[username]["active"] or sessions[username]["level"] != level - 1:
+        return jsonify({"error": "Invalid step or cosmic session expired."}), 400
+
+    level_data = RISK_LEVELS.get(level)
+    win = random.random() <= level_data["chance"]
+    reward = level_data["reward"]
+
+    if win:
+        sessions[username]["level"] = level
+        sessions[username]["potential_reward"] = reward
+        store_json("risk_ladder_sessions.json", sessions)
+        store_balances(balances)
+        store_transactions(transactions)
+        return jsonify({
+            "result": "success",
+            "level": level,
+            "chance": level_data["chance"],
+            "reward": reward,
+            "message": level_data["message"]
+        })
+    else:
+        sessions[username] = {"level": 0, "potential_reward": 0, "active": False}
+        store_json("risk_ladder_sessions.json", sessions)
+        store_balances(balances)
+        store_transactions(transactions)
+        return jsonify({
+            "result": "fail",
+            "level": level,
+            "chance": level_data["chance"],
+            "reward": 0,
+            "message": "Cosmic collapse! All rewards lost in the void."
+        })
+
+@app.route('/api/risk_ladder_take', methods=['POST'])
+def risk_ladder_take():
+    data = request.json
+    username = data.get("username")
+    reward = data.get("reward")
+
+    if not username or reward is None:
+        return jsonify({"error": "Invalid cosmic data!"}), 400
+
+    balances = load_balances()
+    transactions = load_transactions()
+    sessions = load_json("risk_ladder_sessions.json")
+
+    session = sessions.get(username)
+    if not session or not session.get("active"):
+        return jsonify({"error": "No active cosmic session!"}), 400
+
+    expected_reward = session.get("potential_reward", 0)
+    if expected_reward != reward:
+        return jsonify({"error": "Reward mismatch in the cosmos!"}), 400
+
+    balance_before = balances.get(username, 0)
+    balances[username] = balance_before + reward
+
+    transactions[username].append({
+        "id": str(uuid.uuid4()),
+        "amount": reward,
+        "description": "💫 Cosmic Treasure Claimed",
+        "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+        "balance_before": balance_before,
+        "can_cancel": False
+    })
+
+    sessions[username] = {"level": 0, "potential_reward": 0, "active": False}
+
+    store_balances(balances)
+    store_transactions(transactions)
+    store_json("risk_ladder_sessions.json", sessions)
+
+    return jsonify({"success": True, "new_balance": balances[username]})
+
+@app.route('/api/horror_event', methods=['POST'])
+def horror_event():
+    data = request.json
+    username = data.get("username")
+    level = data.get("level", 1)
+
+    if not username:
+        return jsonify({"error": "Who dares enter without a name?"}), 400
+    if not (1 <= level <= 5):
+        return jsonify({"error": "No such nightmare level exists."}), 400
+
+    ENTRY_COST = 2500
+    HORROR_LEVELS = {
+        1: {"screamer": 0.90, "reward": 1300, "message": "A whisper in the dark... move forward?"},
+        2: {"screamer": 0.75, "reward": 2500, "message": "You step on bones... still alive. Proceed?"},
+        3: {"screamer": 0.60, "reward": 4000, "message": "Blood on the walls... almost there?"},
+        4: {"screamer": 0.45, "reward": 7000, "message": "Voices call your name. One last room?"},
+        5: {"screamer": 0.30, "reward": 15000, "message": "The Final Door creaks... Enter or flee?"}
+    }
+
+    balances = load_balances()
+    sessions = load_json("horror_event_sessions.json")
+    transactions = load_transactions()
+
+    balances.setdefault(username, 0.0)
+    transactions.setdefault(username, [])
+    sessions.setdefault(username, {"level": 0, "potential_reward": 0, "active": False})
+
+    if level == 1:
+        if balances[username] < ENTRY_COST:
+            return jsonify({"error": "Not enough points to enter the cursed house (1111 pts needed)."}), 403
+        balances[username] -= ENTRY_COST
+        transactions[username].append({
+            "id": str(uuid.uuid4()),
+            "amount": -ENTRY_COST,
+            "description": "🩸 Entered Horror Games",
+            "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+            "balance_before": balances[username] + ENTRY_COST,
+            "can_cancel": False
+        })
+        sessions[username] = {"level": 1, "potential_reward": 0, "active": True}
+
+    elif not sessions[username]["active"] or sessions[username]["level"] != level - 1:
+        return jsonify({"error": "You lost your way in the maze of madness."}), 400
+
+    level_data = HORROR_LEVELS.get(level)
+    survive = random.random() <= level_data["screamer"]
+    reward = level_data["reward"]
+
+    if survive:
+        sessions[username]["level"] = level
+        sessions[username]["potential_reward"] = reward
+        store_json("horror_event_sessions.json", sessions)
+        store_balances(balances)
+        store_transactions(transactions)
+        return jsonify({
+            "result": "survived",
+            "level": level,
+            "chance": level_data["screamer"],
+            "reward": reward,
+            "message": level_data["message"]
+        })
+    else:
+        sessions[username] = {"level": 0, "potential_reward": 0, "active": False}
+        store_json("horror_event_sessions.json", sessions)
+        store_balances(balances)
+        store_transactions(transactions)
+        return jsonify({
+            "result": "screamer",
+            "level": level,
+            "reward": 0,
+            "message": "Screams echo... and everything goes black. You lost all rewards."
+        })
+
+@app.route('/api/horror_event_take', methods=['POST'])
+def horror_event_take():
+    data = request.json
+    username = data.get("username")
+    reward = data.get("reward")
+
+    if not username or reward is None:
+        return jsonify({"error": "The shadows won't release unmarked souls."}), 400
+
+    balances = load_balances()
+    sessions = load_json("horror_event_sessions.json")
+    transactions = load_transactions()
+
+    session = sessions.get(username)
+    if not session or not session.get("active"):
+        return jsonify({"error": "No active horror session to escape from."}), 400
+
+    expected_reward = session.get("potential_reward", 0)
+    if expected_reward != reward:
+        return jsonify({"error": "Greed consumes the mind — reward mismatch!"}), 400
+
+    balance_before = balances.get(username, 0)
+    balances[username] = balance_before + reward
+
+    transactions[username].append({
+        "id": str(uuid.uuid4()),
+        "amount": reward,
+        "description": "🎁 Escaped Horror with Reward",
+        "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
+        "balance_before": balance_before,
+        "can_cancel": False
+    })
+
+    sessions[username] = {"level": 0, "potential_reward": 0, "active": False}
+
+    store_balances(balances)
+    store_transactions(transactions)
+    store_json("horror_event_sessions.json", sessions)
+
+    return jsonify({"success": True, "new_balance": balances[username]})
+
 
 STRIKES_FILE = 'data/strikes.json'
 
@@ -3374,8 +3617,6 @@ def load_strikes():
 def save_strikes(data):
     with open(STRIKES_FILE, 'w') as f:
         json.dump(data, f, indent=2)
-
-from datetime import datetime
 
 # Список всех Units в порядке
 Units = [
@@ -3545,5 +3786,56 @@ def get_results_average():
 
     return jsonify(result), 200
     
+
+@app.route("/api/stories")
+def get_stories():
+    json_path = os.path.join("data", "stories.json")
+
+    # Создать папку data/, если не существует
+    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+
+    # Если файла нет — создать шаблон
+    if not os.path.exists(json_path):
+        default_data = [
+            {
+                "title": "Welcome Story",
+                "thumbnail": "stories/default.png",
+                "videoUrl": "stories/default.mp4"
+            }
+        ]
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(default_data, f, indent=2)
+
+    # Загрузка stories
+    with open(json_path, "r", encoding="utf-8") as f:
+        raw_stories = json.load(f)
+
+    stories = []
+    for story in raw_stories:
+        video = story.get("videoUrl")
+        image = story.get("imageUrl")
+        thumbnail = story.get("thumbnail", "")
+
+        stories.append({
+            "title": story.get("title", "Untitled"),
+            "thumbnail": url_for('static', filename=thumbnail),
+            "mediaType": "video" if video else "image",
+            "mediaUrl": url_for('static', filename=video) if video else (
+                url_for('static', filename=image) if image else None
+            )
+        })
+
+    return jsonify(stories)
+
+
+    
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # Отключаем use_reloader, чтобы не пытаться читать WERKZEUG_SERVER_FD
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=5000,
+        debug=True,
+        use_reloader=False
+    )
+

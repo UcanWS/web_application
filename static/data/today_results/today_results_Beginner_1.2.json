@@ -1,0 +1,780 @@
+{
+    "Muhammadiso": {
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-10 14:36:32",
+            "correct": 0,
+            "incorrect": 0,
+            "skipped": 13,
+            "total": 13,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "____'s your name?",
+                    "user_answer": "",
+                    "correct_answer": "What",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "____ do you spell your name?",
+                    "user_answer": "",
+                    "correct_answer": "How",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "____ are you from?",
+                    "user_answer": "",
+                    "correct_answer": "Where",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "____ do you live in Russia?",
+                    "user_answer": "",
+                    "correct_answer": "Where",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "____'s your phone number?",
+                    "user_answer": "",
+                    "correct_answer": "What",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1",
+                    "text": "eight, nine, ten, ____",
+                    "user_answer": "",
+                    "correct_answer": "eleven",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2",
+                    "text": "thirteen, fourteen, fifteen, ____",
+                    "user_answer": "",
+                    "correct_answer": "sixteen",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3",
+                    "text": "thirty-one, thirty-two, thirty-three, ____",
+                    "user_answer": "",
+                    "correct_answer": "thirty-four",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4",
+                    "text": "ninety-seven, ninety-eight, ninety-nine, ____",
+                    "user_answer": "",
+                    "correct_answer": "one hundred",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5",
+                    "text": "six, eight, ten, ____",
+                    "user_answer": "",
+                    "correct_answer": "twelve",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6",
+                    "text": "fourteen, sixteen, eighteen, ____",
+                    "user_answer": "",
+                    "correct_answer": "twenty",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7",
+                    "text": "forty-three, forty-five, forty-seven, ____",
+                    "user_answer": "",
+                    "correct_answer": "forty-nine",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8",
+                    "text": "fifty, sixty, seventy, ____",
+                    "user_answer": "",
+                    "correct_answer": "eighty",
+                    "is_correct": false
+                }
+            ]
+        }
+    },
+    "Muhammadali": {
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 14:40:02",
+            "correct": 7,
+            "incorrect": 3,
+            "skipped": 0,
+            "total": 10,
+            "percent": 70.0,
+            "details": [
+                {
+                    "question_id": "5.1",
+                    "text": "She ___ a doctor.",
+                    "user_answer": "is",
+                    "correct_answer": "is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "They ___ from Spain.",
+                    "user_answer": "are",
+                    "correct_answer": "are",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "I ___ coffee in the morning.",
+                    "user_answer": "drinks",
+                    "correct_answer": "drink",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.4",
+                    "text": "He ___ to school by bus.",
+                    "user_answer": "going",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.5",
+                    "text": "We have ___ orange cat.",
+                    "user_answer": "a",
+                    "correct_answer": "an",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.6",
+                    "text": "This is my friend ___ name is Sarah.",
+                    "user_answer": "her",
+                    "correct_answer": "her",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.7",
+                    "text": "There ___ a book on the table.",
+                    "user_answer": "is",
+                    "correct_answer": "is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.8",
+                    "text": "The shoes are ___ the bed.",
+                    "user_answer": "under",
+                    "correct_answer": "under",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.9",
+                    "text": "This is John’s bike. It’s ___ bike.",
+                    "user_answer": "his",
+                    "correct_answer": "his",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.10",
+                    "text": "___ you like pizza?",
+                    "user_answer": "Do",
+                    "correct_answer": "Do",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 14:41:35",
+            "correct": 6,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 6,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "Julian remembers Alyssa.",
+                    "user_answer": "False",
+                    "correct_answer": "False",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "Ben is Alyssa's brother.",
+                    "user_answer": "True",
+                    "correct_answer": "True",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "They were at Ben’s wedding.",
+                    "user_answer": "True",
+                    "correct_answer": "True",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "The wedding was in February.",
+                    "user_answer": "False",
+                    "correct_answer": "False",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "Julian says the wrong name.",
+                    "user_answer": "True",
+                    "correct_answer": "True",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "Alyssa doesn't want a drink.",
+                    "user_answer": "False",
+                    "correct_answer": "False",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Reading Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 14:42:11",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "4.1",
+                    "text": "How old is Anna?",
+                    "user_answer": "10",
+                    "correct_answer": "10",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "What does Anna eat for breakfast?",
+                    "user_answer": "Bread and tea",
+                    "correct_answer": "Bread and tea",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "How does Anna go to school?",
+                    "user_answer": "On foot",
+                    "correct_answer": "On foot",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.4",
+                    "text": "What is Anna’s favorite subject?",
+                    "user_answer": "English",
+                    "correct_answer": "English",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.5",
+                    "text": "When does Anna go to bed?",
+                    "user_answer": "9 o’clock",
+                    "correct_answer": "9 o’clock",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Extra Task": {
+            "submitted": true,
+            "time": "2025-07-10 14:44:03",
+            "correct": 1,
+            "incorrect": 5,
+            "skipped": 0,
+            "total": 6,
+            "percent": 16.666666666666664,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "She ____ to school every day.",
+                    "user_answer": "going",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "They ____ watching a movie now.",
+                    "user_answer": "were",
+                    "correct_answer": "are",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "We ____ dinner when you called.",
+                    "user_answer": "have",
+                    "correct_answer": "were having",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.1",
+                    "text": "I ____ coffee every morning.",
+                    "user_answer": "Drink",
+                    "correct_answer": "drink",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "He ____ to music in the evening.",
+                    "user_answer": "Listen",
+                    "correct_answer": "listens",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "They ____ English at school.",
+                    "user_answer": "Music",
+                    "correct_answer": "study",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-10 14:56:11",
+            "correct": 11,
+            "incorrect": 2,
+            "skipped": 0,
+            "total": 13,
+            "percent": 84.61538461538461,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "____'s your name?",
+                    "user_answer": "What",
+                    "correct_answer": "What",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "____ do you spell your name?",
+                    "user_answer": "How",
+                    "correct_answer": "How",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "____ are you from?",
+                    "user_answer": "Where",
+                    "correct_answer": "Where",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "____ do you live in Russia?",
+                    "user_answer": "Where",
+                    "correct_answer": "Where",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "____'s your phone number?",
+                    "user_answer": "What",
+                    "correct_answer": "What",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1",
+                    "text": "eight, nine, ten, ____",
+                    "user_answer": "Eleven",
+                    "correct_answer": "eleven",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2",
+                    "text": "thirteen, fourteen, fifteen, ____",
+                    "user_answer": "Sixteen",
+                    "correct_answer": "sixteen",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3",
+                    "text": "thirty-one, thirty-two, thirty-three, ____",
+                    "user_answer": "Thirty-four",
+                    "correct_answer": "thirty-four",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4",
+                    "text": "ninety-seven, ninety-eight, ninety-nine, ____",
+                    "user_answer": "one-hundred",
+                    "correct_answer": "one hundred",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5",
+                    "text": "six, eight, ten, ____",
+                    "user_answer": "twelve",
+                    "correct_answer": "twelve",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6",
+                    "text": "fourteen, sixteen, eighteen, ____",
+                    "user_answer": "Ten",
+                    "correct_answer": "twenty",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7",
+                    "text": "forty-three, forty-five, forty-seven, ____",
+                    "user_answer": "Forty-nine",
+                    "correct_answer": "forty-nine",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "8",
+                    "text": "fifty, sixty, seventy, ____",
+                    "user_answer": "Eighty",
+                    "correct_answer": "eighty",
+                    "is_correct": true
+                }
+            ]
+        }
+    },
+    "Abdulmalik": {
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 14:44:40",
+            "correct": 4,
+            "incorrect": 6,
+            "skipped": 0,
+            "total": 10,
+            "percent": 40.0,
+            "details": [
+                {
+                    "question_id": "5.1",
+                    "text": "She ___ a doctor.",
+                    "user_answer": "is",
+                    "correct_answer": "is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "They ___ from Spain.",
+                    "user_answer": "are",
+                    "correct_answer": "are",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "I ___ coffee in the morning.",
+                    "user_answer": "drink",
+                    "correct_answer": "drink",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.4",
+                    "text": "He ___ to school by bus.",
+                    "user_answer": "go",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.5",
+                    "text": "We have ___ orange cat.",
+                    "user_answer": "the",
+                    "correct_answer": "an",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.6",
+                    "text": "This is my friend ___ name is Sarah.",
+                    "user_answer": "her",
+                    "correct_answer": "her",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.7",
+                    "text": "There ___ a book on the table.",
+                    "user_answer": "are",
+                    "correct_answer": "is",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.8",
+                    "text": "The shoes are ___ the bed.",
+                    "user_answer": "next",
+                    "correct_answer": "under",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.9",
+                    "text": "This is John’s bike. It’s ___ bike.",
+                    "user_answer": "him",
+                    "correct_answer": "his",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.10",
+                    "text": "___ you like pizza?",
+                    "user_answer": "Does",
+                    "correct_answer": "Do",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 14:54:42",
+            "correct": 1,
+            "incorrect": 5,
+            "skipped": 0,
+            "total": 6,
+            "percent": 16.666666666666664,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "Julian remembers Alyssa.",
+                    "user_answer": "True",
+                    "correct_answer": "False",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "Ben is Alyssa's brother.",
+                    "user_answer": "True",
+                    "correct_answer": "True",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "They were at Ben’s wedding.",
+                    "user_answer": "False",
+                    "correct_answer": "True",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "The wedding was in February.",
+                    "user_answer": "True",
+                    "correct_answer": "False",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "Julian says the wrong name.",
+                    "user_answer": "False",
+                    "correct_answer": "True",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "Alyssa doesn't want a drink.",
+                    "user_answer": "True",
+                    "correct_answer": "False",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Reading Tasks": {
+            "submitted": true,
+            "time": "2025-07-10 15:00:36",
+            "correct": 5,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 5,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "4.1",
+                    "text": "How old is Anna?",
+                    "user_answer": "10",
+                    "correct_answer": "10",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "What does Anna eat for breakfast?",
+                    "user_answer": "Bread and tea",
+                    "correct_answer": "Bread and tea",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "How does Anna go to school?",
+                    "user_answer": "On foot",
+                    "correct_answer": "On foot",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.4",
+                    "text": "What is Anna’s favorite subject?",
+                    "user_answer": "English",
+                    "correct_answer": "English",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.5",
+                    "text": "When does Anna go to bed?",
+                    "user_answer": "9 o’clock",
+                    "correct_answer": "9 o’clock",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Extra Task": {
+            "submitted": true,
+            "time": "2025-07-10 15:01:55",
+            "correct": 4,
+            "incorrect": 2,
+            "skipped": 0,
+            "total": 6,
+            "percent": 66.66666666666666,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "She ____ to school every day.",
+                    "user_answer": "go",
+                    "correct_answer": "goes",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "They ____ watching a movie now.",
+                    "user_answer": "are",
+                    "correct_answer": "are",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "We ____ dinner when you called.",
+                    "user_answer": "have",
+                    "correct_answer": "were having",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.1",
+                    "text": "I ____ coffee every morning.",
+                    "user_answer": "Drink",
+                    "correct_answer": "drink",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "He ____ to music in the evening.",
+                    "user_answer": "Listens",
+                    "correct_answer": "listens",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "They ____ English at school.",
+                    "user_answer": "Study",
+                    "correct_answer": "study",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-10 15:07:03",
+            "correct": 6,
+            "incorrect": 7,
+            "skipped": 0,
+            "total": 13,
+            "percent": 46.15384615384615,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "____'s your name?",
+                    "user_answer": "What",
+                    "correct_answer": "What",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "____ do you spell your name?",
+                    "user_answer": "Where",
+                    "correct_answer": "How",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "____ are you from?",
+                    "user_answer": "Where",
+                    "correct_answer": "Where",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "____ do you live in Russia?",
+                    "user_answer": "Where",
+                    "correct_answer": "Where",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "____'s your phone number?",
+                    "user_answer": "How",
+                    "correct_answer": "What",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1",
+                    "text": "eight, nine, ten, ____",
+                    "user_answer": "Eleven",
+                    "correct_answer": "eleven",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2",
+                    "text": "thirteen, fourteen, fifteen, ____",
+                    "user_answer": "Sixty",
+                    "correct_answer": "sixteen",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3",
+                    "text": "thirty-one, thirty-two, thirty-three, ____",
+                    "user_answer": "Thirty-four",
+                    "correct_answer": "thirty-four",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4",
+                    "text": "ninety-seven, ninety-eight, ninety-nine, ____",
+                    "user_answer": "Sixty",
+                    "correct_answer": "one hundred",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5",
+                    "text": "six, eight, ten, ____",
+                    "user_answer": "Eleven",
+                    "correct_answer": "twelve",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6",
+                    "text": "fourteen, sixteen, eighteen, ____",
+                    "user_answer": "Sixteen",
+                    "correct_answer": "twenty",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7",
+                    "text": "forty-three, forty-five, forty-seven, ____",
+                    "user_answer": "Forty-eigh",
+                    "correct_answer": "forty-nine",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8",
+                    "text": "fifty, sixty, seventy, ____",
+                    "user_answer": "Eighty",
+                    "correct_answer": "eighty",
+                    "is_correct": true
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "type": "grammar",
+    "text": "Telling the Time",
+    "subquestions": [
+      {
+        "id": "1.1",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕒 It’s ______.",
+        "options": ["three o’clock", "thirty o’clock"],
+        "correct": "three o’clock"
+      },
+      {
+        "id": "1.2",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕥 It’s ______.",
+        "options": ["half past ten", "ten to half"],
+        "correct": "half past ten"
+      },
+      {
+        "id": "1.3",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕧 It’s ______.",
+        "options": ["half past twelve", "quarter past twelve"],
+        "correct": "half past twelve"
+      },
+      {
+        "id": "1.4",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕓 It’s ______.",
+        "options": ["four o’clock", "quarter to five"],
+        "correct": "four o’clock"
+      },
+      {
+        "id": "1.5",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕘 It’s ______.",
+        "options": ["nine o’clock", "quarter past nine"],
+        "correct": "nine o’clock"
+      },
+      {
+        "id": "1.6",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕖 It’s ______.",
+        "options": ["seven o’clock", "seven past five"],
+        "correct": "seven o’clock"
+      },
+      {
+        "id": "1.7",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕤 It’s ______.",
+        "options": ["quarter to ten", "ten o’clock"],
+        "correct": "quarter to ten"
+      },
+      {
+        "id": "1.8",
+        "type": "multiple_choice",
+        "text": "What time is it? 🕒 It’s ______.",
+        "options": ["three o’clock", "thirteen o’clock"],
+        "correct": "three o’clock"
+      }
+    ]
+  }
+]
