@@ -12,6 +12,18 @@
 
 <canvas class='connecting-dots'></canvas>
 
+<div id="faceid-modal" class="faceid-modal hidden">
+  <div class="faceid-box">
+    <div class="faceid-header">Face ID Verification</div>
+    <video id="faceid-video" autoplay muted playsinline></video>
+    <div id="faceid-status">🕵️ Verifying face...</div>
+    <div class="faceid-progress-bar">
+      <div id="faceid-progress" class="faceid-progress"></div>
+    </div>
+    <button id="faceid-skip" class="faceid-skip-btn">Skip Face ID</button>
+  </div>
+</div>
+
   
   <div id="toast-container"></div>
   <div id="global-lottie-loader" style="display: none;">
@@ -89,23 +101,9 @@
   </div>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script defer src="/static/js/face-check.js"></script>
   <script src="/static/js/loginv2.js"></script>
-  <script>
-if (navigator.userAgentData) {
-  navigator.userAgentData.getHighEntropyValues(["platform", "model", "brands", "mobile"]).then(ua => {
-    fetch('/log-client-device', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        platform: ua.platform,
-        model: ua.model,
-        brands: ua.brands,
-        isMobile: ua.mobile
-      })
-    });
-  });
-}
-</script>
 
 </body>
 </html>

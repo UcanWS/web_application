@@ -1130,14 +1130,15 @@ function showToastNotification(message, type = 'success', duration = 5000) {
     });
 	
   const socketBan = io();
-  const itemsPerPageBan = 5;
-  let currentPageBan = 1;
-  let banSessions = [];
-  let currentBanUsername = null;
-  let isLoadingBan = false;
+// Constants and global variables
+const itemsPerPageBan = 5;
+let currentPageBan = 1;
+let banSessions = [];
+let currentBanUsername = null;
+let isLoadingBan = false;
 
-  // Show skeleton loading for ban users
-  function showBanSkeletonLoading() {
+// Show skeleton loading for ban users
+function showBanSkeletonLoading() {
     const tbody = document.getElementById('ban-users-body');
     tbody.innerHTML = `
       <tr>
@@ -1165,61 +1166,53 @@ function showToastNotification(message, type = 'success', duration = 5000) {
         <td class="tdBan"><div class="sceletion-loading-button-ban"></div></td>
       </tr>
     `;
-  }
+}
 
-  // Fetch active sessions for ban users from API endpoint
-  async function fetchBanSessions() {
+// Fetch usernames from /api/users
+async function fetchBanSessions() {
     if (isLoadingBan) return;
     isLoadingBan = true;
-    showBanSkeletonLoading(); // Show skeleton while fetching
+    showBanSkeletonLoading();
 
     try {
-      const response = await fetch('/api/sessions/');
-      const data = await response.json();
-      if (response.ok) {
-        // Group sessions by username and take the latest session for each user
-        const sessionsByUserBan = {};
-        data.sessions.forEach(session => {
-          const usernameBan = session.username;
-          if (!sessionsByUserBan[usernameBan]) {
-            sessionsByUserBan[usernameBan] = session;
-          }
-        });
+        const response = await fetch('/api/users');
+        const data = await response.json();
+        if (response.ok) {
+            // Transform user data into banSessions format
+            banSessions = Object.keys(data).map(username => ({
+                username: username,
+                session: {
+                    "Device-Type": "Unknown",
+                    "OS": "Unknown",
+                    "Platform": "Unknown"
+                }
+            }));
 
-        banSessions = Object.entries(sessionsByUserBan).map(([usernameBan, session]) => ({
-          username: usernameBan,
-          session: {
-            "Device-Type": session.deviceType,
-            "OS": session.os,
-            "Platform": session.platform
-          }
-        }));
-
-        await renderBanTable();
-      } else {
-        console.error('Error fetching ban sessions:', data.error);
-      }
+            await renderBanTable();
+        } else {
+            console.error('Error fetching users:', data.error);
+        }
     } catch (error) {
-      console.error('Fetch error for ban sessions:', error);
+        console.error('Fetch error for users:', error);
     } finally {
-      isLoadingBan = false;
+        isLoadingBan = false;
     }
-  }
+}
 
-  // Fetch avatar for a user in ban users section
-  async function fetchBanAvatar(username) {
+// Fetch avatar for a user in ban users section
+async function fetchBanAvatar(username) {
     try {
-      const response = await fetch(`/get_avatar/${username}`);
-      const data = await response.json();
-      return data.avatar_url || null; // Return null if no avatar
+        const response = await fetch(`/get_avatar/${username}`);
+        const data = await response.json();
+        return data.avatar_url || null;
     } catch (error) {
-      console.error('Error fetching ban avatar:', error);
-      return null;
+        console.error('Error fetching ban avatar:', error);
+        return null;
     }
-  }
+}
 
-  // Render the table with pagination for ban users
-  async function renderBanTable() {
+// Render the table with pagination for ban users
+async function renderBanTable() {
     const tbody = document.getElementById('ban-users-body');
     tbody.innerHTML = '';
 
@@ -1228,28 +1221,28 @@ function showToastNotification(message, type = 'success', duration = 5000) {
     const paginatedDataBan = banSessions.slice(startBan, endBan);
 
     for (const user of paginatedDataBan) {
-      const avatarUrlBan = await fetchBanAvatar(user.username);
-      const row = document.createElement('tr');
-      const avatarDisplayBan = avatarUrlBan
-        ? `<img src="${avatarUrlBan}" alt="${user.username} avatar" class="avatar-ban">`
-        : `<div class="avatar-placeholder-ban">${user.username.charAt(0).toUpperCase()}</div>`;
-      row.innerHTML = `
-        <td class="tdBan">
-          <div class="avatar-container-ban">
-            ${avatarDisplayBan}
-            ${user.username}
-          </div>
-        </td>
-        <td class="tdBan">${user.session["Device-Type"] || "Unknown"}</td>
-        <td class="tdBan">${user.session["OS"] || "Unknown"}</td>
-        <td class="tdBan">${user.session["Platform"] || "Unknown"}</td>
-        <td class="tdBan">
-          <button class="ban-button" onclick="openBanModal('${user.username}')">
-            <i class="fas fa-ban"></i> Ban
-          </button>
-        </td>
-      `;
-      tbody.appendChild(row);
+        const avatarUrlBan = await fetchBanAvatar(user.username);
+        const row = document.createElement('tr');
+        const avatarDisplayBan = avatarUrlBan
+            ? `<img src="${avatarUrlBan}" alt="${user.username} avatar" class="avatar-ban">`
+            : `<div class="avatar-placeholder-ban">${user.username.charAt(0).toUpperCase()}</div>`;
+        row.innerHTML = `
+            <td class="tdBan">
+                <div class="avatar-container-ban">
+                    ${avatarDisplayBan}
+                    ${user.username}
+                </div>
+            </td>
+            <td class="tdBan">${user.session["Device-Type"]}</td>
+            <td class="tdBan">${user.session["OS"]}</td>
+            <td class="tdBan">${user.session["Platform"]}</td>
+            <td class="tdBan">
+                <button class="ban-button" onclick="openBanModal('${user.username}')">
+                    <i class="fas fa-ban"></i> Ban
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
     }
 
     // Update pagination info
@@ -1260,7 +1253,7 @@ function showToastNotification(message, type = 'success', duration = 5000) {
     // Update pagination buttons
     document.getElementById('prev-page').disabled = currentPageBan === 1;
     document.getElementById('next-page').disabled = endBan >= totalEntriesBan;
-  }
+}
 
   // Open modal for banning user
   function openBanModal(username) {

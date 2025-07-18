@@ -1458,6 +1458,80 @@
                     "is_correct": false
                 }
             ]
+        },
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-18 17:00:39",
+            "correct": 0,
+            "incorrect": 3,
+            "skipped": 6,
+            "total": 9,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "Choose the correct sentence.",
+                    "user_answer": "He am a teacher.",
+                    "correct_answer": "He is a teacher.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "Choose the correct form of 'to be': I ___ a student.",
+                    "user_answer": "",
+                    "correct_answer": "am",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "What is the plural form of 'book'?",
+                    "user_answer": "",
+                    "correct_answer": "books",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "Which word is a pronoun?",
+                    "user_answer": "",
+                    "correct_answer": "She",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "Choose the correct question: ___ your name?",
+                    "user_answer": "Who are",
+                    "correct_answer": "What is",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.7",
+                    "text": "Which word completes the sentence: 'He ___ from Canada.'",
+                    "user_answer": "",
+                    "correct_answer": "is",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.8",
+                    "text": "Which sentence is correct?",
+                    "user_answer": "",
+                    "correct_answer": "They are happy.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.9",
+                    "text": "Select the correct sentence.",
+                    "user_answer": "My name Anna.",
+                    "correct_answer": "My name is Anna.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.10",
+                    "text": "Choose the correct order: '___ is this?'",
+                    "user_answer": "",
+                    "correct_answer": "What",
+                    "is_correct": false
+                }
+            ]
         }
     },
     "Elbek": {

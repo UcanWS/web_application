@@ -77,6 +77,216 @@
             "time": "2025-07-16T15:28:01.299045",
             "balance_before": 100515012.0,
             "can_cancel": false
+        },
+        {
+            "amount": -1000,
+            "description": "Debt proposed #30",
+            "time": "2025-07-17T17:26:25.717817",
+            "balance_before": 100530012.0
+        },
+        {
+            "id": "cb6768b3-1a21-4001-b1ab-c52384d391fe",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T17:39:39.958036",
+            "balance_before": 100529012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "6184eb00-b681-40f1-a4a5-67f339ceec1d",
+            "amount": 15000,
+            "description": "\ud83c\udf81 Escaped Horror with Reward",
+            "time": "2025-07-17T17:39:44.177263",
+            "balance_before": 100526512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "2817fa23-ca19-43a3-8ece-e1074db32967",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T17:39:44.902827",
+            "balance_before": 100541512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "4dc38c35-0198-4dd3-8623-3e58c07d6ab9",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T17:39:45.385044",
+            "balance_before": 100539012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "b4e7489d-316d-4ef0-baa3-562413662834",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T17:39:52.248928",
+            "balance_before": 100536512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "a73c11fb-2a1d-4ae0-9b0d-519496ba396c",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T17:39:57.986804",
+            "balance_before": 100534012.0,
+            "can_cancel": false
+        },
+        {
+            "amount": 1000,
+            "description": "Debt auto-declined #30",
+            "time": "2025-07-17T22:00:49.641754",
+            "balance_before": 100531512.0
+        },
+        {
+            "id": "2e052a13-aca0-484d-b26b-3233bb7da796",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:04.129246",
+            "balance_before": 100532512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "bf4448d3-3f32-440d-b601-81d8e5b410c1",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:08.678431",
+            "balance_before": 100530012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "ad15d3a9-1659-4496-a477-21403f60f0ba",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:09.750981",
+            "balance_before": 100527512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "be1240d6-2a9f-4d9f-8a9e-07ec9a070795",
+            "amount": 15000,
+            "description": "\ud83c\udf81 Escaped Horror with Reward",
+            "time": "2025-07-17T22:01:16.761637",
+            "balance_before": 100525012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "ff0f1942-3976-47af-b237-4ad44b34a26e",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:18.838802",
+            "balance_before": 100540012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "7ddc0873-8049-433f-a733-8d2f8da5f166",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:23.700852",
+            "balance_before": 100537512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "df8cbeee-501f-4de6-8168-ee5f093c1cfc",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:33.600200",
+            "balance_before": 100535012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "d7ed134f-72ed-4949-914f-4cd58794b2b1",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:38.272077",
+            "balance_before": 100532512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "0cf61374-a30e-4b20-a1d6-88788b45f882",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-17T22:01:45.350482",
+            "balance_before": 100530012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "c63d861c-3d5e-40c2-9581-7aa779e78901",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-17T22:01:53.187891",
+            "balance_before": 100527512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "f11f167b-3ef1-4574-ab62-07f24b0683cc",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-17T22:01:54.162973",
+            "balance_before": 100524012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "94f49067-0fd6-4810-a142-1313c33698b0",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-17T22:01:59.258298",
+            "balance_before": 100520512.0,
+            "can_cancel": false
+        },
+        {
+            "id": "c3a57681-a910-462d-9acb-99b141407a47",
+            "amount": 50000,
+            "description": "\ud83d\udcab Cosmic Treasure Claimed",
+            "time": "2025-07-17T22:02:20.360956",
+            "balance_before": 100517012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "2da26197-a606-4890-a8e0-dbe2e9f5095d",
+            "amount": -1000,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-17T22:02:25.391176",
+            "balance_before": 100567012.0,
+            "can_cancel": false
+        },
+        {
+            "id": "fca32724-1e98-4e3d-a6d6-a547b7358620",
+            "amount": 341,
+            "description": "\ud83d\udca5 Spin Win (MID)",
+            "time": "2025-07-17T22:02:25.650102",
+            "balance_before": 100566353.0,
+            "can_cancel": false
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing: Pluses and Minuses of Public Transport' with 95%",
+            "time": "2025-07-18T14:43:11.790789",
+            "balance_before": 100566353.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing: Start' with 92%",
+            "time": "2025-07-18T14:56:51.109597",
+            "balance_before": 100566453.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing: Start' with 82%",
+            "time": "2025-07-18T15:06:10.264974",
+            "balance_before": 100566553.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing: Start' with 92%",
+            "time": "2025-07-18T16:05:33.632506",
+            "balance_before": 100566653.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Listening Tasks' with 100%",
+            "time": "2025-07-18T17:24:46.049041",
+            "balance_before": 100566753.0
         }
     ],
     "Muhammadali": [

@@ -1,0 +1,247 @@
+{
+    "Muhammadiso": {
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-18 17:24:46",
+            "correct": 4,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 4,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "A man ____.",
+                    "user_answer": "men",
+                    "correct_answer": "men",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "a woman ____",
+                    "user_answer": "women",
+                    "correct_answer": "women",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "a person ____.",
+                    "user_answer": "people",
+                    "correct_answer": "people",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "a child ____",
+                    "user_answer": "children",
+                    "correct_answer": "children",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-18 17:28:06",
+            "correct": 0,
+            "incorrect": 0,
+            "skipped": 21,
+            "total": 21,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "5.1",
+                    "text": "I ____ a new watch.",
+                    "user_answer": "",
+                    "correct_answer": "have got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "She ____ a big clock in her room.",
+                    "user_answer": "",
+                    "correct_answer": "has got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "They ____ a calendar on the wall.",
+                    "user_answer": "",
+                    "correct_answer": "have got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.4",
+                    "text": "My brother ____ a digital watch.",
+                    "user_answer": "",
+                    "correct_answer": "has got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.5",
+                    "text": "We ____ a meeting at noon.",
+                    "user_answer": "",
+                    "correct_answer": "have got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.6",
+                    "text": "The train ____ a delay.",
+                    "user_answer": "",
+                    "correct_answer": "has got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.1",
+                    "text": "____ the time?",
+                    "user_answer": "",
+                    "correct_answer": "Have you got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.2",
+                    "text": "____ a new clock?",
+                    "user_answer": "",
+                    "correct_answer": "Has she got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.3",
+                    "text": "____ a schedule?",
+                    "user_answer": "",
+                    "correct_answer": "Has he got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.4",
+                    "text": "____ alarms?",
+                    "user_answer": "",
+                    "correct_answer": "Have they got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.5",
+                    "text": "____ watches?",
+                    "user_answer": "",
+                    "correct_answer": "Have you got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.1",
+                    "text": "He ____ a new alarm clock.",
+                    "user_answer": "",
+                    "correct_answer": "has got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.2",
+                    "text": "I ____ a schedule on my desk.",
+                    "user_answer": "",
+                    "correct_answer": "have got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.3",
+                    "text": "They ____ two clocks in their room.",
+                    "user_answer": "",
+                    "correct_answer": "have got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.4",
+                    "text": "My teacher ____ a timetable.",
+                    "user_answer": "",
+                    "correct_answer": "has got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.5",
+                    "text": "We ____ the correct time.",
+                    "user_answer": "",
+                    "correct_answer": "have got",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.1",
+                    "text": "My brother owns a clock. ____",
+                    "user_answer": "",
+                    "correct_answer": "He has got a clock.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.2",
+                    "text": "You own a smart watch. ____",
+                    "user_answer": "",
+                    "correct_answer": "You have got a smart watch.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.3",
+                    "text": "Anna and I have digital alarms. ____",
+                    "user_answer": "",
+                    "correct_answer": "We have got digital alarms.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.4",
+                    "text": "The students have calendars. ____",
+                    "user_answer": "",
+                    "correct_answer": "They have got calendars.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.5",
+                    "text": "My mother owns a diary. ____",
+                    "user_answer": "",
+                    "correct_answer": "She has got a diary.",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Reading tasks": {
+            "submitted": true,
+            "time": "2025-07-18 17:30:55",
+            "correct": 0,
+            "incorrect": 0,
+            "skipped": 5,
+            "total": 5,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "2.1",
+                    "text": "The metro is popular in ____.",
+                    "user_answer": "",
+                    "correct_answer": "Tashkent",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "People buy bus tickets from the ____. ",
+                    "user_answer": "",
+                    "correct_answer": "driver",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "The metro trains come every five to ____ minutes.",
+                    "user_answer": "",
+                    "correct_answer": "ten",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "New buses sometimes have air ____.",
+                    "user_answer": "",
+                    "correct_answer": "conditioning",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.5",
+                    "text": "In small towns, people often use ____ instead of buses.",
+                    "user_answer": "",
+                    "correct_answer": "taxis",
+                    "is_correct": false
+                }
+            ]
+        }
+    }
+}

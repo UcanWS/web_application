@@ -132,7 +132,7 @@ loginForm.addEventListener("submit", async (e) => {
 
       // 📱 Определяем устройство
       const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      window.location.href = isMobile ? "/app" : "/chat";
+      window.location.href = isMobile ? "/app" : "/app";
 
     } else {
       const html = await response.text();

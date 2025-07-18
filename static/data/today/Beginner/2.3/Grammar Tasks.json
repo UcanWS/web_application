@@ -2,115 +2,105 @@
 {
   "id": 5,
   "type": "grammar",
-  "text": "Complete the sentences with the correct form of be. Use contractions where possible.",
+  "text": "Complete the sentences with the correct form of be to tell the time. Use contractions where possible.",
   "subquestions": [
-    { "id": "5.1", "type": "write-in-blank", "text": "It ____ ten o’clock.", "correct": "’s" },
-    { "id": "5.2", "type": "write-in-blank", "text": "____ it time for lunch?", "correct": "Is" },
-    { "id": "5.3", "type": "write-in-blank", "text": "It ____ midnight. It's only 11:30.", "correct": "isn’t" },
-    { "id": "5.4", "type": "write-in-blank", "text": "I ____ late for my meeting.", "correct": "’m" },
-    { "id": "5.5", "type": "write-in-blank", "text": "____ they on time?", "correct": "Are" },
-    { "id": "5.6", "type": "write-in-blank", "text": "We ____ early. The train is at 8.", "correct": "aren’t" }
+    { "id": "5.1", "type": "write-in-blank", "text": "What time is it? (10:25) ____", "correct": "It's ten twenty-five" },
+    { "id": "5.2", "type": "write-in-blank", "text": "What time is your meeting? (2:30) ____", "correct": "It's two thirty" },
+    { "id": "5.3", "type": "write-in-blank", "text": "What time is the class? (9:45) ____", "correct": "It's nine forty-five" },
+    { "id": "5.4", "type": "write-in-blank", "text": "What time is your appointment? (1:15) ____", "correct": "It's one fifteen" },
+    { "id": "5.5", "type": "write-in-blank", "text": "What time is the train? (6:50) ____", "correct": "It's six fifty" },
+    { "id": "5.6", "type": "write-in-blank", "text": "What time is the event? (8:10) ____", "correct": "It's eight ten" }
   ]
-}
-,
-{
-  "id": 6,
-  "type": "vocabulary",
-  "text": "Complete the conversations with the question words in the box (What / When / How / Who)",
-  "subquestions": [
-    { "id": "6.1", "type": "write-in-blank", "text": "____ time is it?", "correct": "What" },
-    { "id": "6.2", "type": "write-in-blank", "text": "____ do you usually get up?", "correct": "When" },
-    { "id": "6.3", "type": "write-in-blank", "text": "____ do you say 'quarter past' in Spanish?", "correct": "How" },
-    { "id": "6.4", "type": "write-in-blank", "text": "____ is late again? Oh no, Mark!", "correct": "Who" },
-    { "id": "6.5", "type": "write-in-blank", "text": "____ time does the movie start?", "correct": "What" }
-  ]
-}
-,
-{
-  "id": 7,
-  "type": "multiple_choice",
-  "text": "Circle the correct options.",
-  "subquestions": [
-    {
-      "id": "7.1",
-      "type": "multiple_choice",
-      "text": "A What time is it?\nB It's half past six / six past half.",
-      "options": ["half past six", "six past half"],
-      "correct": "half past six"
-    },
-    {
-      "id": "7.2",
-      "type": "multiple_choice",
-      "text": "A Is it five o’clock / five hours?\nB Yes, exactly five.",
-      "options": ["five o’clock", "five hours"],
-      "correct": "five o’clock"
-    },
-    {
-      "id": "7.3",
-      "type": "multiple_choice",
-      "text": "A What time is our class?\nB It’s at quarter past / quarter pass nine.",
-      "options": ["quarter past", "quarter pass"],
-      "correct": "quarter past"
-    },
-    {
-      "id": "7.4",
-      "type": "multiple_choice",
-      "text": "A What time is it?\nB It’s twelve o’clock / twelve hours.",
-      "options": ["twelve o’clock", "twelve hours"],
-      "correct": "twelve o’clock"
-    },
-    {
-      "id": "7.5",
-      "type": "multiple_choice",
-      "text": "A When is the meeting?\nB It’s at ten to eight / ten before eight.",
-      "options": ["ten to eight", "ten before eight"],
-      "correct": "ten to eight"
-    }
-  ]
-}
-,
-{
-  "id": 8,
-  "type": "rewrite",
-  "text": "Rewrite the sentences using the correct time expression.",
-  "subquestions": [
-    {
-      "id": "8.0",
-      "type": "write-in-blank",
-      "text": "It is 9:15.",
-      "correct": "It’s quarter past nine."
-    },
-    {
-      "id": "8.1",
-      "type": "write-in-blank",
-      "text": "It is 3:00. ____",
-      "correct": "It’s three o’clock."
-    },
-    {
-      "id": "8.2",
-      "type": "write-in-blank",
-      "text": "It is 9:15. ____",
-      "correct": "It’s quarter past nine."
-    },
-    {
-      "id": "8.3",
-      "type": "write-in-blank",
-      "text": "It is 12:30. ____",
-      "correct": "It’s half past twelve."
-    },
-    {
-      "id": "8.4",
-      "type": "write-in-blank",
-      "text": "It is 7:45. ____",
-      "correct": "It’s quarter to eight."
-    },
-    {
-      "id": "8.5",
-      "type": "write-in-blank",
-      "text": "It is 11:50. ____",
-      "correct": "It’s ten to twelve."
-    }
-  ]
-}
-
+},
+  {
+    "id": 6,
+    "type": "vocabulary",
+    "text": "Complete the conversations about time with the question words in the box (How / What / Where / Who)",
+    "subquestions": [
+      { "id": "6.1", "type": "write-in-blank", "text": "____ time is it now?", "correct": "What" },
+      { "id": "6.2", "type": "write-in-blank", "text": "____ is the meeting held?", "correct": "Where" },
+      { "id": "6.3", "type": "write-in-blank", "text": "____ do you set the alarm?", "correct": "How" },
+      { "id": "6.4", "type": "write-in-blank", "text": "____’s responsible for the schedule?", "correct": "Who" },
+      { "id": "6.5", "type": "write-in-blank", "text": "____ time does the class start?", "correct": "What" }
+    ]
+  },
+  {
+    "id": 7,
+    "type": "multiple_choice",
+    "text": "Circle the correct options related to telling the time.",
+    "subquestions": [
+      {
+        "id": "7.1",
+        "type": "multiple_choice",
+        "text": "A: What time is this / these clock? B: It’s two o’clock.",
+        "options": ["this", "these"],
+        "correct": "this"
+      },
+      {
+        "id": "7.2",
+        "type": "multiple_choice",
+        "text": "A: Who’s that / those setting the time? B: It’s John.",
+        "options": ["that", "those"],
+        "correct": "that"
+      },
+      {
+        "id": "7.3",
+        "type": "multiple_choice",
+        "text": "A: What time are those / this clocks? B: They’re five past ten.",
+        "options": ["those", "this"],
+        "correct": "those"
+      },
+      {
+        "id": "7.4",
+        "type": "multiple_choice",
+        "text": "A: What time is this / these? B: It’s quarter past six.",
+        "options": ["this", "these"],
+        "correct": "this"
+      },
+      {
+        "id": "7.5",
+        "type": "multiple_choice",
+        "text": "A: Who are that / those people checking the time? B: They’re students.",
+        "options": ["that", "those"],
+        "correct": "those"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "type": "rewrite",
+    "text": "Rewrite the sentences about time with the correct subject pronoun.",
+    "subquestions": [
+      {
+        "id": "8.1",
+        "type": "write-in-blank",
+        "text": "The meeting’s at noon. ____",
+        "correct": "It's at noon."
+      },
+      {
+        "id": "8.2",
+        "type": "write-in-blank",
+        "text": "Tom and Jerry are late. ____",
+        "correct": "They're late."
+      },
+      {
+        "id": "8.3",
+        "type": "write-in-blank",
+        "text": "The clock’s slow. ____",
+        "correct": "It's slow."
+      },
+      {
+        "id": "8.4",
+        "type": "write-in-blank",
+        "text": "Anna’s on time. ____",
+        "correct": "She's on time."
+      },
+      {
+        "id": "8.5",
+        "type": "write-in-blank",
+        "text": "You and I are early. ____",
+        "correct": "We're early."
+      }
+    ]
+  }
 ]

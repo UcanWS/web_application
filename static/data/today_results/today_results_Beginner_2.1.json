@@ -1195,6 +1195,228 @@
                     "is_correct": true
                 }
             ]
+        },
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-17 23:02:31",
+            "correct": 0,
+            "incorrect": 6,
+            "skipped": 18,
+            "total": 24,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "0.1",
+                    "text": "First name ____",
+                    "user_answer": "Eva Sanz",
+                    "correct_answer": "Eva",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.2",
+                    "text": "Last name ____",
+                    "user_answer": "0034 758 3902281",
+                    "correct_answer": "Sanz",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.3",
+                    "text": "Country ____",
+                    "user_answer": "Avenida Lusitana, 13, Granada",
+                    "correct_answer": "Spain",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.4",
+                    "text": "Home address ____",
+                    "user_answer": "Eva",
+                    "correct_answer": "Avenida Lusitana, 13, Granada",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.5",
+                    "text": "Phone number ____",
+                    "user_answer": "Spain",
+                    "correct_answer": "0034 758 3902281",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.6",
+                    "text": "Signature ____",
+                    "user_answer": "Sanz",
+                    "correct_answer": "Eva Sanz",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.1",
+                    "text": "___'s your name?",
+                    "user_answer": "",
+                    "correct_answer": "What",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "____ do you spell that?",
+                    "user_answer": "",
+                    "correct_answer": "How",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "_____ are you from?",
+                    "user_answer": "",
+                    "correct_answer": "Where",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "___ in Russia?",
+                    "user_answer": "",
+                    "correct_answer": "Where",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "____'s your phone number?",
+                    "user_answer": "",
+                    "correct_answer": "What",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.1",
+                    "text": "Hi, Chris. Louise here. How are ___?",
+                    "user_answer": "",
+                    "correct_answer": "you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "___’m fine, thanks.",
+                    "user_answer": "",
+                    "correct_answer": "I",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "And ___?",
+                    "user_answer": "",
+                    "correct_answer": "you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "Great, thanks. Are ___ at home?",
+                    "user_answer": "",
+                    "correct_answer": "you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.5",
+                    "text": "No, ___’m on business in the USA with Jack.",
+                    "user_answer": "",
+                    "correct_answer": "I",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.6",
+                    "text": "___’re in New York.",
+                    "user_answer": "",
+                    "correct_answer": "We",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.7",
+                    "text": "No, ___ isn’t.",
+                    "user_answer": "",
+                    "correct_answer": "she",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.8",
+                    "text": "___’s on holiday with friends.",
+                    "user_answer": "",
+                    "correct_answer": "She",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.9",
+                    "text": "Really? Where are ___?",
+                    "user_answer": "",
+                    "correct_answer": "they",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.10",
+                    "text": "___’re in Izmir.",
+                    "user_answer": "",
+                    "correct_answer": "They",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.11",
+                    "text": "___’s in Turkey.",
+                    "user_answer": "",
+                    "correct_answer": "It",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.12",
+                    "text": "No, ___ isn’t.",
+                    "user_answer": "",
+                    "correct_answer": "he",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.13",
+                    "text": "___’s at home with my mother.",
+                    "user_answer": "",
+                    "correct_answer": "He",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Writing: Start": {
+            "submitted": true,
+            "time": "2025-07-18 16:46:04",
+            "correct": 0,
+            "incorrect": 1,
+            "skipped": 0,
+            "total": 1,
+            "percent": 2,
+            "feedback": {
+                "task_structure": "The essay completely misses the given topic, which was to discuss the advantages and disadvantages of public transport. Instead, it seems to be a meta-commentary about the writing process itself. It lacks any essay structure (introduction, body, conclusion) and falls far short of the required word count. It does not fulfill the task requirements at all.",
+                "organization": "There is no discernible organization in the essay. The sentences are a collection of disconnected thoughts, lacking any logical flow or coherence. There are no paragraphs to separate ideas, and the overall text is very difficult to follow.",
+                "grammar": "Grammar is a significant area for improvement. The essay contains numerous fundamental errors in sentence structure, capitalization, and punctuation. Many phrases are grammatically incorrect or nonsensical (e.g., 'What i should write there idols,' 'a number one ui in english,' 'a journey to avoid the environment in english but'). These errors make the essay largely unintelligible.",
+                "vocabulary": "The vocabulary used is extremely limited and frequently misused or irrelevant to any potential topic. Words like 'idols' and 'ui' are out of context, and there is no attempt to use topic-specific language or demonstrate a range of vocabulary. This significantly hinders communication."
+            },
+            "scores": {
+                "task_structure": 0,
+                "organization": 0,
+                "grammar": 1,
+                "vocabulary": 1
+            },
+            "details": [
+                {
+                    "question_id": "Writing Topic ID 1: ",
+                    "text": "Write an essay discussing the advantages and disadvantages of public transport. Aim for 150–200 words.",
+                    "user_answer": "What i should write there idols I was just saying I was a number one ui in english but I think I have had a journey to avoid the environment in english but.",
+                    "correct_answer": "",
+                    "is_correct": false,
+                    "feedback": {
+                        "task_structure": "The essay completely misses the given topic, which was to discuss the advantages and disadvantages of public transport. Instead, it seems to be a meta-commentary about the writing process itself. It lacks any essay structure (introduction, body, conclusion) and falls far short of the required word count. It does not fulfill the task requirements at all.",
+                        "organization": "There is no discernible organization in the essay. The sentences are a collection of disconnected thoughts, lacking any logical flow or coherence. There are no paragraphs to separate ideas, and the overall text is very difficult to follow.",
+                        "grammar": "Grammar is a significant area for improvement. The essay contains numerous fundamental errors in sentence structure, capitalization, and punctuation. Many phrases are grammatically incorrect or nonsensical (e.g., 'What i should write there idols,' 'a number one ui in english,' 'a journey to avoid the environment in english but'). These errors make the essay largely unintelligible.",
+                        "vocabulary": "The vocabulary used is extremely limited and frequently misused or irrelevant to any potential topic. Words like 'idols' and 'ui' are out of context, and there is no attempt to use topic-specific language or demonstrate a range of vocabulary. This significantly hinders communication."
+                    },
+                    "score": 2,
+                    "scores_breakdown": {
+                        "task_structure": 0,
+                        "organization": 0,
+                        "grammar": 1,
+                        "vocabulary": 1
+                    }
+                }
+            ]
         }
     }
 }

@@ -4,3 +4,5 @@ flask-cors
 werkzeug
 eventlet
 user-agents
+google-generativeai
+device-detector

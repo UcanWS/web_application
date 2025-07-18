@@ -12,6 +12,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from flask import send_from_directory, make_response
+import numpy as np
 
 # Initialize app and socket
 app = Flask(__name__)
@@ -384,20 +385,19 @@ def upload_avatar():
     
 @app.route("/get_avatar/<username>", methods=["GET"])
 def get_avatar(username):
-    if not os.path.exists(USER_AVATAR_FILE):
-        return jsonify({"avatar_url": None})  # Указываем, что аватарка не найдена
-
-    with open(USER_AVATAR_FILE, "r") as f:
-        users = json.load(f)
-
-    avatar_url = users.get(username)
-
-    if avatar_url:
-        # Возвращаем ссылку на аватар, если он есть
-        return jsonify({"avatar_url": avatar_url})
+    username = username.strip()
     
-    # Если аватарки нет, возвращаем None
-    return jsonify({"avatar_url": None})
+    if not os.path.exists(USER_AVATAR_FILE):
+        return jsonify({"avatar_url": None})
+
+    try:
+        with open(USER_AVATAR_FILE, "r") as f:
+            users = json.load(f)
+        avatar_url = users.get(username)
+    except Exception:
+        avatar_url = None
+
+    return jsonify({"avatar_url": avatar_url})
         
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
@@ -2111,39 +2111,40 @@ def is_recent_session(login_time_str):
 def get_sessions_api():
     username = session.get('username')
     current_session_id = session.get('session_id')
-
     sessions_data = []
 
-    if username in active_sessions:
-        now = datetime.utcnow()
-        for device in active_sessions[username]:
-            session_id = device.get('Session-ID')
-            login_time_str = device.get('Timestamp')  # UTC ISO format
+    if not username or username not in active_sessions:
+        return jsonify({'sessions': []})
 
-            # Parse timestamp and check age
-            try:
-                login_time_dt = datetime.fromisoformat(login_time_str)
-                is_new = (now - login_time_dt) < timedelta(minutes=10)
-            except Exception:
-                is_new = False
+    now = datetime.utcnow()
+    for device in active_sessions.get(username, []):
+        session_id = device.get('Session-ID')
+        login_time_str = device.get('Timestamp')
 
-            is_current = (session_id == current_session_id)
+        # Определяем, новая ли сессия (<10 минут)
+        try:
+            login_time_dt = datetime.fromisoformat(login_time_str)
+            is_new = (now - login_time_dt) < timedelta(minutes=10)
+        except Exception:
+            is_new = False
 
-            sessions_data.append({
-                'username': username,
-                'deviceType': device.get('Device-Type', 'Unknown'),
-                'deviceBrand': device.get('Device-Brand', 'Unknown'),
-                'deviceModel': device.get('Device-Model', 'Unknown'),
-                'os': device.get('OS', 'Unknown'),
-                'browser': device.get('Browser', 'Unknown'),
-                'ipAddress': device.get('IP-Address', 'Unknown'),
-                'language': device.get('Language', 'Unknown'),
-                'loginTime': device.get('Login-Time', 'Unknown'),
-                'country': device.get('Country', 'Unknown'),
-                'isCurrent': is_current,
-                'isNew': is_new,
-                'sessionId': session_id
-            })
+        is_current = (session_id == current_session_id)
+
+        sessions_data.append({
+            'username': username,
+            'sessionId': session_id,
+            'deviceType': device.get('Device-Type', 'Unknown'),
+            'deviceBrand': device.get('Device-Brand', 'Unknown'),
+            'deviceModel': device.get('Device-Model', 'Unknown'),
+            'os': device.get('OS', 'Unknown'),
+            'browser': device.get('Browser', 'Unknown'),
+            'ipAddress': device.get('IP-Address', 'Unknown'),
+            'language': device.get('Language', 'Unknown'),
+            'country': device.get('Country', 'Unknown'),
+            'loginTime': device.get('Login-Time', 'Unknown'),
+            'isCurrent': is_current,
+            'isNew': is_new
+        })
 
     return jsonify({'sessions': sessions_data})
 
@@ -3712,6 +3713,35 @@ def get_strikes(username):
         "lastUpdated": None
     })
     return jsonify(user_data)
+    
+from flask import jsonify
+import operator
+
+@app.route('/api/leaderboard-strikes')
+def leaderboard_strikes():
+    strikes_data = load_strikes()  # из вашего strikes.json
+    # Формируем список [(username, data), ...]
+    sorted_items = sorted(
+        strikes_data.items(),
+        key=lambda item: item[1].get('strikes', 0),
+        reverse=True
+    )
+
+    top_3 = sorted_items[:3]
+    others = sorted_items[3:]
+
+    # Преобразуем в JSON-ответ
+    return jsonify({
+        "top_3": [
+            {"name": user, "strikes": info.get("strikes", 0)}
+            for user, info in top_3
+        ],
+        "others": [
+            {"name": user, "strikes": info.get("strikes", 0)}
+            for user, info in others
+        ]
+    })
+
 
 @app.route('/api/get-results/average', methods=['GET'])
 def get_results_average():
@@ -3826,9 +3856,182 @@ def get_stories():
         })
 
     return jsonify(stories)
+    
+import google.generativeai as genai
+import re
 
+# Embedded Gemini API key (replace with actual key before deployment)
+GEMINI_API_KEY = 'AIzaSyDqubnDo6Tcmb1mrlMtyOBfXOId_7dSpdA'
+
+# Configure Gemini client
+genai.configure(api_key=GEMINI_API_KEY)
+client = genai.GenerativeModel('gemini-2.5-flash')
+
+@app.route('/api/submit-writing-task', methods=['POST'])
+def submit_writing_task():
+    time.sleep(1)  # Simulate processing delay
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        level = data.get('level')
+        unit = data.get('unit')
+        username = data.get('username')
+        title = data.get('title')
+        answers = data.get('answers', {})
+        questions = data.get('questions', [{}])  # Default to empty dict if missing
+
+        if not all([level, unit, username, title]):
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+        if not isinstance(answers, dict):
+            return jsonify({'success': False, 'error': 'Invalid answers format'}), 400
+        if not answers:
+            return jsonify({'success': False, 'error': 'Essay text is required'}), 400
+
+        essay_id, writing_answer = next(iter(answers.items()))
+        if not writing_answer or len(writing_answer.strip().split()) < 5:
+            return jsonify({'success': False, 'error': 'Essay text is required'}), 400
+
+        word_count = len(writing_answer.strip().split())
+        if word_count < 30 or word_count > 200:
+            return jsonify({
+                'success': False,
+                'error': f'Essay must be between 30 and 200 words (current: {word_count})'
+            }), 400
+
+        all_results = load_results(level, unit)
+        user_results = all_results.setdefault(username, {})
+
+        if user_results.get(title, {}).get('submitted'):
+            return jsonify({'success': False, 'error': f"'{title}' already submitted"}), 403
+
+        topic = questions[0].get('text', 'Write an essay on a given topic. Aim for 30-200 words.')
+        print(f'[Writing] Topic used for evaluation: {topic}')
+
+        prompt = (
+            f"Evaluate the following essay based on the topic: \"{topic}\".\n"
+            f"The writer is an English learner at the {level} level.\n\n"
+            f"Please evaluate the essay based on these criteria and provide feedback and score for each out of 25:\n"
+            f"1. Task Achievement & Structure\n"
+            f"2. Organization\n"
+            f"3. Grammar\n"
+            f"4. Vocabulary\n"
+            f"Respond as JSON in this format:\n"
+            f"{{\n"
+            f"  \"feedback\": {{\n"
+            f"    \"task_structure\": \"string\",\n"
+            f"    \"organization\": \"string\",\n"
+            f"    \"grammar\": \"string\",\n"
+            f"    \"vocabulary\": \"string\"\n"
+            f"  }},\n"
+            f"  \"scores\": {{\n"
+            f"    \"task_structure\": number,\n"
+            f"    \"organization\": number,\n"
+            f"    \"grammar\": number,\n"
+            f"    \"vocabulary\": number\n"
+            f"  }}\n"
+            f"}}\n\n"
+            f"Essay:\n{writing_answer}"
+        )
+
+        try:
+            response = client.generate_content(
+                contents=prompt,
+                generation_config={
+                    'response_mime_type': 'application/json'
+                }
+            )
+            response_text = response.text
+            print(f'[Writing] Raw Gemini response: {response_text}')
+
+            # Fix invalid escape sequences
+            response_text = re.sub(r'(?<!\\)\\(?![\\"/bfnrt])', r'\\\\', response_text)
+            # Remove extraneous tokens (e.g., "concentric") after feedback object
+            response_text = re.sub(r'("[^"]*"\s*:\s*"[^"]*"\s*)\s*\w+\s*}', r'\1}', response_text)
+
+            try:
+                gemini_result = json.loads(response_text)
+                feedback = gemini_result.get('feedback', {})
+                scores = gemini_result.get('scores', {})
+
+                ts_score = min(max(scores.get('task_structure', 0), 0), 25)
+                org_score = min(max(scores.get('organization', 0), 0), 25)
+                grammar_score = min(max(scores.get('grammar', 0), 0), 25)
+                vocab_score = min(max(scores.get('vocabulary', 0), 0), 25)
+                total_score = ts_score + org_score + grammar_score + vocab_score
+
+            except json.JSONDecodeError as e:
+                print(f'[Writing] ❌ JSON parsing error: {str(e)}. Response text: {response_text}')
+                return jsonify({
+                    'success': False,
+                    'error': f'Invalid AI response: JSON parsing failed ({str(e)})'
+                }), 500
+
+        except Exception as e:
+            print(f'[Writing] ❌ Error calling Gemini API: {str(e)}')
+            return jsonify({
+                'success': False,
+                'error': 'Failed to get feedback from Gemini'
+            }), 500
+
+        record = {
+            'submitted': True,
+            'time': datetime.now().isoformat(sep=' ', timespec='seconds'),
+            'correct': 1 if total_score >= 60 else 0,
+            'incorrect': 0 if total_score >= 60 else 1,
+            'skipped': 0,
+            'total': 1,
+            'percent': total_score,
+            'feedback': feedback,
+            'scores': scores,
+            'details': [{
+                'question_id': essay_id,
+                'text': topic,
+                'user_answer': writing_answer,
+                'correct_answer': '',
+                'is_correct': total_score >= 60,
+                'feedback': feedback,
+                'score': total_score,
+                'scores_breakdown': scores
+            }]
+        }
+
+        user_results[title] = record
+        save_results(level, unit, all_results)
+
+        reward_given = False
+        if total_score >= 80:
+            reward_given = True
+            try:
+                add_tx_url = url_for('add_transaction', _external=True)
+                resp = requests.post(add_tx_url, json={
+                    'username': username,
+                    'amount': 100,
+                    'description': f"Reward for completing '{title}' with {int(total_score)}%"
+                }, timeout=5)
+                resp.raise_for_status()
+            except Exception as e:
+                print(f'[Writing] ❌ Error awarding points: {str(e)}')
+                reward_given = False
+
+        return jsonify({
+            'success': True,
+            'feedback': feedback,
+            'scores': scores,
+            'score': total_score,
+            'reward_given': reward_given
+        }), 200
+
+    except Exception as e:
+        print(f'[Writing] ❌ Error submitting writing task: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error'
+        }), 500
 
     
+        
 if __name__ == '__main__':
     # Отключаем use_reloader, чтобы не пытаться читать WERKZEUG_SERVER_FD
     socketio.run(

@@ -2254,100 +2254,133 @@ async function fetchAvatar(name) {
 }
 
 // Обновить таблицу лидеров
-async function updateLeaderboardUI() {
-    const leaderboardContainer = document.getElementById('leaderboard-container');
-    if (!leaderboardContainer) {
-        console.error('Leaderboard container element not found');
-        return;
+async function updateLeaderboardUI(mode = 'points') {
+  const leaderboardContainer = document.getElementById('leaderboard-container');
+  if (!leaderboardContainer) return;
+
+  // Скелетон загрузки
+  leaderboardContainer.innerHTML = `
+    <div class="leaderboard-loading">
+      <div class="skeleton skeleton-title"></div>
+
+      <div class="skeleton-top-3">
+        <div class="skeleton-top-player">
+          <div class="skeleton skeleton-avatar-top"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line" style="width: 40px;"></div>
+        </div>
+        <div class="skeleton-top-player">
+          <div class="skeleton skeleton-avatar-top"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line" style="width: 40px;"></div>
+        </div>
+        <div class="skeleton-top-player">
+          <div class="skeleton skeleton-avatar-top"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line" style="width: 40px;"></div>
+        </div>
+      </div>
+
+      <div class="skeleton skeleton-list"></div>
+      <div class="skeleton skeleton-list"></div>
+      <div class="skeleton skeleton-list"></div>
+    </div>
+  `;
+
+  const endpoint = mode === 'strikes'
+    ? '/api/leaderboard-strikes'
+    : '/api/leaderboard';
+
+const iconHtml = mode === 'strikes'
+  ? '<i class="fas fa-fire" style="color:#ff4d4d;"></i> Strikes'
+  : '<i class="fas fa-star"></i>';
+
+
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+
+    const allPlayers = [...data.top_3, ...data.others];
+    const sorted = allPlayers.sort((a, b) =>
+      mode === 'strikes' ? b.strikes - a.strikes : b.coins - a.coins
+    );
+
+    const top3 = sorted.slice(0, 3);
+    const others = sorted.slice(3);
+
+    let html = `
+      <div class="leaderboard">
+        <button class="back-button" onclick="history.back()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h2>Leaderboard (${mode === 'strikes' ? 'Strikes' : 'Points'})</h2>
+
+        <div class="leaderboard-tabs">
+          <button class="tab-button ${mode === 'points' ? 'active' : ''}" onclick="updateLeaderboardUI('points')">
+            <i class="fas fa-star"></i> Points
+          </button>
+<button class="tab-button ${mode === 'strikes' ? 'active fire-tab' : ''}" onclick="updateLeaderboardUI('strikes')">
+  <i class="fas fa-fire"></i> Strikes
+</button>
+
+        </div>
+
+        <div class="top-3">
+    `;
+
+    for (let i = 0; i < top3.length; i++) {
+      const player = top3[i];
+      const avatar = await fetchAvatar(player.name);
+      const rank = i + 1;
+      const suffix = getRankSuffix(rank);
+      const value = mode === 'strikes' ? player.strikes : player.coins;
+
+      html += `
+        <div class="top-player">
+          <div class="leaderboard-avatar">${avatar}</div>
+          <div class="rank-number">${rank}${suffix}</div>
+          <p>${player.name}</p>
+          <p style="opacity:0.8; font-size:0.9em;">
+            ${value} ${iconHtml}
+          </p>
+        </div>
+      `;
     }
 
-    leaderboardContainer.innerHTML = `
-<div class="leaderboard-loading">
-  <div class="skeleton skeleton-title"></div>
+    html += `</div><ul class="leaderboard-list">`;
 
-  <div class="skeleton-top-3">
-    <div class="skeleton-top-player">
-      <div class="skeleton skeleton-avatar-top"></div>
-      <div class="skeleton skeleton-line"></div>
-      <div class="skeleton skeleton-line" style="width: 40px;"></div>
-    </div>
-    <div class="skeleton-top-player">
-      <div class="skeleton skeleton-avatar-top"></div>
-      <div class="skeleton skeleton-line"></div>
-      <div class="skeleton skeleton-line" style="width: 40px;"></div>
-    </div>
-    <div class="skeleton-top-player">
-      <div class="skeleton skeleton-avatar-top"></div>
-      <div class="skeleton skeleton-line"></div>
-      <div class="skeleton skeleton-line" style="width: 40px;"></div>
-    </div>
-  </div>
+    const colors = ['#ffa500', '#ff8c00', '#f39c12', '#e74c3c', '#c0392b'];
+    for (let i = 0; i < others.length; i++) {
+      const player = others[i];
+      const avatar = await fetchAvatar(player.name);
+      const rank = i + 4;
+      const suffix = getRankSuffix(rank);
+      const color = colors[i] || '#555';
+      const value = mode === 'strikes' ? player.strikes : player.coins;
 
-  <div class="skeleton skeleton-list"></div>
-  <div class="skeleton skeleton-list"></div>
-  <div class="skeleton skeleton-list"></div>
-</div>
-`;
-
-    try {
-        const response = await fetch('/api/leaderboard');
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-
-        let leaderboardHTML = `
-            <div class="leaderboard">
-                <button class="back-button" onclick="window.history.back()">
-                    <i class="fas fa-arrow-left"></i> Back
-                </button>
-                <h2>Leaderboard</h2>
-                <div class="top-3">`;
-
-        const topOrder = [1, 0, 2]; // Центровка: 2-й, 1-й, 3-й
-
-        for (let i of topOrder) {
-            const player = data.top_3[i];
-            const avatar = await fetchAvatar(player.name);
-            const rank = i + 1;
-            const suffix = getRankSuffix(rank);
-
-            leaderboardHTML += `
-                <div class="top-player">
-                    <div class="leaderboard-avatar">${avatar}</div>
-                    <div class="rank-number">${rank}${suffix}</div>
-                    <p>${player.name}</p>
-                    <p style="opacity: 0.8; font-size: 0.9em;">
-                        ${player.coins} <i class="fas fa-star"></i>
-                    </p>
-                </div>`;
-        }
-
-        leaderboardHTML += `</div><ul class="leaderboard-list">`;
-        const colors = ['#ffa500', '#ff8c00', '#f39c12', '#e74c3c', '#c0392b'];
-        let rank = 4;
-
-        for (let i = 0; i < data.others.length; i++) {
-            const player = data.others[i];
-            const avatar = await fetchAvatar(player.name);
-            const color = colors[i] || '#555';
-            const suffix = getRankSuffix(rank);
-
-            leaderboardHTML += `
-                <li class="leaderboard-item">
-                    <div class="leaderboard-avatar">${avatar}</div>
-                    <span class="leaderboard-name">${player.name}</span>
-                    <span class="rank-badge" style="background:${color}">${rank}${suffix}</span>
-                    <span class="leaderboard-rank">${player.coins} <i class="fas fa-star"></i></span>
-                </li>`;
-            rank++;
-        }
-
-        leaderboardHTML += `</ul></div>`;
-        leaderboardContainer.innerHTML = leaderboardHTML;
-    } catch (error) {
-        console.error('Error fetching leaderboard:', error);
-        leaderboardContainer.innerHTML = "<p>Error loading leaderboard. Please try again later.</p>";
+      html += `
+        <li class="leaderboard-item">
+          <div class="leaderboard-avatar">${avatar}</div>
+          <span class="leaderboard-name">${player.name}</span>
+          <span class="rank-badge" style="background:${color}">${rank}${suffix}</span>
+          <span class="leaderboard-rank">
+            ${value} ${iconHtml}
+          </span>
+        </li>
+      `;
     }
+
+    html += `</ul></div>`;
+    leaderboardContainer.innerHTML = html;
+
+  } catch (err) {
+    console.error('Error loading leaderboard:', err);
+    leaderboardContainer.innerHTML =
+      '<p>Error loading leaderboard. Please try again later.</p>';
+  }
 }
+
 
 
 
@@ -2366,25 +2399,40 @@ function getRankSuffix(rank) {
 
 
 // Helper function (assuming it exists)
+const avatarCache = new Map(); // name -> { html, timestamp }
+
+const CACHE_TTL = 30 * 60 * 1000; // 10 минут
+
 async function fetchAvatar(name) {
     const safeName = name.trim();
     const fallback = `<div class="avatar-placeholder">${safeName.charAt(0).toUpperCase()}</div>`;
+    const now = Date.now();
+
+    const cached = avatarCache.get(safeName);
+    if (cached && now - cached.timestamp < CACHE_TTL) {
+        return cached.html;
+    }
 
     try {
         const response = await fetch(`/get_avatar/${encodeURIComponent(safeName)}`);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
+
         const data = await response.json();
-        if (data.avatar_url) {
-            return `<img src="${data.avatar_url}" alt="${safeName}" class="avatar">`;
-        } else {
-            return fallback;
-        }
+        const html = data.avatar_url
+            ? `<img src="${data.avatar_url}" alt="${safeName}" class="avatar">`
+            : fallback;
+
+        avatarCache.set(safeName, { html, timestamp: now });
+        return html;
+
     } catch (error) {
         console.warn(`Avatar not found for "${safeName}":`, error);
+        avatarCache.set(safeName, { html: fallback, timestamp: now });
         return fallback;
     }
 }
+
+
 
 
 // Привязываем кнопку “Back” при инициализации приложения
@@ -3096,6 +3144,9 @@ function updateExamDisplay() {
 // ----------------------------
 // 1. Рендер списка Today’s Tasks с лоадером и центрированием
 // ----------------------------
+// ----------------------------
+// 1. Рендер списка Today’s Tasks с лоадером и центрированием
+// ----------------------------
 async function renderTasksSection() {
   const container = document.getElementById('today');
   container.querySelectorAll('.tasks-section, .no-tasks-placeholder').forEach(el => el.remove());
@@ -3138,11 +3189,33 @@ async function renderTasksSection() {
     const avgData = await avgRes.json();
     const userAvg = avgData[currentUser] || { average_percent: 0, submitted_count: 0, total_tasks: today_tasks.length };
 
-    // Remove loading state after all data is fetched
-    section.classList.remove('loading');
-    section.innerHTML = ''; // Clear spinner
+    // Check for Writing AI block
+    const writingAIBlock = today_tasks.find(task => task.title === 'Writing AI');
+    if (writingAIBlock) {
+      const writingTask = {
+        title: "Writing: Start",
+        type: "writing",
+        questions: [{
+          type: "writing",
+          text: writingAIBlock.questions && writingAIBlock.questions.topic
+            ? `Write an essay discussing the topic: “${writingAIBlock.questions.topic}”. Aim for 150–200 words.`
+            : "Write an essay discussing the advantages and disadvantages of public transport. Aim for 150–200 words.",
+          id: "Writing Topic ID 1"
+        }]
+      };
 
-    // Add average progress bar at the top
+      // Replace the existing Writing AI task with the formatted writingTask
+      const existingWritingTaskIndex = today_tasks.findIndex(task => 
+        task.title === 'Writing AI' || task.type === 'writing' || task.title.toLowerCase().includes('writing')
+      );
+      if (existingWritingTaskIndex !== -1) {
+        today_tasks[existingWritingTaskIndex] = writingTask;
+      }
+    }
+
+    section.classList.remove('loading');
+    section.innerHTML = '';
+
     const avgContainer = document.createElement('div');
     avgContainer.className = 'average-progress-container';
     if (typeof activeCurrentUnit !== 'undefined' && currentUnit !== activeCurrentUnit) {
@@ -3164,9 +3237,11 @@ async function renderTasksSection() {
     progressBar.className = 'average-progress-bar';
     progressBar.style.setProperty('--progress-width', `${avgPercent}%`);
 
-    // Add strike icon on top of the progress bar
     const strikeIcon = document.createElement('i');
     strikeIcon.className = 'fas fa-fire strike-icon';
+    if (avgPercent >= 80) {
+      strikeIcon.classList.add('strike-active');
+    }
     progressBar.appendChild(strikeIcon);
 
     const progressText = document.createElement('span');
@@ -3178,7 +3253,7 @@ async function renderTasksSection() {
 
     section.innerHTML += `<h2 id="task-count" style="display:none;">Today's Tasks</h2>`;
 
-    const typePriority = ['homework', 'grammar', 'vocabulary', 'listening', 'reading'];
+    const typePriority = ['homework', 'grammar', 'vocabulary', 'listening', 'reading', 'writing'];
 
     let examTask = null;
     let filteredTasks = today_tasks.filter(block => {
@@ -3216,7 +3291,13 @@ async function renderTasksSection() {
       card.className = 'task-progress-card';
       if (isCompleted) card.classList.add('disabled');
       if (!isCompleted) {
-        card.onclick = () => openTodayTaskPage(title, block.questions);
+        card.onclick = () => {
+          if (block.type === 'writing') {
+            openWritingTaskPage(title, block.questions);
+          } else {
+            openTodayTaskPage(title, block.questions);
+          }
+        };
         card.classList.add('clickable');
       }
 
@@ -3238,6 +3319,9 @@ async function renderTasksSection() {
       } else if (key.includes('reading')) {
         iconClass = 'fa-book-reader';
         iconColor = 'linear-gradient(135deg, #00bcd4, #0097a7)';
+      } else if (key.includes('writing')) {
+        iconClass = 'fa-pen';
+        iconColor = 'linear-gradient(135deg, #f06292, #d81b60)';
       }
 
       const icon = document.createElement('div');
@@ -3324,6 +3408,275 @@ async function renderTasksSection() {
 }
 
 
+function finishWritingAI(title, questions) {
+  initExamSecurity(false);
+  updateStrikes();
+  showNavigation();
+  const answers = {};
+  const errors = [];
+  const content = document.getElementById('todaytasks-content');
+
+  content.querySelectorAll('textarea.writing-task-textarea').forEach(textarea => {
+    const qid = textarea.dataset.qid;
+    const val = textarea.value.trim();
+    if (val) {
+      const wordCount = val.split(/\s+/).filter(word => word.length > 0).length;
+      if (wordCount < 30 || wordCount > 200) {
+        errors.push(`Your essay should be between 30 and 200 words (current: ${wordCount} words).`);
+      } else {
+        answers[qid] = val;
+      }
+    } else {
+      errors.push(`Please provide an essay for the writing task (question ${qid}).`);
+    }
+  });
+
+  if (errors.length) {
+    showToastNotification(errors[0], 'warning');
+    return;
+  }
+
+  const payload = {
+    level: currentLevel,
+    unit: currentUnit,
+    username: currentUser,
+    title,
+    answers,
+    questions
+  };
+
+  document.getElementById('updateModal').style.display = 'flex';
+  startUpdateStatusText();
+
+  fetch('/api/submit-writing-task', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+      document.getElementById('updateModal').style.display = 'none';
+      stopUpdateStatusText();
+
+      if (!ok) throw new Error(data.error || 'Submission failed');
+
+      const { feedback, scores, score } = data;
+      const resultHTML = [];
+
+      resultHTML.push(`<h2 class="writing-result-header">Writing Task Result: ${score}%</h2>`);
+
+      questions.forEach(q => {
+        resultHTML.push(`<div class="exam-subquestion">`);
+        resultHTML.push(`<p class="question-text"><strong>${q.id}.</strong> ${q.text}</p>`);
+
+        if (feedback && scores) {
+          resultHTML.push(`<div class="writing-feedback">`);
+          resultHTML.push(`<h4>Feedback from Gemini</h4>`);
+          resultHTML.push(`<div class="feedback-columns">`);
+          
+          // Task Achievement & Structure
+          resultHTML.push(`<div class="feedback-col">`);
+          resultHTML.push(`<p><strong>Task Achievement & Structure (${scores.task_structure}/25):</strong></p>`);
+          resultHTML.push(`<p>${feedback.task_structure.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
+          resultHTML.push(`</div>`);
+
+          // Organization
+          resultHTML.push(`<div class="feedback-col">`);
+          resultHTML.push(`<p><strong>Organization (${scores.organization}/25):</strong></p>`);
+          resultHTML.push(`<p>${feedback.organization.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
+          resultHTML.push(`</div>`);
+
+          // Grammar
+          resultHTML.push(`<div class="feedback-col">`);
+          resultHTML.push(`<p><strong>Grammar (${scores.grammar}/25):</strong></p>`);
+          resultHTML.push(`<p>${feedback.grammar.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
+          resultHTML.push(`</div>`);
+
+          // Vocabulary
+          resultHTML.push(`<div class="feedback-col">`);
+          resultHTML.push(`<p><strong>Vocabulary (${scores.vocabulary}/25):</strong></p>`);
+          resultHTML.push(`<p>${feedback.vocabulary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
+          resultHTML.push(`</div>`);
+
+          resultHTML.push(`</div>`);
+          resultHTML.push(`<p><strong>Total Score:</strong> ${score}%</p>`);
+          resultHTML.push(`</div>`);
+        } else {
+          resultHTML.push(`<p class="feedback-warning">No feedback available.</p>`);
+        }
+
+        resultHTML.push(`</div>`);
+      });
+
+      content.innerHTML = resultHTML.join('');
+
+      if (score >= 80) {
+        new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
+      }
+
+      document.querySelectorAll('.rain-drop, .lightning-flash, .lightning-icon').forEach(el => el.remove());
+
+      const header = document.getElementById('todaytasks-header');
+      header.classList.add('summer-scene');
+
+      const moon = document.createElement('div');
+      moon.className = 'moon';
+      header.appendChild(moon);
+
+      const tree = document.createElement('div');
+      tree.className = 'summer-tree';
+      header.appendChild(tree);
+
+      for (let i = 0; i < 30; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.top = `${Math.random() * 60}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 4}s`;
+        header.appendChild(star);
+      }
+
+      for (let i = 0; i < 8; i++) {
+        const firefly = document.createElement('div');
+        firefly.className = 'firefly';
+        firefly.style.top = `${60 + Math.random() * 40}%`;
+        firefly.style.left = `${Math.random() * 100}%`;
+        firefly.style.animationDelay = `${Math.random() * 5}s`;
+        header.appendChild(firefly);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      document.getElementById('finish-tasks-btn').style.display = 'none';
+      let doneBtn = document.getElementById('done-tasks-btn');
+
+      if (!doneBtn) {
+        doneBtn = document.createElement('button');
+        doneBtn.id = 'done-tasks-btn';
+        doneBtn.className = 'btn btn-success';
+        doneBtn.textContent = 'Done';
+        doneBtn.onclick = () => {
+          showPage('today');
+          content.innerHTML = '';
+          doneBtn.style.display = 'none';
+          document.getElementById('finish-tasks-btn').style.display = 'inline-block';
+          renderTasksSection();
+        };
+        document.getElementById('todaytasks-header').appendChild(doneBtn);
+      } else {
+        doneBtn.style.display = 'inline-block';
+      }
+
+      document.getElementById('done-tasks-btn').onclick = () => {
+        showPage('today');
+        content.innerHTML = '';
+        document.getElementById('done-tasks-btn').style.display = 'none';
+        document.getElementById('finish-tasks-btn').style.display = 'inline-block';
+        const floating = document.getElementById('floating-finish-btn');
+        if (floating) floating.style.display = 'none';
+        renderTasksSection();
+      };
+
+      fetch(`/api/update-results?level=${encodeURIComponent(currentLevel)}&unit=${encodeURIComponent(currentUnit)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: currentUser,
+          taskTitle: title,
+          percent: score,
+          submitted: true
+        })
+      }).then(() => renderTasksSection());
+    })
+    .catch(err => {
+      console.error('[Writing] ❌ Error submitting writing task:', err);
+      document.getElementById('updateModal').style.display = 'none';
+      stopUpdateStatusText();
+      showToastNotification(err.message, 'error');
+    });
+}
+
+
+function openWritingTaskPage(title, questions) {
+  initExamSecurity(true);
+  hideNavigation();
+  showPage('todaytasks');
+  const header = document.getElementById('header-today');
+  const unit = document.getElementById('todaytasks-unit');
+  header.textContent = title;
+  unit.textContent = `Unit ${currentUnit}`;
+
+  // Удаляем летние элементы
+  document.querySelectorAll('.moon, .summer-tree, .star, .firefly').forEach(el => el.remove());
+  document.getElementById('todaytasks-header').classList.remove('summer-scene');
+
+  // Добавляем дождь и молнию
+  const rainAndLightningHTML = `
+    <div class="lightning-flash"></div>
+    ${[10, 20, 30, 40, 50, 60, 70].map((left, i) =>
+      `<span class="rain-drop" style="left: ${left}%; animation-delay: ${i * 0.2}s;"></span>`
+    ).join('')}
+    ${Array.from({length: 3}).map(() =>
+      `<div class="lightning-drop" style="left: ${Math.random() * 90 + 5}%; animation-delay: ${Math.random() * 3}s;"></div>`
+    ).join('')}
+  `;
+  header.insertAdjacentHTML('beforeend', rainAndLightningHTML);
+
+  const content = document.getElementById('todaytasks-content');
+  content.innerHTML = '';
+
+  questions.forEach((q, qi) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'exam-question-block';
+
+    const heading = document.createElement('h3');
+    heading.className = 'question-title';
+    heading.innerHTML = `${qi + 1}. ${q.text}`;
+    wrapper.appendChild(heading);
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'writing-task-textarea';
+    textarea.placeholder = 'Write your essay here (30+ words)...';
+    textarea.name = `q${q.id}`;
+    textarea.dataset.qid = q.id;
+
+    textarea.addEventListener('blur', () => {
+      const text = textarea.value.trim();
+      const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+      if (wordCount < 30) {
+        showToastNotification(`Your writing must be at least 30 words. Currently: ${wordCount}`, 'warning');
+      }
+    });
+
+    wrapper.appendChild(textarea);
+    content.appendChild(wrapper);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Плавающая кнопка завершения
+  let floatingBtn = document.getElementById('floating-finish-btn');
+  if (!floatingBtn) {
+    floatingBtn = document.createElement('button');
+    floatingBtn.id = 'floating-finish-btn';
+    floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
+    document.body.appendChild(floatingBtn);
+  }
+  floatingBtn.style.display = 'block';
+  floatingBtn.onclick = () => {
+    floatingBtn.style.display = 'none';
+    finishWritingAI(title, questions);
+  };
+
+  document.getElementById('done-tasks-btn').style.display = 'none';
+  document.getElementById('finish-tasks-btn').style.display = 'inline-block';
+  document.getElementById('finish-tasks-btn').onclick = () => {
+    floatingBtn.style.display = 'none';
+    finishWritingAI(title, questions);
+  };
+}
+
+
 
 
 
@@ -3336,8 +3689,27 @@ function openTodayTaskPage(title, questions) {
   initExamSecurity(true);
   hideNavigation();
   showPage('todaytasks');
-  document.getElementById('header-today').textContent = title;
-  document.getElementById('todaytasks-unit').textContent = `Unit ${currentUnit}`;
+  const header = document.getElementById('header-today');
+  const unit = document.getElementById('todaytasks-unit');
+  header.textContent = title;
+  unit.textContent = `Unit ${currentUnit}`;
+
+  // Удалить летние элементы (луна, дерево, звезды, светлячки)
+  document.querySelectorAll('.moon, .summer-tree, .star, .firefly').forEach(el => el.remove());
+  document.getElementById('todaytasks-header').classList.remove('summer-scene');
+
+  // Добавить молнии и дождь
+  const rainAndLightningHTML = `
+    <div class="lightning-flash"></div>
+    ${[10, 20, 30, 40, 50, 60, 70].map((left, i) =>
+      `<span class="rain-drop" style="left: ${left}%; animation-delay: ${i * 0.2}s;"></span>`
+    ).join('')}
+    ${Array.from({length: 3}).map(() =>
+      `<div class="lightning-drop" style="left: ${Math.random() * 90 + 5}%; animation-delay: ${Math.random() * 3}s;"></div>`
+    ).join('')}
+  `;
+  header.insertAdjacentHTML('beforeend', rainAndLightningHTML);
+
   const content = document.getElementById('todaytasks-content');
   content.innerHTML = '';
 
@@ -3481,7 +3853,7 @@ function openTodayTaskPage(title, questions) {
       groupedWriteIn.forEach(sub => {
         const p = document.createElement('p');
         p.className = 'question-text';
-        p.innerHTML = `${sub.id}. ${sub.text.replace('____', `<input type="text" class="write-in-blank-input" name="q${sub.id}" placeholder="____" autocomplete="off">`)}`;
+        p.innerHTML = `${sub.id}. ${sub.text.replace('____', `<input type="password" class="write-in-blank-input" name="q${sub.id}" placeholder="____" autocomplete="off">`)}`;
         subDiv.appendChild(p);
       });
       wrapper.appendChild(subDiv);
@@ -3566,6 +3938,7 @@ function openTodayTaskPage(title, questions) {
     }
 
     content.appendChild(wrapper);
+	window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   document.getElementById('finish-tasks-btn').onclick = () => {
@@ -3947,6 +4320,49 @@ function finishTodayTasks(title, questions) {
 	  if (percent >= 80) {
 	  new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
       }
+
+// Удалить дождь и молнии
+document.querySelectorAll('.rain-drop, .lightning-flash, .lightning-icon').forEach(el => el.remove());
+
+// Добавить летнюю ночную сцену
+const header = document.getElementById('todaytasks-header');
+header.classList.add('summer-scene');
+
+// 🌙 Луна
+const moon = document.createElement('div');
+moon.className = 'moon';
+header.appendChild(moon);
+
+// 🌳 Дерево
+const tree = document.createElement('div');
+tree.className = 'summer-tree';
+header.appendChild(tree);
+
+// ✨ Звёзды
+for (let i = 0; i < 30; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.top = `${Math.random() * 60}%`;
+  star.style.left = `${Math.random() * 100}%`;
+  star.style.animationDelay = `${Math.random() * 4}s`;
+  header.appendChild(star);
+}
+
+// 🪰 Светлячки
+for (let i = 0; i < 8; i++) {
+  const firefly = document.createElement('div');
+  firefly.className = 'firefly';
+  firefly.style.top = `${60 + Math.random() * 40}%`;
+  firefly.style.left = `${Math.random() * 100}%`;
+  firefly.style.animationDelay = `${Math.random() * 5}s`;
+  header.appendChild(firefly);
+}
+
+window.scrollTo({ top: 0, behavior: 'smooth' });
+
+
+
+
 
       // Кнопки
       document.getElementById('finish-tasks-btn').style.display = 'none';
@@ -5112,6 +5528,49 @@ function showNextItem() {
 
 setInterval(showNextItem, 3000);
 carouselItems[currentIndex].classList.add('active');
+
+const carousel = document.querySelector('.carousel');
+let startX = 0;
+let endX = 0;
+
+carousel.addEventListener('touchstart', (e) => {
+  startX = e.touches[0].clientX;
+});
+
+carousel.addEventListener('touchmove', (e) => {
+  endX = e.touches[0].clientX;
+});
+
+carousel.addEventListener('touchend', () => {
+  const deltaX = endX - startX;
+
+  if (Math.abs(deltaX) > 50) {
+    if (deltaX < 0) {
+      showNextItem(); // свайп влево
+    } else {
+      showPrevItem(); // свайп вправо
+    }
+  }
+
+  // сброс координат
+  startX = 0;
+  endX = 0;
+});
+
+function showPrevItem() {
+  const current = carouselItems[currentIndex];
+  const prevIndex = (currentIndex - 1 + totalItems) % totalItems;
+  const prev = carouselItems[prevIndex];
+
+  current.classList.add('exiting');
+  prev.classList.add('active');
+
+  setTimeout(() => {
+    current.classList.remove('active', 'exiting');
+    currentIndex = prevIndex;
+  }, 600);
+}
+
 /*
 Event
 */
@@ -5809,12 +6268,13 @@ socket.on('updated-sessions', (data) => {
 let storiesItemsStories = [];
 let currentIndexStories = 0;
 let timeoutHandleStories = null;
+let isPausedStories = false;
+let holdTimeoutStories = null;
 
 function fetchStoriesStories() {
   fetch('/api/stories')
     .then(r => r.json())
     .then(data => {
-      // Оставляем только те, у которых есть mediaUrl
       storiesItemsStories = data.filter(s => s.mediaUrl || s.imageUrl);
       const list = document.getElementById('storiesList');
       list.innerHTML = '';
@@ -5845,26 +6305,28 @@ function openStoryStories(idx) {
     </div>
   `;
 
+  let mediaElement;
+
   if (story.mediaType === 'video' || (story.videoUrl && story.videoUrl.endsWith('.mp4'))) {
-    const vid = document.createElement('video');
-    vid.src = story.videoUrl || story.mediaUrl;
-    vid.autoplay = true;
-    vid.playsInline = true;
-    vid.onloadedmetadata = () => startProgressStories(vid.duration * 1000);
-    vid.onended = nextStoryStories;
-    content.append(vid);
+    mediaElement = document.createElement('video');
+    mediaElement.src = story.videoUrl || story.mediaUrl;
+    mediaElement.autoplay = true;
+    mediaElement.playsInline = true;
+    mediaElement.onloadedmetadata = () => startProgressStories(mediaElement.duration * 1000);
+    mediaElement.onended = nextStoryStories;
   } else {
-    const img = document.createElement('img');
-    img.src = story.mediaUrl || story.imageUrl;
-    content.append(img);
+    mediaElement = document.createElement('img');
+    mediaElement.src = story.mediaUrl || story.imageUrl;
     startProgressStories(7000);
   }
+
+  addStoryInteractions(mediaElement);
+  content.append(mediaElement);
 
   document.getElementById('storyModal').style.display = 'flex';
 }
 
 function startProgressStories(duration) {
-  // Сразу сбросить все бары
   storiesItemsStories.forEach((_, i) => {
     const b = document.getElementById(`barStories${i}`);
     if (b) {
@@ -5872,15 +6334,73 @@ function startProgressStories(duration) {
       b.style.transform = i < currentIndexStories ? 'scaleX(1)' : 'scaleX(0)';
     }
   });
-  // Анимировать текущий
+
   const bar = document.getElementById(`barStories${currentIndexStories}`);
   if (!bar) return;
+
   setTimeout(() => {
     bar.style.transition = `transform ${duration}ms linear`;
     bar.style.transform = 'scaleX(1)';
   }, 50);
 
   timeoutHandleStories = setTimeout(nextStoryStories, duration);
+}
+
+function pauseStory() {
+  clearTimeout(timeoutHandleStories);
+  isPausedStories = true;
+
+  const video = document.querySelector('#storyContent video');
+  if (video) video.pause();
+
+  const bar = document.getElementById(`barStories${currentIndexStories}`);
+  if (bar) {
+    const computed = window.getComputedStyle(bar);
+    const matrix = new WebKitCSSMatrix(computed.transform);
+    const scale = matrix.a;
+    bar.style.transition = 'none';
+    bar.style.transform = `scaleX(${scale})`;
+  }
+}
+
+function resumeStory() {
+  if (!isPausedStories) return;
+  isPausedStories = false;
+
+  const video = document.querySelector('#storyContent video');
+  if (video) {
+    const remaining = (1 - video.currentTime / video.duration) * 1000 * video.duration;
+    video.play();
+    startProgressStories(remaining);
+  } else {
+    startProgressStories(3000); // assume 3s left on hold
+  }
+}
+
+function addStoryInteractions(el) {
+  if (!el) return;
+
+  el.addEventListener('mousedown', () => {
+    holdTimeoutStories = setTimeout(pauseStory, 200);
+  });
+
+  el.addEventListener('mouseup', () => {
+    clearTimeout(holdTimeoutStories);
+    resumeStory();
+  });
+
+  el.addEventListener('touchstart', () => {
+    holdTimeoutStories = setTimeout(pauseStory, 200);
+  });
+
+  el.addEventListener('touchend', () => {
+    clearTimeout(holdTimeoutStories);
+    resumeStory();
+  });
+
+  el.addEventListener('dblclick', () => {
+    nextStoryStories();
+  });
 }
 
 function nextStoryStories() {
@@ -5899,3 +6419,5 @@ function closeStoriesStories() {
 }
 
 document.addEventListener('DOMContentLoaded', fetchStoriesStories);
+
+
