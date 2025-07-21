@@ -225,7 +225,19 @@ function showPage(id) {
       break;
 	case 'settings':
     fetchSessions();
-      break;
+    break;
+	
+	case 'exams':
+    examsPageActive();
+    break;
+	
+	case 'upload':
+    loadIdeas();
+    break;
+	
+	case 'tasks':
+    loadTasks();
+    break;
   }
 }
 
@@ -1713,32 +1725,47 @@ function fetchStudentProgress() {
   progressContainer.style.display = "none";
   loadingEl.style.display = "flex";
 
-  function updateTableHeaders(view) {
-    if (view === "progress") {
-      fixedTableHead.innerHTML = `
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Progress %</th>
-        </tr>
-      `;
-      unitsTableHead.innerHTML = '';
-    } else if (view === "today") {
-      fixedTableHead.innerHTML = `
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Today %</th>
-        </tr>
-      `;
-      const currentUnitIndex = Units.indexOf(activeCurrentUnit);
-      const relevantUnits = currentUnitIndex >= 0 ? Units.slice(0, currentUnitIndex + 1) : [];
-      const headerRow = document.createElement('tr');
-      headerRow.innerHTML = relevantUnits.map(unit => `<th>Unit ${unit}</th>`).join('');
-      unitsTableHead.innerHTML = '';
-      unitsTableHead.appendChild(headerRow);
-    }
+function updateTableHeaders(view) {
+  if (view === "progress") {
+    fixedTableHead.innerHTML = `
+      <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Progress</th>
+      </tr>
+    `;
+    unitsTableHead.innerHTML = '';
+  } else if (view === "today") {
+    fixedTableHead.innerHTML = `
+      <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Today</th>
+      </tr>
+    `;
+
+    // Определяем индекс текущего юнита
+    const currentUnitIndex = Units.indexOf(currentUnit);
+
+    // Обрезаем Units только до текущего юнита включительно
+    const relevantUnits = currentUnitIndex >= 0
+      ? Units.slice(0, currentUnitIndex + 1)
+      : [];
+
+    // Генерация строк заголовков
+    const headerRow = document.createElement('tr');
+    relevantUnits.forEach(unit => {
+      const th = document.createElement('th');
+      th.textContent = `Unit ${unit}`;
+      headerRow.appendChild(th);
+    });
+
+    // Обновляем заголовок таблицы
+    unitsTableHead.innerHTML = '';
+    unitsTableHead.appendChild(headerRow);
   }
+}
+
 
   function updateLeaderboard(view, data, historyData) {
     fixedTableBody.innerHTML = "";
@@ -1787,7 +1814,11 @@ function fetchStudentProgress() {
         unitsTableBody.appendChild(document.createElement('tr'));
       });
     } else if (view === "today") {
-      const relevantUnits = Units;
+      const currentUnitIndex = Units.indexOf(currentUnit);
+const relevantUnits = currentUnitIndex >= 0
+  ? Units.slice(0, currentUnitIndex + 1)
+  : [];
+
       const sortedToday = Object.entries(data).map(([student, info]) => {
         const unitPercentages = {};
         relevantUnits.forEach(unit => {
@@ -2107,80 +2138,6 @@ function fetchLeaderboardRank(username) {
         observer.observe(progressCard, { attributes: true });
     }
 }
-
-	/*
-	document.addEventListener("DOMContentLoaded", function() {
-    // Предполагаем, что currentUser — это строка с именем пользователя
-    const username = currentUser.trim(); // Убираем лишние пробелы
-    console.info("Текущий пользователь:", username); // Логируем имя пользователя
-
-    fetch('/api/leaderboard')
-        .then(response => {
-            console.log("Запрос к /api/leaderboard отправлен"); // Логируем начало запроса
-            return response.json();
-        })
-        .then(data => {
-            // Находим элемент с id="leaderboard-value"
-            const leaderboardValue = document.getElementById("leaderboard-value");
-            if (!leaderboardValue) {
-                console.warn("Элемент leaderboard-value не найден."); // Предупреждение, если элемент отсутствует
-                return;
-            }
-
-            // Проверяем, существует ли username
-            if (!username) {
-                console.error("Текущий пользователь не определен."); // Ошибка, если username пустой
-                return;
-            }
-
-            // Собираем полный список игроков (топ-3 + остальные)
-            let allPlayers = [...data.top_3, ...data.others];
-            console.log("Список игроков:", allPlayers.map(player => player.name)); // Логируем имена игроков
-
-            // Находим ранг пользователя с учетом регистра
-            let userRank = allPlayers.findIndex(player => player.name.trim().toLowerCase() === username.toLowerCase()) + 1;
-            console.info("Ранг пользователя:", userRank); // Логируем найденный ранг
-
-            // Обновляем текст элемента
-            if (userRank > 0) {
-                leaderboardValue.innerText = `#${userRank}`; // Пользователь найден
-                console.log(`Элемент leaderboard-value обновлен: #${userRank}`); // Логируем успешное обновление
-            } else {
-                leaderboardValue.innerText = `#?`; // Пользователь не найден
-                console.warn("Пользователь не найден в таблице лидеров"); // Предупреждение, если пользователь не найден
-            }
-        })
-        .catch(error => {
-            console.error("Ошибка при загрузке таблицы лидеров:", error); // Ошибка уже логируется
-        });
-		// Запрос для получения баланса пользователя
-    fetch(`/api/get_balance/${username}`)
-        .then(response => {
-            console.log("Запрос к /api/get_balance отправлен");
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const pointsValue = document.getElementById("points-value");
-            if (!pointsValue) {
-                console.warn("Элемент points-value не найден.");
-                return;
-            }
-
-            pointsValue.innerText = data.balance;
-            console.log(`Элемент points-value обновлен: ${data.balance}`);
-        })
-        .catch(error => {
-            console.error("Ошибка при загрузке баланса:", error);
-            const pointsValue = document.getElementById("points-value");
-            if (pointsValue) {
-                pointsValue.innerText = "--";
-            }
-        });
-});*/
-
     // Initial load
     showPage('main');
 	
@@ -3144,9 +3101,6 @@ function updateExamDisplay() {
 // ----------------------------
 // 1. Рендер списка Today’s Tasks с лоадером и центрированием
 // ----------------------------
-// ----------------------------
-// 1. Рендер списка Today’s Tasks с лоадером и центрированием
-// ----------------------------
 async function renderTasksSection() {
   const container = document.getElementById('today');
   container.querySelectorAll('.tasks-section, .no-tasks-placeholder').forEach(el => el.remove());
@@ -3193,18 +3147,17 @@ async function renderTasksSection() {
     const writingAIBlock = today_tasks.find(task => task.title === 'Writing AI');
     if (writingAIBlock) {
       const writingTask = {
-        title: "Writing: Start",
+        title: "Writing AI",
         type: "writing",
         questions: [{
           type: "writing",
           text: writingAIBlock.questions && writingAIBlock.questions.topic
-            ? `Write an essay discussing the topic: “${writingAIBlock.questions.topic}”. Aim for 150–200 words.`
-            : "Write an essay discussing the advantages and disadvantages of public transport. Aim for 150–200 words.",
+            ? `Write an essay the topic: “${writingAIBlock.questions.topic}”. Aim for 70+ words.`
+            : "Write an essay the advantages and disadvantages of public transport. Aim for 70+ words.",
           id: "Writing Topic ID 1"
         }]
       };
 
-      // Replace the existing Writing AI task with the formatted writingTask
       const existingWritingTaskIndex = today_tasks.findIndex(task => 
         task.title === 'Writing AI' || task.type === 'writing' || task.title.toLowerCase().includes('writing')
       );
@@ -3323,6 +3276,10 @@ async function renderTasksSection() {
         iconClass = 'fa-pen';
         iconColor = 'linear-gradient(135deg, #f06292, #d81b60)';
       }
+	  else if (key.includes('fun')) {
+            iconClass = 'fa-play';
+            iconColor = 'linear-gradient(135deg, #4caf50, #8bc34a)';
+          }
 
       const icon = document.createElement('div');
       icon.className = 'task-progress-icon';
@@ -3335,6 +3292,16 @@ async function renderTasksSection() {
       const titleDiv = document.createElement('div');
       titleDiv.className = 'task-progress-title';
       titleDiv.textContent = title;
+
+      // Only add task count if the task is submitted
+      let taskCount = null;
+      if (result?.submitted) {
+        taskCount = document.createElement('div');
+        taskCount.className = 'task-progress-count';
+        const totalTasks = result.total || (block.questions ? block.questions.length : 0);
+        const correctTasks = result.correct || 0;
+        taskCount.textContent = `${correctTasks} correct out of ${totalTasks} tasks`;
+      }
 
       const progressContainer = document.createElement('div');
       progressContainer.className = 'task-progress-container';
@@ -3364,7 +3331,9 @@ async function renderTasksSection() {
 
       progressBarWrapper.appendChild(progressBar);
       progressContainer.append(progressBarWrapper, progressText);
-      textGroup.append(titleDiv, progressContainer);
+      textGroup.append(titleDiv);
+      if (taskCount) textGroup.append(taskCount); // Append taskCount only if it exists
+      textGroup.append(progressContainer);
 
       const award = document.createElement('div');
       award.className = 'task-progress-award';
@@ -3470,37 +3439,35 @@ function finishWritingAI(title, questions) {
         resultHTML.push(`<p class="question-text"><strong>${q.id}.</strong> ${q.text}</p>`);
 
         if (feedback && scores) {
-          resultHTML.push(`<div class="writing-feedback">`);
-          resultHTML.push(`<h4>Feedback from Gemini</h4>`);
-          resultHTML.push(`<div class="feedback-columns">`);
-          
-          // Task Achievement & Structure
-          resultHTML.push(`<div class="feedback-col">`);
-          resultHTML.push(`<p><strong>Task Achievement & Structure (${scores.task_structure}/25):</strong></p>`);
-          resultHTML.push(`<p>${feedback.task_structure.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
-          resultHTML.push(`</div>`);
+          resultHTML.push(`<div class="writing-feedback-card">`);
+          resultHTML.push(`<div class="score-circle">${score}%</div>`);
+          resultHTML.push(`<div class="accordion-writingai">`);
 
-          // Organization
-          resultHTML.push(`<div class="feedback-col">`);
-          resultHTML.push(`<p><strong>Organization (${scores.organization}/25):</strong></p>`);
-          resultHTML.push(`<p>${feedback.organization.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
-          resultHTML.push(`</div>`);
+const feedbackMap = [
+  { label: "Task Achievement & Structure", key: "task_structure", iconClass: "fas fa-tasks" },
+  { label: "Organization", key: "organization", iconClass: "fas fa-layer-group" },
+  { label: "Grammar", key: "grammar", iconClass: "fas fa-pen-nib" },
+  { label: "Vocabulary", key: "vocabulary", iconClass: "fas fa-book" }
+];
 
-          // Grammar
-          resultHTML.push(`<div class="feedback-col">`);
-          resultHTML.push(`<p><strong>Grammar (${scores.grammar}/25):</strong></p>`);
-          resultHTML.push(`<p>${feedback.grammar.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
-          resultHTML.push(`</div>`);
+feedbackMap.forEach(({ label, key, iconClass }) => {
+  resultHTML.push(`
+    <div class="accordion-item">
+      <button class="accordion-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('open');">
+        <span class="feedback-icon"><i class="${iconClass}"></i></span>
+        <span class="label">${label}</span>
+        <span class="score">${scores[key]}/25</span>
+      </button>
+      <div class="accordion-body">
+        ${feedback[key].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
+      </div>
+    </div>
+  `);
+});
 
-          // Vocabulary
-          resultHTML.push(`<div class="feedback-col">`);
-          resultHTML.push(`<p><strong>Vocabulary (${scores.vocabulary}/25):</strong></p>`);
-          resultHTML.push(`<p>${feedback.vocabulary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`);
-          resultHTML.push(`</div>`);
 
-          resultHTML.push(`</div>`);
-          resultHTML.push(`<p><strong>Total Score:</strong> ${score}%</p>`);
-          resultHTML.push(`</div>`);
+
+          resultHTML.push(`</div></div>`);
         } else {
           resultHTML.push(`<p class="feedback-warning">No feedback available.</p>`);
         }
@@ -3597,6 +3564,7 @@ function finishWritingAI(title, questions) {
 }
 
 
+
 function openWritingTaskPage(title, questions) {
   initExamSecurity(true);
   hideNavigation();
@@ -3685,8 +3653,8 @@ function openWritingTaskPage(title, questions) {
 // ----------------------------
 // 2. Открытие страницы с вопросами и рендер
 // ----------------------------
+
 function openTodayTaskPage(title, questions) {
-  initExamSecurity(true);
   hideNavigation();
   showPage('todaytasks');
   const header = document.getElementById('header-today');
@@ -3694,11 +3662,11 @@ function openTodayTaskPage(title, questions) {
   header.textContent = title;
   unit.textContent = `Unit ${currentUnit}`;
 
-  // Удалить летние элементы (луна, дерево, звезды, светлячки)
+  // Remove summer elements
   document.querySelectorAll('.moon, .summer-tree, .star, .firefly').forEach(el => el.remove());
   document.getElementById('todaytasks-header').classList.remove('summer-scene');
 
-  // Добавить молнии и дождь
+  // Add rain and lightning
   const rainAndLightningHTML = `
     <div class="lightning-flash"></div>
     ${[10, 20, 30, 40, 50, 60, 70].map((left, i) =>
@@ -3738,6 +3706,26 @@ function openTodayTaskPage(title, questions) {
       wrapper.appendChild(div.firstElementChild);
     }
 
+    if (q.type === 'video' && (q['link-youtube'] || q['local-link'])) {
+      const div = document.createElement('div');
+      div.className = 'video-question';
+      if (q['link-youtube'] && q['link-youtube'].includes('<iframe')) {
+        div.innerHTML = `
+          <div class="video-player">
+            ${q['link-youtube']}
+          </div>`;
+      } else if (q['local-link']) {
+        div.innerHTML = `
+          <div class="video-player">
+            <video controls width="100%" preload="metadata">
+              <source src="${q['local-link']}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>`;
+      }
+      wrapper.appendChild(div.firstElementChild);
+    }
+
     if (q.text && q.type !== 'reading') {
       const heading = document.createElement('h3');
       heading.className = 'question-title';
@@ -3746,19 +3734,22 @@ function openTodayTaskPage(title, questions) {
     }
 
     const subList = Array.isArray(q.subquestions) ? q.subquestions : [q];
-    const groupedBoxChoose = [];
+    const groupedSelectOptions = [];
     const groupedWriteIn = [];
+    const groupedBoxChoose = [];
 
     subList.forEach(sub => {
-      if (sub.type === 'box-choose') {
-        groupedBoxChoose.push(sub);
+      if (sub.type === 'select-options') {
+        groupedSelectOptions.push(sub);
       } else if (sub.type === 'write-in-blank') {
         groupedWriteIn.push(sub);
+      } else if (sub.type === 'box-choose') {
+        groupedBoxChoose.push(sub);
       }
     });
 
     subList.forEach(sub => {
-      if (sub.type === 'box-choose' || sub.type === 'write-in-blank') return;
+      if (sub.type === 'select-options' || sub.type === 'write-in-blank' || sub.type === 'box-choose') return;
       const subDiv = document.createElement('div');
       subDiv.className = 'exam-subquestion';
 
@@ -3859,6 +3850,113 @@ function openTodayTaskPage(title, questions) {
       wrapper.appendChild(subDiv);
     }
 
+    if (groupedSelectOptions.length) {
+      const subDiv = document.createElement('div');
+      subDiv.className = 'exam-subquestion';
+      groupedSelectOptions.forEach(sub => {
+        const p = document.createElement('p');
+        p.className = 'question-text';
+
+        const match = sub.text.match(/^(.*?)\((.*?)\)(.*)$/);
+        if (!match) {
+          console.warn('Invalid select-options format:', sub.text);
+          return;
+        }
+
+        const fullText = match[1].trim();
+        const optionsStr = match[2].trim();
+        const after = match[3].trim();
+
+        const parts = fullText.split('____');
+        if (parts.length < 2) {
+          console.warn('No ____ found in select-options text:', sub.text);
+          return;
+        }
+
+        const before = parts[0];
+        const afterBlank = parts[1];
+
+        const options = optionsStr.split('/').map(opt => opt.trim());
+        const cleanOptions = options.map(opt => opt.replace(/\*\*/g, ''));
+
+        const selectWrapper = document.createElement('div');
+        selectWrapper.className = 'custom-select-wrapper';
+        selectWrapper.dataset.qid = sub.id;
+
+        const display = document.createElement('div');
+        display.className = 'custom-select-display';
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'selected-text';
+        textSpan.textContent = '';
+
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-caret-down';
+
+        display.appendChild(textSpan);
+        display.appendChild(icon);
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'custom-select-dropdown';
+
+        cleanOptions.forEach(optionText => {
+          const option = document.createElement('div');
+          option.className = 'custom-select-option';
+          option.textContent = optionText;
+          option.onclick = (e) => {
+            e.stopPropagation();
+            textSpan.textContent = optionText;
+            selectWrapper.dataset.selected = optionText;
+            selectWrapper.classList.remove('open');
+            if (icon.parentNode) icon.remove();
+          };
+          dropdown.appendChild(option);
+        });
+
+        display.onclick = (e) => {
+          e.stopPropagation();
+          const isOpen = selectWrapper.classList.contains('open');
+          document.querySelectorAll('.custom-select-wrapper.open').forEach(w => w.classList.remove('open'));
+          if (!isOpen) {
+            selectWrapper.classList.add('open');
+            document.addEventListener('click', function closeDropdown(ev) {
+              if (!selectWrapper.contains(ev.target)) {
+                selectWrapper.classList.remove('open');
+                document.removeEventListener('click', closeDropdown);
+              }
+            }, { once: true });
+          }
+        };
+
+        selectWrapper.appendChild(display);
+        selectWrapper.appendChild(dropdown);
+
+        // Construct the p element with select-options in the middle
+        const idSpan = document.createElement('span');
+        idSpan.textContent = `${sub.id}. `;
+        p.appendChild(idSpan);
+
+        const beforeSpan = document.createElement('span');
+        beforeSpan.textContent = before;
+        p.appendChild(beforeSpan);
+
+        p.appendChild(selectWrapper);
+
+        const afterBlankSpan = document.createElement('span');
+        afterBlankSpan.textContent = afterBlank;
+        p.appendChild(afterBlankSpan);
+
+        if (after) {
+          const afterSpan = document.createElement('span');
+          afterSpan.textContent = ` ${after}`;
+          p.appendChild(afterSpan);
+        }
+
+        subDiv.appendChild(p);
+      });
+      wrapper.appendChild(subDiv);
+    }
+
     if (groupedBoxChoose.length) {
       const subDiv = document.createElement('div');
       subDiv.className = 'exam-subquestion';
@@ -3938,7 +4036,7 @@ function openTodayTaskPage(title, questions) {
     }
 
     content.appendChild(wrapper);
-	window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   document.getElementById('finish-tasks-btn').onclick = () => {
@@ -3956,7 +4054,6 @@ function openTodayTaskPage(title, questions) {
     if (floating) floating.style.display = 'none';
   };
 
-  // Create floating finish button
   let floatingBtn = document.getElementById('floating-finish-btn');
   if (!floatingBtn) {
     floatingBtn = document.createElement('button');
@@ -3973,9 +4070,6 @@ function openTodayTaskPage(title, questions) {
   initCustomAudioPlayers();
 }
 
-
-
-
 function getInstructionForType(type) {
   switch (type) {
     case 'multiple_choice': return 'Choose the correct option.';
@@ -3989,173 +4083,9 @@ function getInstructionForType(type) {
   }
 }
 
-
-function renderSubquestion(sub, container) {
-  const subDiv = document.createElement('div');
-  subDiv.className = 'subquestion';
-
-  // Если это reading type, отображаем rich block
-  if (sub.type === 'reading' && sub.text) {
-    const readingBlock = document.createElement('div');
-    readingBlock.className = 'exam-parent-question';
-    readingBlock.innerHTML = sub.text;
-    subDiv.appendChild(readingBlock);
-    container.appendChild(subDiv);
-    return;
-  }
-
-  // Вставка текста вопроса
-  let questionHTML = sub.text || '(no question text)';
-  if (sub.type === 'write-in-blank' && questionHTML.includes('____')) {
-    const inputHTML = `<input type="text" name="q${sub.id}" class="write-in-blank-input" placeholder="Answer...">`;
-    questionHTML = questionHTML.replace('____', inputHTML);
-  }
-
-  const p = document.createElement('p');
-  p.innerHTML = questionHTML;
-  subDiv.appendChild(p);
-
-  switch (sub.type) {
-    case 'multiple_choice':
-    case 'true_false':
-      (sub.options || ['True', 'False']).forEach((opt, i) => {
-        const id = `opt-${sub.id}-${opt.replace(/\s+/g, '')}`;
-        const letter = String.fromCharCode(65 + i);
-        subDiv.insertAdjacentHTML('beforeend', `
-          <div class="option-group">
-            <input type="radio" name="q${sub.id}" value="${opt}" id="${id}">
-            <label for="${id}">
-              <span class="option-letter">${letter}</span>
-              <span class="option-text">${opt}</span>
-            </label>
-          </div>
-        `);
-      });
-      break;
-
-    case 'box-choose': {
-      const blankId = `blank-${sub.id}`;
-      const textWithBlank = (sub.text || '').replace(
-        '____',
-        `<span class="box-choose-blank" id="${blankId}" data-qid="${sub.id}" data-active="false">_____</span>`
-      );
-
-      const textP = document.createElement('p');
-      textP.innerHTML = textWithBlank;
-      subDiv.appendChild(textP);
-
-      const optionsDiv = document.createElement('div');
-      optionsDiv.className = 'box-choose-options';
-
-      let selectedOption = null;
-
-      (sub.options || []).forEach((opt, i) => {
-        const optEl = document.createElement('span');
-        optEl.className = 'box-choose-option';
-        optEl.textContent = opt;
-        optEl.style.setProperty('--index', i); // for animation delay
-
-        optEl.addEventListener('click', () => {
-          // Remove previous selections
-          optionsDiv.querySelectorAll('.box-choose-option').forEach(el => el.classList.remove('selected'));
-          optEl.classList.add('selected');
-          selectedOption = opt;
-
-          // Highlight empty blanks
-          subDiv.querySelectorAll('.box-choose-blank').forEach(blank => {
-            if (!blank.textContent || blank.textContent === '_____') {
-              blank.classList.add('highlight-pending');
-              blank.style.borderColor = '#4a90e2';
-            }
-          });
-        });
-
-        optionsDiv.appendChild(optEl);
-      });
-
-      subDiv.appendChild(optionsDiv);
-
-      setTimeout(() => {
-        const blank = document.getElementById(blankId);
-        if (blank) {
-          blank.onclick = () => {
-            if (!selectedOption) return;
-
-            blank.textContent = selectedOption;
-            blank.dataset.value = selectedOption;
-            blank.dataset.active = 'false';
-            blank.classList.remove('highlight-pending');
-            blank.style.borderColor = '';
-
-            // Remove selected option
-            optionsDiv.querySelectorAll('.box-choose-option').forEach(optEl => {
-              if (optEl.textContent === selectedOption) {
-                optEl.classList.remove('selected');
-                optEl.classList.add('used');
-                setTimeout(() => optEl.remove(), 500);
-              }
-            });
-
-            selectedOption = null;
-          };
-        }
-      }, 0);
-
-      break;
-    }
-
-    case 'unscramble':
-      const letters = (sub.text || '').split('');
-      const shuffled = [...letters].sort(() => Math.random() - 0.5);
-
-      const dragContainer = document.createElement('div');
-      dragContainer.className = 'unscramble-container';
-
-      shuffled.forEach((char, i) => {
-        const el = document.createElement('span');
-        el.className = 'unscramble-letter';
-        el.textContent = char;
-        el.draggable = true;
-        el.setAttribute('data-char', char);
-        dragContainer.appendChild(el);
-      });
-
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'Type or drag letters...';
-      input.name = `q${sub.id}`;
-      input.className = 'unscramble-input';
-
-      subDiv.appendChild(dragContainer);
-      subDiv.appendChild(input);
-      break;
-
-    case 'question':
-      subDiv.innerHTML += `
-        <textarea name="q${sub.id}" placeholder="Your response..." class="question-textarea"></textarea>
-      `;
-      break;
-
-    case 'picture':
-      if (sub.image) {
-        subDiv.innerHTML += `<img src="${sub.image}" alt="Image for question" class="question-image">`;
-      }
-      subDiv.innerHTML += `
-        <input type="text" name="q${sub.id}" placeholder="Answer based on image..." class="image-answer">
-      `;
-      break;
-
-    default:
-      subDiv.innerHTML += `
-        <input type="text" name="q${sub.id}" placeholder="Answer..." class="default-text-input">
-      `;
-  }
-
-  container.appendChild(subDiv);
-}
-
-
-
+// ----------------------------
+// 3. Сбор ответов и отправка на сервер с результатом и ошибками
+// ----------------------------
 // ----------------------------
 // 3. Сбор ответов и отправка на сервер с результатом и ошибками
 // ----------------------------
@@ -4205,7 +4135,18 @@ function finishTodayTasks(title, questions) {
     else if (qid) errors.push(`Listening answer missing for question ${qid}`);
   });
 
-  // 5. Проверка ошибок
+  // 5. select-options
+  content.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+    const qid = wrapper.dataset.qid; // Use the stored question ID
+    const selected = wrapper.dataset.selected;
+    if (qid && selected) {
+      answers[qid] = selected;
+    } else if (qid) {
+      errors.push(`Select option missing for question ${qid}`);
+    }
+  });
+
+  // 6. Проверка ошибок
   if (errors.length) {
     showToastNotification(errors[0], 'warning');
     return;
@@ -4232,7 +4173,7 @@ function finishTodayTasks(title, questions) {
     .then(({ ok, data }) => {
       // СКРЫТЬ МОДАЛКУ
       document.getElementById('updateModal').style.display = 'none';
-	  stopUpdateStatusText();
+      stopUpdateStatusText();
 
       if (!ok) throw new Error(data.error || 'Submission failed');
 
@@ -4304,6 +4245,15 @@ function finishTodayTasks(title, questions) {
             resultHTML.push(`<p><strong>Correct:</strong> <span style="color:#4caf50">${item.correct}</span></p>`);
           }
 
+          // select-options
+          else if (sub.type === 'select-options') {
+            const isCorrect = item.user === item.correct;
+            resultHTML.push(`<p><strong>Your Answer:</strong> <span style="${isCorrect ? 'color: #4caf50;' : 'color: #f44336;'}">${item.user || '—'}</span></p>`);
+            if (!isCorrect) {
+              resultHTML.push(`<p><strong>Correct Answer:</strong> <span style="color: #4caf50;">${item.correct}</span></p>`);
+            }
+          }
+
           // текст
           else {
             resultHTML.push(`<p><strong>Your Answer:</strong> <span style="color: #f44336;">${item.user || '—'}</span></p>`);
@@ -4317,54 +4267,50 @@ function finishTodayTasks(title, questions) {
       }
 
       content.innerHTML = resultHTML.join('');
-	  if (percent >= 80) {
-	  new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
+      if (percent >= 80) {
+        new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
       }
 
-// Удалить дождь и молнии
-document.querySelectorAll('.rain-drop, .lightning-flash, .lightning-icon').forEach(el => el.remove());
+      // Remove rain and lightning
+      document.querySelectorAll('.rain-drop, .lightning-flash, .lightning-drop').forEach(el => el.remove());
 
-// Добавить летнюю ночную сцену
-const header = document.getElementById('todaytasks-header');
-header.classList.add('summer-scene');
+      // Add summer night scene
+      const header = document.getElementById('todaytasks-header');
+      header.classList.add('summer-scene');
 
-// 🌙 Луна
-const moon = document.createElement('div');
-moon.className = 'moon';
-header.appendChild(moon);
+      // 🌙 Moon
+      const moon = document.createElement('div');
+      moon.className = 'moon';
+      header.appendChild(moon);
 
-// 🌳 Дерево
-const tree = document.createElement('div');
-tree.className = 'summer-tree';
-header.appendChild(tree);
+      // 🌳 Tree
+      const tree = document.createElement('div');
+      tree.className = 'summer-tree';
+      header.appendChild(tree);
 
-// ✨ Звёзды
-for (let i = 0; i < 30; i++) {
-  const star = document.createElement('div');
-  star.className = 'star';
-  star.style.top = `${Math.random() * 60}%`;
-  star.style.left = `${Math.random() * 100}%`;
-  star.style.animationDelay = `${Math.random() * 4}s`;
-  header.appendChild(star);
-}
+      // ✨ Stars
+      for (let i = 0; i < 30; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.top = `${Math.random() * 60}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 4}s`;
+        header.appendChild(star);
+      }
 
-// 🪰 Светлячки
-for (let i = 0; i < 8; i++) {
-  const firefly = document.createElement('div');
-  firefly.className = 'firefly';
-  firefly.style.top = `${60 + Math.random() * 40}%`;
-  firefly.style.left = `${Math.random() * 100}%`;
-  firefly.style.animationDelay = `${Math.random() * 5}s`;
-  header.appendChild(firefly);
-}
+      // 🪰 Fireflies
+      for (let i = 0; i < 8; i++) {
+        const firefly = document.createElement('div');
+        firefly.className = 'firefly';
+        firefly.style.top = `${60 + Math.random() * 40}%`;
+        firefly.style.left = `${Math.random() * 100}%`;
+        firefly.style.animationDelay = `${Math.random() * 5}s`;
+        header.appendChild(firefly);
+      }
 
-window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
-
-
-
-
-      // Кнопки
+      // Buttons
       document.getElementById('finish-tasks-btn').style.display = 'none';
       let doneBtn = document.getElementById('done-tasks-btn');
       if (!doneBtn) {
@@ -4387,13 +4333,10 @@ window.scrollTo({ top: 0, behavior: 'smooth' });
     })
     .catch(err => {
       console.error(err);
-      document.getElementById('updateModal').style.display = 'none'; // скрываем даже при ошибке
+      document.getElementById('updateModal').style.display = 'none';
       showToastNotification(err.message, 'error');
     });
 }
-
-
-
 
 
 function initCustomAudioPlayers() {
@@ -4525,39 +4468,36 @@ socket.on('unblockUser', (data) => {
   unblockUsername(data.username);
 });
 
-const blockStates = new Map(); // { username: { isBlocked, timerInterval, blockEndTime } }
+const blockStates = new Map(); // { username: { isBlocked, timerInterval, blockEndTime, clickHandler } }
+const blockScreen = document.getElementById("block-screen");
+const timerElement = document.getElementById("timer");
 
-// Функция для форматирования времени в формате MM:SS
+// Форматирование времени MM:SS
 function formatTimeBlock(seconds) {
   const minutes = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Функция для запуска таймера блокировки
+// Таймер блокировки
 function startBlockTimer(username, duration, userState, timerElement) {
   let timeLeft = duration;
   let intervalId = null;
   let musicTriggered = false;
 
-  // Начальное сообщение на таймере
   timerElement.textContent = "Click here to start timer";
   timerElement.style.cursor = 'pointer';
   timerElement.classList.add('pulse-timer');
 
-  // Обработчик клика
   const handleClick = () => {
-    if (musicTriggered) return; // защита от повторного запуска
+    if (musicTriggered) return;
     musicTriggered = true;
 
-    playSpecialMusic(); // запускаем музыку
-
-    // Показываем сразу первый тик
+    playSpecialMusic();
     timerElement.textContent = formatTimeBlock(timeLeft);
     timerElement.classList.remove('pulse-timer');
     timerElement.style.cursor = 'default';
 
-    // Запускаем таймер только при клике
     intervalId = setInterval(() => {
       timeLeft--;
       timerElement.textContent = formatTimeBlock(timeLeft);
@@ -4565,61 +4505,55 @@ function startBlockTimer(username, duration, userState, timerElement) {
       if (timeLeft <= 0) {
         clearInterval(intervalId);
         unblockUsername(username);
-        blockStates.delete(username);
-        try {
-          localStorage.removeItem(`blockEndTime_${username}`);
-        } catch (err) {
-          console.error(`Failed to remove blockEndTime from localStorage for ${username}: ${err.message}`);
-        }
       }
     }, 1000);
+
     userState.timerInterval = intervalId;
   };
 
-  // Удаляем старый обработчик, если он есть
-  timerElement.removeEventListener('click', userState.clickHandler);
-  // Сохраняем новый обработчик
-  userState.clickHandler = handleClick;
-  // Вешаем новый обработчик
-  timerElement.addEventListener('click', handleClick);
+  // Удаляем старый обработчик, если был
+  if (userState.clickHandler) {
+    timerElement.removeEventListener('click', userState.clickHandler);
+  }
 
-  blockStates.set(username, userState);
+  userState.clickHandler = handleClick;
+  timerElement.addEventListener('click', handleClick);
 }
 
-// Функция для блокировки пользователя
+// Блокировка пользователя
 function blockUser(username, duration) {
   stopSpecialMusic();
+
   if (!Number.isInteger(duration) || duration <= 0) {
-    console.log(`Invalid duration: ${duration}. Duration must be a positive integer.`);
+    console.log(`Invalid duration: ${duration}. Must be a positive integer.`);
     return;
   }
 
   const currentUser = getCurrentUser();
   if (username !== currentUser) return;
 
-  const userState = blockStates.get(username) || {
+  let userState = blockStates.get(username) || {
     isBlocked: false,
     timerInterval: null,
     blockEndTime: null,
     clickHandler: null
   };
 
-  // Очищаем существующий таймер, если он есть
+  // Очищаем старый таймер, если он был
   if (userState.timerInterval) {
     clearInterval(userState.timerInterval);
     userState.timerInterval = null;
   }
 
-  // Показываем экран блокировки
+  // Показываем блокировку
   blockScreen.classList.remove('hidden');
   blockScreen.classList.add('visible');
 
-  const warningText = `${username} has violated the rules. ChatGPT ishlatmoqchimiding.
-This behavior is strictly prohibited. 
-You are now temporarily blocked. 
-Further violations will result in a permanent ban.`;
+  const warningText = `${username}, your recent actions have crossed the line! 
+Such behavior is absolutely not allowed here. 
+You are temporarily blocked to cool off. 
+If this happens again, a permanent ban will follow — no second chances!`;
 
-  // Устанавливаем новое время окончания блокировки
   const blockEndTime = Date.now() + duration * 1000;
   userState.isBlocked = true;
   userState.blockEndTime = blockEndTime;
@@ -4627,27 +4561,18 @@ Further violations will result in a permanent ban.`;
   try {
     localStorage.setItem(`blockEndTime_${username}`, blockEndTime);
   } catch (err) {
-    console.error(`Failed to save blockEndTime for ${username}: ${err.message}`);
+    console.error(`Failed to save blockEndTime: ${err.message}`);
   }
 
-  // Блокируем взаимодействие
   document.body.style.pointerEvents = 'none';
 
-  // Озвучиваем предупреждение и затем настраиваем таймер
   speak(warningText, () => {
     startBlockTimer(username, duration, userState, timerElement);
+    blockStates.set(username, userState); // Обновляем userState только после запуска таймера
   });
-
-  blockStates.set(username, userState);
 }
 
-
-
-
-const blockScreen = document.getElementById("block-screen");
-const timerElement = document.getElementById("timer");
-let isBlocked = false; // Флаг блокировки
-
+// Разблокировка
 function unblockUsername(username) {
   const userState = blockStates.get(username);
   if (!userState || !userState.isBlocked) {
@@ -4655,31 +4580,33 @@ function unblockUsername(username) {
     return;
   }
 
-  // Очищаем таймер, если он активен
   if (userState.timerInterval) {
     clearInterval(userState.timerInterval);
     userState.timerInterval = null;
   }
 
-  // Сбрасываем состояние блокировки
-  userState.isBlocked = false;
-  blockStates.set(username, userState);
-
-  // Восстанавливаем взаимодействие с элементами
   document.body.style.pointerEvents = 'auto';
-
-  // Удаляем данные из localStorage
-  localStorage.removeItem(`blockEndTime_${username}`);
-  stopSpecialMusic();
-
-  // Скрываем экран блокировки
   blockScreen.classList.remove("visible");
-  messageTimestamps = []; // Сбрасываем историю сообщений
-  timerElement.textContent = ''; // Сбрасываем отображение таймера
 
-  // Удаляем состояние пользователя из Map
+  stopSpecialMusic();
+  messageTimestamps = [];
+
+  timerElement.textContent = '';
+  if (userState.clickHandler) {
+    timerElement.removeEventListener('click', userState.clickHandler);
+    userState.clickHandler = null;
+  }
+
+  try {
+    localStorage.removeItem(`blockEndTime_${username}`);
+  } catch (err) {
+    console.error(`Failed to remove blockEndTime: ${err.message}`);
+  }
+
+  userState.isBlocked = false;
   blockStates.delete(username);
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const currentUser = getCurrentUser();
@@ -4720,46 +4647,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
-
-
-document.getElementById('upload-file-input').addEventListener('change', async function (e) {
-  // 🚫 Проверка статуса аккаунта
-  if (typeof accountStatus !== 'undefined' && accountStatus === 'Debtor') {
-    showToastNotification("You cannot upload files while your account is in debt.", 'error');
-    e.target.value = ""; // сбрасываем выбранный файл
-    return;
-  }
-
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const uploadBox = document.querySelector('.upload-info');
-  uploadBox.classList.add('disabled');
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    const res = await fetch('/upload-section', {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      showToastNotification(result.message || "File uploaded successfully!", 'success');
-    } else {
-      showToastNotification(result.error || "Upload failed", 'error');
-    }
-  } catch (err) {
-    showToastNotification("An error occurred during upload.", 'error');
-  } finally {
-    uploadBox.classList.remove('disabled');
-    e.target.value = ""; // очистить выбранный файл
-  }
-});
-
 
 async function fetchDebts() {
   const res = await fetch('/api/debts');
@@ -4853,25 +4740,41 @@ let gainNode = null;
 let isMusicPlaying = false;
 
 const tracks = [
-  ''
+  '/static/music/season3.mp3'
 ];
 
 let currentTrackIndex = 0;
 
-// 🔁 Функция для запуска бесконечного плейлиста
-async function playNextTrack() {
-  stopSpecialMusic(); // остановим предыдущую, если была
+// 🔁 Кэш загруженных аудио
+const audioBufferCache = new Map();
+
+// 🔁 Функция для загрузки и кэширования трека
+async function loadAndCacheTrack(url) {
+  if (audioBufferCache.has(url)) {
+    return audioBufferCache.get(url); // ✅ уже загружен
+  }
+
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
 
   if (!audioContext) audioContext = new AudioContext();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+  audioBufferCache.set(url, audioBuffer); // 📦 кэшируем
+  return audioBuffer;
+}
+
+// 🔁 Воспроизведение трека из кэша
+async function playNextTrack() {
+  stopSpecialMusic(); // ⛔ остановка предыдущего трека
+
+  const trackUrl = tracks[currentTrackIndex];
 
   try {
-    const trackUrl = tracks[currentTrackIndex];
-    const response = await fetch(trackUrl);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await loadAndCacheTrack(trackUrl);
 
     gainNode = audioContext.createGain();
-    gainNode.gain.value = 1.0; // 100% громкость
+    gainNode.gain.value = 1.0;
 
     sourceNode = audioContext.createBufferSource();
     sourceNode.buffer = audioBuffer;
@@ -4884,34 +4787,35 @@ async function playNextTrack() {
 
     sourceNode.onended = () => {
       currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-      playNextTrack(); // запускаем следующий
+      playNextTrack(); // 🔁 следующий
     };
-
   } catch (err) {
     console.error('❌ Failed to play track:', err);
   }
 }
 
-// 🔈 Основная функция, которую ты вызываешь
+// ▶️ Запуск
 function playSpecialMusic() {
-  if (isMusicPlaying) return; // уже играет — не запускаем заново
+  if (isMusicPlaying) return;
+  if (!audioContext) audioContext = new AudioContext();
   playNextTrack();
 }
 
-// ⛔ Остановка музыки
+// ⛔ Остановка
 function stopSpecialMusic() {
   if (sourceNode) {
     try {
-      sourceNode.onended = null; // ❗ отключаем автозапуск следующего трека
+      sourceNode.onended = null;
       sourceNode.stop();
       sourceNode.disconnect();
     } catch (e) {
-      console.warn("⚠️ Already stopped or failed to stop source");
+      console.warn("⚠️ Already stopped or error:", e);
     }
     sourceNode = null;
   }
   isMusicPlaying = false;
 }
+
 
 
 
@@ -5303,211 +5207,6 @@ function stopUpdateStatusText() {
     }
   }
   
-const spinSfx = new Audio('/static/music/Bang Bang starter audio.mp3');
-const winSfx = new Audio('/static/music/Coins_Rewarded.mp3');
-const ballSfx = new Audio('/static/sfx/ball.mp3');
-
-function saveBoxStateLocally(data) {
-  localStorage.setItem('lucky_spin_state', JSON.stringify(data));
-}
-
-function loadBoxStateLocally() {
-  try {
-    return JSON.parse(localStorage.getItem('lucky_spin_state')) || null;
-  } catch {
-    return null;
-  }
-}
-
-function renderBoxState(state) {
-  ['A', 'B', 'C'].forEach(box => {
-    const container = document.querySelector(`#box-${box} .balls`);
-    const boxEl = document.getElementById(`box-${box}`);
-    if (!container) return;
-    container.innerHTML = '';
-    for (let i = 0; i < (state.current_boxes[box] || 0); i++) {
-      const ball = document.createElement('img');
-      ball.classList.add('ball');
-      ball.src = '/static/icons/ball.png';
-      container.appendChild(ball);
-    }
-    boxEl.classList.toggle('LuckyBox', state.winning_box === box);
-  });
-
-  const spinCounter = document.getElementById("spin-counter");
-  if (spinCounter) {
-    spinCounter.textContent = `Spins: ${state.spin_count} / 10`;
-  }
-}
-
-async function preloadBoxState(username) {
-  const res = await fetch(`/api/lucky_progress?username=${username}`);
-  const data = await res.json();
-  saveBoxStateLocally(data);
-  renderBoxState(data);
-}
-
-function saveRewardHistory(entry) {
-  const history = loadRewardHistory();
-  history.unshift(entry);
-  if (history.length > 20) history.pop();
-  localStorage.setItem("lucky_spin_history", JSON.stringify(history));
-}
-
-function loadRewardHistory() {
-  try {
-    return JSON.parse(localStorage.getItem("lucky_spin_history")) || [];
-  } catch {
-    return [];
-  }
-}
-
-function renderRewardHistory() {
-  const history = loadRewardHistory();
-  const list = document.getElementById("history-list");
-  if (!list) return;
-  list.innerHTML = "";
-
-  history.forEach(entry => {
-    const li = document.createElement("li");
-    if (entry.type === "LuckyBox") {
-      li.textContent = `🎉 ${entry.time}: Lucky Box ${entry.amount} pts from box ${entry.box}`;
-    } else if (entry.type === "Ball") {
-      li.textContent = `🎯 ${entry.time}: Ball in box ${entry.box}`;
-    } else if (entry.type === "Small Win") {
-      li.textContent = `💰 ${entry.time}: Won ${entry.amount} pts`;
-    } else {
-      li.textContent = `❌ ${entry.time}: Nothing`;
-    }
-    list.appendChild(li);
-  });
-}
-
-function formatTime(ts = Date.now()) {
-  const d = new Date(ts);
-  return d.toLocaleString(undefined, {
-    day: "2-digit", month: "2-digit", year: "2-digit",
-    hour: "2-digit", minute: "2-digit"
-  });
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  const saved = loadBoxStateLocally();
-  if (saved) renderBoxState(saved);
-  if (typeof currentUser !== 'undefined') {
-    preloadBoxState(currentUser);
-  }
-  renderRewardHistory();
-});
-
-document.getElementById("luckySpinBtn").addEventListener("click", async () => {
-  const btn = document.getElementById("luckySpinBtn");
-  const wrapper = document.getElementById("lucky-spin-wrapper");
-  btn.disabled = true;
-  wrapper.className = "lucky-glass-wrapper";
-  btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Spinning...`;
-
-  try {
-    const res = await fetch('/api/lucky_event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: currentUser })
-    });
-
-    const data = await res.json();
-    const now = new Date().toLocaleTimeString();
-
-    // Обновление UI
-    if (data.new_balance !== undefined) {
-      const balanceElement = document.getElementById("balance");
-      if (balanceElement) balanceElement.textContent = `${Math.floor(data.new_balance)} pts`;
-    }
-
-    if (data.spin_count !== undefined) {
-      document.getElementById("spin-counter").textContent = `Spins: ${data.spin_count} / 10`;
-    }
-
-    // Обновление коробок
-    if (data.current_boxes) {
-      ['A', 'B', 'C'].forEach(boxId => {
-        const container = document.querySelector(`#box-${boxId} .balls`);
-        container.innerHTML = "";
-        for (let i = 0; i < data.current_boxes[boxId]; i++) {
-          const ball = document.createElement('img');
-          ball.src = '/static/icons/ball.png';
-          ball.className = 'ball';
-          container.appendChild(ball);
-        }
-      });
-    }
-
-    // Анимация шарика
-    if (data.got_ball && data.ball_box) {
-      const container = document.querySelector(`#box-${data.ball_box} .balls`);
-      const falling = document.createElement('img');
-      falling.src = '/static/icons/ball.png';
-      falling.className = 'ball-falling';
-      container.appendChild(falling);
-      setTimeout(() => {
-        container.removeChild(falling);
-        const ball = document.createElement('img');
-        ball.src = '/static/icons/ball.png';
-        ball.className = 'ball';
-        container.appendChild(ball);
-      }, 600);
-    }
-
-    // Эффекты по типу награды
-    const type = data.reward_type || "none";
-    wrapper.classList.add(type); // для CSS-эффектов
-
-    switch (type) {
-      case "jackpot":
-        showModalStatus(`🎉 JACKPOT! ${data.won} pts from box ${data.winning_box}!`, "success");
-        winSfx.play();
-        break;
-      case "mega":
-        showModalStatus(`🔥 MEGA WIN! ${data.won} pts!`, "success");
-        megaSfx?.play?.();
-        break;
-      case "big":
-        showModalStatus(`💥 Big win! You got ${data.won} pts!`, "success");
-        winSfx.play();
-        break;
-      case "mid":
-        showModalStatus(`✨ You won ${data.won} pts`, "success");
-        break;
-      case "small":
-        showModalStatus(`✅ Small win: ${data.won} pts`, "success");
-        break;
-      case "almost":
-        showModalStatus(`😫 Almost hit a big prize...`, "neutral");
-        break;
-      case "none":
-      default:
-        showModalStatus("❌ No reward this time", "neutral");
-        break;
-    }
-
-    // Сохраняем историю
-    saveRewardHistory({
-      type: type.charAt(0).toUpperCase() + type.slice(1),
-      amount: data.won,
-      time: now,
-      box: data.winning_box || data.ball_box || null
-    });
-
-    renderRewardHistory();
-
-  } catch (err) {
-    console.error("Spin error:", err);
-    showModalStatus("❗ Something went wrong.", "failed");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<i class="fas fa-magic"></i> Spin Now`;
-  }
-});
-
 const carouselItems = document.querySelectorAll('.carousel-item');
 let currentIndex = 0;
 const totalItems = carouselItems.length;
@@ -5666,25 +5365,37 @@ function onContextMenu(event) {
 }
 
 let violationCount = 0;
-const maxViolations = 1;
+const maxViolations = 3;
 
 function incrementViolation(reason = "Violation") {
-	  // ГОЛОСОВОЕ ПРЕДУПРЕЖДЕНИЕ → запуск музыки по завершении речи
-  const warningText = `${username} has violated the rules. ChatGPT ishlatmoqchimiding.
-This behavior is strictly prohibited. 
-You are now temporarily blocked. 
-Further violations will result in a permanent ban.`;
+  let warningText = "";
 
-  speak(warningText, () => {
-    
-  });
-    violationCount++;
-    showToastNotification(`${reason}: ${violationCount}/${maxViolations}`,'info');
-    if (violationCount >= maxViolations) {
-        blockUser(currentUser, 900);
-        violationCount = 0;
-    }
+  if (violationCount === 0) {
+    warningText = `${username}, this is a gentle reminder: please follow the community rules.
+Let's keep things respectful.`;
+  } else if (violationCount === 1) {
+  warningText = `${username}, this is your second warning.
+You've broken the rules again. Please correct your behavior or you may be blocked next time.`;
 }
+else if (violationCount === 2) {
+    warningText = `${username}, this is your final warning.
+One more violation and you're out — permanently. Make the right choice.`;
+  }
+
+  // Воспроизведение голосового предупреждения и последующая музыка
+  speak(warningText, () => {
+    // тут можно запустить музыку, если нужно
+  });
+
+  violationCount++;
+  showToastNotification(`${reason}: ${violationCount}/${maxViolations}`, 'info');
+
+  if (violationCount >= maxViolations) {
+    blockUser(currentUser, 900); // временная блокировка на 15 минут
+    violationCount = 0; // сброс счётчика
+  }
+}
+
 
 document.querySelectorAll('.menu-item').forEach(item => {
   item.addEventListener('click', () => {
@@ -6421,3 +6132,285 @@ function closeStoriesStories() {
 document.addEventListener('DOMContentLoaded', fetchStoriesStories);
 
 
+async function examsPageActive() {
+  const container = document.getElementById("exams-container");
+  container.innerHTML = `
+    <div class="container-exam-loading">
+      <div class="loader">
+        <div class="crystal"></div>
+        <div class="crystal"></div>
+        <div class="crystal"></div>
+        <div class="crystal"></div>
+        <div class="crystal"></div>
+        <div class="crystal"></div>
+      </div>
+    </div>
+  `;
+
+  const username = currentUser;
+  try {
+    const res = await fetch(`/api/get-student-progress?username=${username}`);
+    const data = await res.json();
+
+    if (data.error || !data[username]) {
+      container.innerHTML = '<p class="error-msg">No data found.</p>';
+      return;
+    }
+
+    const student = data[username];
+    const level = window.currentLevel || "Beginner";
+    const studyDays = student["study_days"] || "-";
+    const midterm = student["midterm-exam"] || "Not Assigned";
+    const final = student["final-exam"] || "Not Assigned";
+
+    container.innerHTML = `
+      <div class="exam-card" style="animation-delay: 0s;">
+        <div class="exam-icon" style="background: linear-gradient(135deg, #007bff, #0056b3);">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="exam-info">
+          <h3>Midterm Exam</h3>
+          <p><strong>Group:</strong> ${level} (${studyDays})</p>
+          <p><strong>Date:</strong> ${midterm}</p>
+        </div>
+      </div>
+      <div class="exam-card" style="animation-delay: 0.15s;">
+        <div class="exam-icon" style="background: linear-gradient(135deg, #dc3545, #a71d2a);">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="exam-info">
+          <h3>Final Exam</h3>
+          <p><strong>Group:</strong> ${level} (${studyDays})</p>
+          <p><strong>Date:</strong> ${final}</p>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<p class="error-msg">Server error. Try again later.</p>';
+  }
+}
+
+const ideaList = document.getElementById('idea-list');
+const ideaForm = document.getElementById('idea-form');
+const toggleButton = document.getElementById('toggle-idea-form');
+const overlay = document.getElementById('idea-overlay');
+const fileInputIdeas = document.querySelector('input[name="media"]');
+const submitButton = ideaForm.querySelector('button[type="submit"]');
+
+// Показываем форму
+toggleButton.onclick = () => {
+  hideNavigation();
+  ideaForm.classList.add('show');
+  ideaForm.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+};
+
+// Скрываем форму
+overlay.onclick = () => {
+  showNavigation();
+  ideaForm.classList.remove('show');
+  ideaForm.classList.add('hidden');
+  overlay.classList.add('hidden');
+};
+
+// Загрузка идей при входе
+async function loadIdeas() {
+  const res = await fetch(`/get_ideas/${currentUser}`);
+  const ideas = await res.json();
+
+  ideaList.innerHTML = '';
+  ideas.reverse().forEach((idea, index) => {
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+
+    const date = new Date(idea.timestamp);
+    const formatted = date.toLocaleString('en-US', {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric'
+    });
+
+    card.innerHTML = `
+      <div class="idea-header">
+        <div class="idea-title">Submission #${index + 1}</div>
+        <span class="idea-status ${idea.status.toLowerCase().replace(' ', '-')}"">${idea.status}</span>
+      </div>
+      <div class="idea-text">${idea.text}</div>
+      ${idea.media ? '<div class="idea-media">Attached file</div>' : ''}
+      <div class="idea-footer">
+        <i class="far fa-calendar-alt"></i>
+        <span>${formatted}</span>
+      </div>
+    `;
+    ideaList.appendChild(card);
+  });
+}
+
+// Отправка формы
+ideaForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData(ideaForm);
+  formData.append('username', currentUser);
+
+  const loader = document.createElement('div');
+  loader.className = 'container-exam-loading';
+  const innerLoader = document.createElement('div');
+  innerLoader.className = 'loader';
+  for (let i = 0; i < 6; i++) {
+    const crystal = document.createElement('div');
+    crystal.className = 'crystal';
+    innerLoader.appendChild(crystal);
+  }
+  const progress = document.createElement('span');
+  progress.className = 'upload-progress';
+  progress.textContent = '0%';
+  loader.appendChild(innerLoader);
+  loader.appendChild(progress);
+  loader.style.display = 'flex';
+  loader.style.flexDirection = 'column';
+  loader.style.alignItems = 'center';
+  loader.style.marginLeft = '10px';
+  fileInputIdeas.parentNode.appendChild(loader);
+
+  submitButton.disabled = true;
+  submitButton.style.pointerEvents = 'none';
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/submit_idea', true);
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      progress.textContent = `${percent}%`;
+    }
+  };
+  xhr.onload = () => {
+    loader.remove();
+    submitButton.disabled = false;
+    submitButton.style.pointerEvents = 'auto';
+    if (xhr.status === 200) {
+      const data = JSON.parse(xhr.responseText);
+      if (data.success) {
+        ideaForm.reset();
+        ideaForm.classList.remove('show');
+        ideaForm.classList.add('hidden');
+        overlay.classList.add('hidden');
+        loadIdeas();
+      }
+    } else {
+      const errorText = xhr.responseText;
+      alert('Submission failed: ' + errorText);
+      console.error('Submit error:', errorText);
+    }
+  };
+  xhr.send(formData);
+};
+
+function loadTasks() {
+  const container = document.getElementById('tasks-container');
+  container.innerHTML = '<p><i class="fas fa-spinner fa-spin icon"></i> Loading tasks...</p>';
+
+  fetch(`/api/tasks-list/${currentUser}`)
+    .then(response => response.json())
+    .then(tasks => {
+      container.innerHTML = '';
+
+      if (tasks.length === 0) {
+        container.innerHTML = '<p><i class="fas fa-exclamation-circle icon"></i> No tasks found.</p>';
+        return;
+      }
+
+      tasks.forEach(task => {
+        const card = document.createElement('div');
+        card.className = 'task-card';
+
+        const deadlineDate = new Date(task.deadline);
+        const id = `timer-${task.id}`;
+
+        const statusIcon = task.completed ? '<i class="fas fa-check icon"></i>' : '<i class="fas fa-clock icon"></i>';
+        const statusText = task.completed ? 'Done' : 'In Progress';
+        const showTimer = !task.completed;
+
+        let claimBtn = '';
+        if (task.completed && !task.claimed) {
+          claimBtn = `<button class="claim-btn" onclick="claimTask(${task.id}, '${task.title}', ${task.reward})"><i class="fas fa-coins icon"></i> Claim ${task.reward} pts</button>`;
+        } else if (task.claimed) {
+          claimBtn = `<p class="claimed-text"><i class="fas fa-check icon"></i> Claimed</p>`;
+        }
+
+        card.innerHTML = `
+          <h3><i class="fas fa-tasks icon"></i> ${task.title}</h3>
+          <p><i class="fas fa-trophy icon"></i> <strong>Reward:</strong> ${task.reward} pts</p>
+          <p><i class="fas fa-calendar-alt icon"></i> <strong>Deadline:</strong> ${task.deadline}</p>
+          <p>${statusIcon} <strong>Status:</strong> ${statusText}</p>
+          ${showTimer ? `<p><i class="fas fa-hourglass-half icon"></i> <strong>Time Left:</strong> <span class="timer" id="${id}"></span></p>` : ''}
+          ${claimBtn}
+        `;
+
+        container.appendChild(card);
+
+        if (showTimer) {
+          startCountdownTasks(deadlineDate, id);
+        }
+      });
+    });
+}
+
+function claimTask(taskId, title, reward) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin icon"></i> Claiming...';
+
+  fetch(`/api/claim-task/${currentUser}/${taskId}`, {
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then(data => {
+      showToastNotification(`Claimed ${reward} pts for "${title}"`);
+      loadTasks();
+    })
+    .catch(err => {
+      showToastNotification("Error claiming reward",'error');
+      console.error(err);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fas fa-coins icon"></i> Claim ${reward} pts`;
+    });
+}
+
+function startCountdownTasks(deadline, elementId) {
+  function updateTimer() {
+    const now = new Date();
+    const diff = deadline - now;
+
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    if (diff <= 0) {
+      el.textContent = "Expired";
+      el.style.color = 'red';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    el.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+    if (diff < 3600000) { // Less than 1 hour
+      el.style.color = 'red';
+    } else if (diff < 86400000) { // Less than 1 day
+      el.style.color = 'orange';
+    } else {
+      el.style.color = 'green';
+    }
+  }
+
+  updateTimer();
+  setInterval(updateTimer, 1000);
+}

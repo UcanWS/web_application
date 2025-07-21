@@ -272,9 +272,11 @@ def get_progress():
     progress = student_data.get("progress", 0)
     start_date = student_data.get("start_date", None)
     study_days = student_data.get("study_days", None)  # Получаем study_days
+    midterm = student_data.get("midterm-exam", None)
+    final = student_data.get("final-exam", None)
 
     # Возвращаем прогресс, start_date и study_days для указанного пользователя
-    return jsonify({current_user: {"progress": progress, "start_date": start_date, "study_days": study_days}})
+    return jsonify({current_user: {"progress": progress, "start_date": start_date, "study_days": study_days,"midterm-exam": midterm, "final-exam": final}})
     
 @app.route('/api/get-student-names', methods=['GET'])
 def get_student_names():
@@ -2976,7 +2978,14 @@ def submit_tasks():
         for sub in items:
             qid = str(sub['id'])
             ans = answers.get(qid, '').strip()
-            correct_answer = str(sub['correct']).strip()
+
+            # Derive correct answer from text for select-options if not provided
+            correct_answer = str(sub.get('correct', '')).strip()
+            if sub.get('type') == 'select-options' and not correct_answer:
+                match = re.search(r'\((.*?)\)', sub.get('text', ''))
+                if match:
+                    options = match.group(1).split('/')
+                    correct_answer = next((opt.strip() for opt in options if '**' in opt), '').replace('**', '').strip()
 
             if not ans:
                 skipped += 1
@@ -3253,122 +3262,6 @@ def mark_messages_as_read(user1, user2):
         }, room=get_room_id(user1, user2))
 
     return jsonify({'status': 'ok', 'updated': updated})
-
-@app.route('/api/lucky_event', methods=['POST'])
-def lucky_event():
-    import numpy as np
-
-    data = request.json
-    username = data.get("username")
-    if not username:
-        return jsonify({"error": "Username is required"}), 400
-
-    SPIN_COST = 1000
-    spins = load_json("spins.json")
-    boxes = load_json("boxes.json")
-    balances = load_balances()
-    transactions = load_transactions()
-
-    spins.setdefault(username, 0)
-    boxes.setdefault(username, {"A": 0, "B": 0, "C": 0})
-    balances.setdefault(username, 0.0)
-    transactions.setdefault(username, [])
-
-    if balances[username] < SPIN_COST:
-        return jsonify({"error": "Insufficient points for a spin."}), 403
-
-    # Update spin
-    balances[username] -= SPIN_COST
-    spins[username] += 1
-    spin_number = spins[username]
-
-    def add_tx(amount, desc):
-        transactions[username].append({
-            "id": str(uuid.uuid4()),
-            "amount": amount,
-            "description": desc,
-            "time": (datetime.utcnow() + timedelta(hours=5)).isoformat(),
-            "balance_before": balances[username] + (abs(amount) if amount < 0 else 0),
-            "can_cancel": False
-        })
-
-    add_tx(-SPIN_COST, "🎰 Lucky Spin")
-
-    # ⚙️ Псевдослучайная таблица шансов
-    reward_pool = [
-        {"type": "mega",   "chance": 1.5,  "min": 5000, "max": 15000},  # редкий эпик
-        {"type": "big",    "chance": 4.0,  "min": 1000, "max": 4000},   # мощный выигрыш
-        {"type": "mid",    "chance": 10.0, "min": 200,  "max": 900},    # средний
-        {"type": "small",  "chance": 16.0, "min": 20,   "max": 199},    # часто
-        {"type": "almost", "chance": 20.0, "min": 0,    "max": 0},      # почти выиграл
-        {"type": "none",   "chance": 48.5, "min": 0,    "max": 0}       # ничего
-    ]
-
-    choices = [r["type"] for r in reward_pool]
-    probs = [r["chance"] for r in reward_pool]
-    reward_type = np.random.choice(choices, p=np.array(probs) / sum(probs))
-    won = 0
-    got_ball = False
-    winning_box = None
-
-    if reward_type in ("mega", "big", "mid", "small"):
-        reward_range = next(r for r in reward_pool if r["type"] == reward_type)
-        won = random.randint(reward_range["min"], reward_range["max"])
-        balances[username] += won
-        add_tx(won, f"💥 Spin Win ({reward_type.upper()})")
-
-    # 🎯 "Почти выиграл" — можно показывать визуализацию почти-выпавшего приза
-    elif reward_type == "almost":
-        pass  # Ничего не добавляем — будет просто эффект на фронте
-
-    # 💎 Каждые 10 спинов — шанс на шар
-    if spin_number % 10 == 0:
-        got_ball = True
-        box = random.choice(["A", "B", "C"])
-        boxes[username][box] += 1
-        if boxes[username][box] >= 3:
-            jackpot = random.randint(10000, 30000)
-            balances[username] += jackpot
-            add_tx(jackpot, f"🎁 Lucky Box Win ({box})")
-            boxes[username] = {"A": 0, "B": 0, "C": 0}
-            reward_type = "jackpot"
-            won = jackpot
-            winning_box = box
-
-    # Save
-    store_json("spins.json", spins)
-    store_json("boxes.json", boxes)
-    store_balances(balances)
-    store_transactions(transactions)
-
-    return jsonify({
-        "spin_count": spins[username],
-        "got_ball": got_ball,
-        "ball_box": box if got_ball else None,
-        "current_boxes": boxes[username],
-        "won": won,
-        "reward_type": reward_type,
-        "winning_box": winning_box,
-        "new_balance": balances[username]
-    })
-
-    
-@app.route('/api/spin_state', methods=['POST'])
-def get_spin_state():
-    data = request.json
-    username = data.get('username')
-    if not username:
-        return jsonify({"error": "Username required"}), 400
-
-    spins = load_json("spins.json")
-    boxes = load_json("boxes.json")
-    spins.setdefault(username, 0)
-    boxes.setdefault(username, {"A": 0, "B": 0, "C": 0})
-
-    return jsonify({
-        "spin_count": spins[username],
-        "current_boxes": boxes[username]
-    })
     
 @app.route('/api/risk_ladder', methods=['POST'])
 def risk_ladder():
@@ -3745,8 +3638,8 @@ def leaderboard_strikes():
 
 @app.route('/api/get-results/average', methods=['GET'])
 def get_results_average():
-    level    = request.args.get('level')
-    unit     = request.args.get('unit')
+    level = request.args.get('level')
+    unit = request.args.get('unit')
     username = request.args.get('username')
 
     if not level or not unit:
@@ -3770,38 +3663,43 @@ def get_results_average():
     for user, tasks in submissions.items():
         percents = []
 
-        if isinstance(tasks, dict):
-            for key, value in tasks.items():
-                # пропускаем категории-экзамены
-                if 'exam' in key.lower():
-                    continue
-                # если под записью dict с percent
-                if isinstance(value, dict) and 'percent' in value:
-                    try:
-                        percents.append(float(value['percent']))
-                    except (ValueError, TypeError):
-                        pass
-                # если запись сама число/строка
-                elif isinstance(value, (int, float, str)):
-                    try:
-                        percents.append(float(value))
-                    except (ValueError, TypeError):
-                        pass
+        # Check each task in all_files
+        for task_file in all_files:
+            task_key = os.path.splitext(task_file)[0]  # Remove .json extension
+            percent = 0.0  # Default to 0% for unsubmitted tasks
 
-        elif isinstance(tasks, list):
-            for item in tasks:
-                if isinstance(item, dict) and 'percent' in item:
-                    try:
-                        percents.append(float(item['percent']))
-                    except (ValueError, TypeError):
-                        pass
+            if isinstance(tasks, dict):
+                # Handle case where tasks is a dictionary
+                if task_key in tasks:
+                    value = tasks[task_key]
+                    if isinstance(value, dict) and 'percent' in value:
+                        try:
+                            percent = float(value['percent'])
+                        except (ValueError, TypeError):
+                            percent = 0.0
+                    elif isinstance(value, (int, float, str)):
+                        try:
+                            percent = float(value)
+                        except (ValueError, TypeError):
+                            percent = 0.0
+            elif isinstance(tasks, list):
+                # Handle case where tasks is a list
+                for item in tasks:
+                    if isinstance(item, dict) and 'percent' in item and item.get('task') == task_key:
+                        try:
+                            percent = float(item['percent'])
+                        except (ValueError, TypeError):
+                            percent = 0.0
+                        break
 
-        submitted_count = len(percents)
-        total_percent   = sum(percents)
-        average_percent = (total_percent / total_tasks) if total_tasks > 0 else 0
+            percents.append(percent)
+
+        submitted_count = sum(1 for p in percents if p > 0)  # Count non-zero submissions
+        total_percent = sum(percents)
+        average_percent = (total_percent / total_tasks) if total_tasks > 0 else 0.0
 
         result[user] = {
-            "average_percent": average_percent,
+            "average_percent": round(average_percent, 2),  # Round for cleaner output
             "submitted_count": submitted_count,
             "total_tasks": total_tasks
         }
@@ -3869,7 +3767,6 @@ client = genai.GenerativeModel('gemini-2.5-flash')
 
 @app.route('/api/submit-writing-task', methods=['POST'])
 def submit_writing_task():
-    time.sleep(1)  # Simulate processing delay
     try:
         data = request.get_json(force=True)
         if not data:
@@ -3906,7 +3803,7 @@ def submit_writing_task():
         if user_results.get(title, {}).get('submitted'):
             return jsonify({'success': False, 'error': f"'{title}' already submitted"}), 403
 
-        topic = questions[0].get('text', 'Write an essay on a given topic. Aim for 30-200 words.')
+        topic = questions[0].get('text', 'Write an essay on a given topic. Aim for 30+ words.')
         print(f'[Writing] Topic used for evaluation: {topic}')
 
         prompt = (
@@ -4030,7 +3927,147 @@ def submit_writing_task():
             'error': 'Internal server error'
         }), 500
 
+IDEAS_FOLDER = 'data/ideas/files'       # Папка для загрузки файлов
+IDEAS_DATA = 'data/ideas'               # Папка для хранения JSON
+
+os.makedirs(IDEAS_FOLDER, exist_ok=True)
+os.makedirs(IDEAS_DATA, exist_ok=True)
+
+@app.route('/submit_idea', methods=['POST'])
+def submit_idea():
+    username = request.form.get('username')  # Получаем имя из запроса
+    if not username:
+        return jsonify({"error": "Username required"}), 400
+
+    text = request.form.get('text', '').strip()
+    file = request.files.get('media')
+    filename = None
+
+    if file:
+        filename = datetime.now().strftime('%Y%m%d%H%M%S_') + secure_filename(file.filename)
+        file_path = os.path.join(IDEAS_FOLDER, filename)
+        file.save(file_path)
+
+    idea = {
+        "text": text,
+        "media": f"/get_file/{filename}" if filename else None,
+        "timestamp": datetime.now().isoformat(),
+        "status": "In review"
+    }
+
+    user_file = os.path.join(IDEAS_DATA, f"{username}.json")
+    ideas = []
+    if os.path.exists(user_file):
+        with open(user_file, 'r', encoding='utf-8') as f:
+            ideas = json.load(f)
+
+    ideas.append(idea)
+
+    with open(user_file, 'w', encoding='utf-8') as f:
+        json.dump(ideas, f, ensure_ascii=False, indent=2)
+
+    return jsonify({"success": True})
+
+@app.route('/get_ideas/<username>')
+def get_ideas(username):
+    user_file = os.path.join(IDEAS_DATA, f"{username}.json")
+    if os.path.exists(user_file):
+        with open(user_file, 'r', encoding='utf-8') as f:
+            return jsonify(json.load(f))
+    return jsonify([])
+
+@app.route('/get_file/<filename>')
+def get_file(filename):
+    return send_from_directory(IDEAS_FOLDER, filename)
     
+DATA_PACK_TASKS = 'data/tasks'  # заменили BASE_DIR
+
+def get_task_file_path(username):
+    return os.path.join(DATA_PACK_TASKS, username, 'task-list.json')
+
+def load_tasks(username):
+    path = get_task_file_path(username)
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+def save_tasks(username, tasks):
+    user_dir = os.path.join(DATA_PACK_TASKS, username)
+    os.makedirs(user_dir, exist_ok=True)
+    with open(get_task_file_path(username), 'w', encoding='utf-8') as f:
+        json.dump(tasks, f, indent=2, ensure_ascii=False)
+
+@app.route('/api/tasks-list/<username>', methods=['GET'])
+def get_tasks(username):
+    tasks = load_tasks(username)
+    return jsonify(tasks), 200
+
+@app.route('/api/task-status/<username>', methods=['GET'])
+def get_task_status(username):
+    tasks = load_tasks(username)
+    total = len(tasks)
+    completed = sum(1 for t in tasks if t.get('completed') == True)
+    pending = total - completed
+    return jsonify({
+        "total": total,
+        "completed": completed,
+        "pending": pending
+    }), 200
+
+@app.route('/api/create-task/<username>', methods=['POST'])
+def create_task(username):
+    data = request.json
+    required_fields = ['title', 'deadline', 'reward']
+
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    try:
+        reward_points = int(data['reward'])
+    except ValueError:
+        return jsonify({"error": "Reward must be a number (e.g., 700)"}), 400
+
+    tasks = load_tasks(username)
+
+    new_task = {
+        "id": len(tasks) + 1,
+        "title": data['title'],
+        "deadline": data['deadline'],
+        "reward": reward_points,
+        "created_at": datetime.now().isoformat(),
+        "completed": False,
+        "claimed": False
+    }
+
+    tasks.append(new_task)
+    save_tasks(username, tasks)
+    return jsonify({"message": "Task created", "task": new_task}), 201
+
+@app.route('/api/claim-task/<username>/<int:task_id>', methods=['POST'])
+def claim_task(username, task_id):
+    tasks = load_tasks(username)
+
+    for task in tasks:
+        if task['id'] == task_id:
+            if not task.get('completed'):
+                return jsonify({"error": "Task not completed"}), 400
+            if task.get('claimed'):
+                return jsonify({"error": "Reward already claimed"}), 400
+
+            task['claimed'] = True
+            save_tasks(username, tasks)
+
+            # Вызов твоей функции
+            result = add_transaction_internal(
+                username,
+                task['reward'],
+                f"Claimed reward for task: {task['title']}"
+            )
+            return jsonify(result), 200
+
+    return jsonify({"error": "Task not found"}), 404
+
         
 if __name__ == '__main__':
     # Отключаем use_reloader, чтобы не пытаться читать WERKZEUG_SERVER_FD
@@ -4039,6 +4076,6 @@ if __name__ == '__main__':
         host='0.0.0.0',
         port=5000,
         debug=True,
-        use_reloader=False
+        use_reloader=True
     )
 

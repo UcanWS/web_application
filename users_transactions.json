@@ -287,6 +287,70 @@
             "description": "Reward for completing 'Listening Tasks' with 100%",
             "time": "2025-07-18T17:24:46.049041",
             "balance_before": 100566753.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Listening Tasks' with 100%",
+            "time": "2025-07-20T02:22:24.915646",
+            "balance_before": 100566853.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Fun Video' with 100%",
+            "time": "2025-07-20T20:20:26.333409",
+            "balance_before": 100566953.0
+        },
+        {
+            "id": "1872e72d-773d-4caf-b92d-51987412ba19",
+            "amount": -1000,
+            "description": "\ud83c\udfb0 Lucky Spin",
+            "time": "2025-07-20T21:09:18.193951",
+            "balance_before": 100567053.0,
+            "can_cancel": false
+        },
+        {
+            "id": "458cb627-3c12-4565-a27e-9a721113a34f",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-20T21:09:31.443099",
+            "balance_before": 100566053.0,
+            "can_cancel": false
+        },
+        {
+            "id": "6bdb2491-5bfb-415a-95b3-7158d50c1e94",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-20T21:13:31.975475",
+            "balance_before": 100562553.0,
+            "can_cancel": false
+        },
+        {
+            "id": "cc2127c0-fe58-4767-8e83-53fa7ff3b3bb",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-20T21:13:45.486028",
+            "balance_before": 100559053.0,
+            "can_cancel": false
+        },
+        {
+            "id": "75f78697-fbb9-4eb7-a0cc-6bc642531520",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-20T21:17:14.956931",
+            "balance_before": 100556553.0,
+            "can_cancel": false
+        },
+        {
+            "amount": 700,
+            "description": "Claimed reward for task: Write essay",
+            "time": "2025-07-21T16:05:03.615707",
+            "balance_before": 100553053.0
+        },
+        {
+            "amount": 700,
+            "description": "Claimed reward for task: Write essay",
+            "time": "2025-07-21T16:20:29.804933",
+            "balance_before": 100553753.0
         }
     ],
     "Muhammadali": [

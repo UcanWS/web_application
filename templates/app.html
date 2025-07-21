@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link rel="stylesheet" href="/static/styles/app.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -113,7 +115,7 @@
 
 
 <!-- Actual Progress Content (initially hidden) -->
-  <div id="progress-card" class="progress-card">
+  <div id="progress-card" style="display:none;" class="progress-card">
     <div class="progress-view level">
       <div class="value" id="current-level-value">Level</div>
       <div class="label" id="next-level-label">Next Level: </div>
@@ -150,6 +152,21 @@
       <div class="value" id="strike-value">-- day</div>
     </div>
   </div>
+  
+
+<div class="services-wrapper">
+  <div class="services-container">
+    <div class="service-card" onclick="showPage('exams')">
+      <i class="fas fa-graduation-cap"></i>
+      <span>Final Exams</span>
+    </div>
+	<div class="service-card" onclick="showPage('tasks')">
+  <i class="fas fa-tasks"></i>
+  <span>Tasks</span>
+</div>
+
+  </div>
+</div>
   
   <div class="informations-blocks">
     <div class="carousel">
@@ -199,6 +216,17 @@
   <div id="leaderboard-container"></div>
 </div>
 
+<div id="tasks" class="page">
+ <div id="tasks-container"></div>
+</div>
+
+
+<div id="exams" class="page">
+
+<div id="exams-container"></div>
+
+</div>
+
 <div id="strikes-page" class="page hidden">
   <div class="strike-summary">
     <div class="strike-info">
@@ -237,50 +265,6 @@
   <button class="transfer-btn" onclick="submitTransfer()">
     <i class="fas fa-arrow-right"></i> Send Points
   </button>
-</div>
-
-<div id="lucky-spin-wrapper" class="lucky-glass-wrapper">
-  <div class="glass-card">
-    <h2 class="spin-title"><i class="fas fa-gift"></i> Lucky Spin</h2>
-    <p class="cost-text"><i class="fas fa-coins"></i> Each spin costs <strong class="highlight">500 pts</strong></p>
-
-    <button id="luckySpinBtn" class="glass-btn">
-      <i class="fas fa-magic"></i> Spin Now
-    </button>
-    <p id="spin-counter" class="spin-info"><i class="fas fa-undo"></i> Spins: 0 / 10</p>
-    <p class="reward-hint"><i class="fas fa-info-circle"></i> Rewards vary from <strong>0 – 15,000 pts</strong>. Mega spins possible!</p>
-
-    <div class="box-container">
-      <div class="box glass-box" id="box-A">
-        <div class="box-label"><i class="fas fa-box"></i> Box A</div>
-        <div class="balls"></div>
-      </div>
-      <div class="box glass-box" id="box-B">
-        <div class="box-label"><i class="fas fa-box"></i> Box B</div>
-        <div class="balls"></div>
-      </div>
-      <div class="box glass-box" id="box-C">
-        <div class="box-label"><i class="fas fa-box"></i> Box C</div>
-        <div class="balls"></div>
-      </div>
-    </div>
-
-    <div class="reward-history glass-card">
-      <h3><i class="fas fa-history"></i> Recent Spin History</h3>
-      <ul id="history-list" class="history-list"></ul>
-    </div>
-
-    <div class="faq-section">
-      <h3><i class="fas fa-question-circle"></i> How It Works</h3>
-      <ul>
-        <li><strong>500 pts per spin</strong></li>
-        <li>Every 10 spins = 1 ball in a random box</li>
-        <li>3 balls in one box = Jackpot (10,000–30,000 pts)</li>
-        <li>Other prizes: small, mid, big, mega spins</li>
-        <li>Watch out for fake "almost won" moments 😬</li>
-      </ul>
-    </div>
-  </div>
 </div>
 
  <div class="risk-ladder glass-card">
@@ -510,7 +494,7 @@
   <header id="todaytasks-header" class="page-header">
     <div>
       <h1 id="header-today">Today’s Tasks</h1>
-      <p id="todaytasks-unit">Unit 1.1</p>
+      <p id="todaytasks-unit">Unit</p>
     </div>
     <button id="finish-tasks-btn" class="btn btn-primary">
       Finish Tasks
@@ -771,17 +755,41 @@
         <span id="balance-status">Paid</span>
       </div>
 <!-- Upload Files Section -->
-<div class="upload-section" onclick="document.getElementById('upload-file-input').click()" title="Upload Files">
+<div class="upload-section" onclick="showPage('upload');" title="Upload Files">
   <div class="upload-info">
-    <div class="shop-title-main"> Upload Files <i class="fas fa-chevron-right"></i> </div>
-    <div class="shop-subtext">To buy items, earn points<br>send bugs and earn points.</div>
+    <div class="shop-title-main">
+      Upload Files <i class="fas fa-chevron-right"></i>
+    </div>
+    <div class="shop-subtext">
+      To buy items, earn points<br>send bugs and earn points.
+    </div>
   </div>
-  <input type="file" id="upload-file-input" style="display: none;" accept=".zip,image/*,video/*">
 </div>
+
 
 
     </div>
   </div>
+
+<!-- Upload Page -->
+<!-- Upload Page -->
+<div id="upload" class="page">
+  <div class="suggestions-header">Suggestions</div>
+
+  <div id="idea-list"></div>
+
+  <button id="toggle-idea-form" class="new-idea-button">Send New Idea</button>
+
+<div id="idea-overlay" class="idea-overlay hidden"></div>
+
+<form id="idea-form" enctype="multipart/form-data" class="idea-form hidden">
+  <textarea name="text" placeholder="Describe your idea or bug..." required></textarea>
+  <input type="file" name="media" accept="image/*,video/*" />
+  <button type="submit">Submit</button>
+</form>
+
+</div>
+
 
 
 

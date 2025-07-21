@@ -751,5 +751,211 @@
                 }
             ]
         }
+    },
+    "Abdulmalik": {
+        "Reading Tasks": {
+            "submitted": true,
+            "time": "2025-07-18 17:17:25",
+            "correct": 3,
+            "incorrect": 2,
+            "skipped": 0,
+            "total": 5,
+            "percent": 60.0,
+            "details": [
+                {
+                    "question_id": "3.1",
+                    "text": "Why do people need sleep?",
+                    "user_answer": "To help the body and brain rest",
+                    "correct_answer": "To help the body and brain rest",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.2",
+                    "text": "When do most people sleep?",
+                    "user_answer": "At night",
+                    "correct_answer": "At night",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.3",
+                    "text": "How many hours of sleep do adults need?",
+                    "user_answer": "7 to 9 hours",
+                    "correct_answer": "7 to 9 hours",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.4",
+                    "text": "What can help you relax before bed?",
+                    "user_answer": "Using your phone",
+                    "correct_answer": "Reading a book",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.5",
+                    "text": "What can happen if you don’t sleep enough?",
+                    "user_answer": "You feel happy",
+                    "correct_answer": "You feel tired or sick",
+                    "is_correct": false
+                }
+            ]
+        },
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-18 17:25:32",
+            "correct": 11,
+            "incorrect": 9,
+            "skipped": 1,
+            "total": 21,
+            "percent": 52.38095238095239,
+            "details": [
+                {
+                    "question_id": "5.1",
+                    "text": "It’s a pen.",
+                    "user_answer": "",
+                    "correct_answer": "It’s",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "____ you from Germany?",
+                    "user_answer": "where",
+                    "correct_answer": "Are",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "He ____ an engineer. He’s a teacher.",
+                    "user_answer": "is'nt",
+                    "correct_answer": "isn’t",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.4",
+                    "text": "Hi, I ____ Sophie.",
+                    "user_answer": "'m",
+                    "correct_answer": "’m",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.5",
+                    "text": "____ she a student?",
+                    "user_answer": "Is",
+                    "correct_answer": "Is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.6",
+                    "text": "We ____ on holiday. We’re on business.",
+                    "user_answer": "'re",
+                    "correct_answer": "aren’t",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.1",
+                    "text": "____'s your name?",
+                    "user_answer": "what",
+                    "correct_answer": "What",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.2",
+                    "text": "____ are you from?",
+                    "user_answer": "where",
+                    "correct_answer": "Where",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.3",
+                    "text": "____ do you spell 'clock'?",
+                    "user_answer": "how",
+                    "correct_answer": "How",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.4",
+                    "text": "____’s that?",
+                    "user_answer": "who",
+                    "correct_answer": "Who",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.5",
+                    "text": "____'s this in English?",
+                    "user_answer": "what",
+                    "correct_answer": "What",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "7.1",
+                    "text": "A What are this / these?\nB They're apples.",
+                    "user_answer": "these",
+                    "correct_answer": "these",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "7.2",
+                    "text": "A Who’s that / those?\nB It’s Sam.",
+                    "user_answer": "that",
+                    "correct_answer": "that",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "7.3",
+                    "text": "A What are those buildings?\nB It's / They’re the Parliament Buildings.",
+                    "user_answer": "They’re",
+                    "correct_answer": "They’re",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "7.4",
+                    "text": "A What’s this / these?\nB It's a tablet.",
+                    "user_answer": "this",
+                    "correct_answer": "this",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "7.5",
+                    "text": "A Who are that / those people?\nB They're students.",
+                    "user_answer": "those",
+                    "correct_answer": "those",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "8.1",
+                    "text": "John’s a waiter. ____",
+                    "user_answer": "He's a waiter.",
+                    "correct_answer": "He’s a waiter.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.2",
+                    "text": "George and Millie are friends. ____",
+                    "user_answer": "Rhe are friends.",
+                    "correct_answer": "They’re friends.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.3",
+                    "text": "Jakarta's in Indonesia. ____",
+                    "user_answer": "He's ib Ibdonesia.",
+                    "correct_answer": "It’s in Indonesia.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.4",
+                    "text": "Laura's from Australia. ____",
+                    "user_answer": "She's from Australia.",
+                    "correct_answer": "She’s from Australia.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "8.5",
+                    "text": "You and Robbie are late. ____",
+                    "user_answer": "The are late.",
+                    "correct_answer": "You’re late.",
+                    "is_correct": false
+                }
+            ]
+        }
     }
 }

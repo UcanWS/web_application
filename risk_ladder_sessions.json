@@ -1,8 +1,8 @@
 {
   "Muhammadiso": {
-    "level": 0,
-    "potential_reward": 0,
-    "active": false
+    "level": 3,
+    "potential_reward": 3500,
+    "active": true
   },
   "Muhammadali": {
     "level": 0,
