@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from flask import send_from_directory, make_response
 import numpy as np
+from flask_mail import Mail, Message
 
 # Initialize app and socket
 app = Flask(__name__)
@@ -2018,6 +2019,96 @@ def reactivate_user(username):
 
 
 from device_detector import DeviceDetector
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'terminatorkashey@gmail.com'
+app.config['MAIL_PASSWORD'] = 'nhqi etio crcy xquk'  # Вставь App Password сюда
+app.config['MAIL_DEFAULT_SENDER'] = 'terminatorkashey@gmail.com'
+
+mail = Mail(app)
+
+
+# Генерация 6-значного кода
+def generate_code():
+    return str(random.randint(100000, 999999))
+
+def get_email_by_username(username):
+    with open("data/users-settings.json", "r") as f:
+        data = json.load(f)
+    return data.get(username)
+
+def mask_email(email):
+    local, domain = email.split("@")
+    return f"{local[0]}{'*'*(len(local)-2)}{local[-1]}@{domain}"
+
+
+# 🔹 Отправка 2FA кода
+@app.route("/send-2fa-email", methods=["POST"])
+def send_2fa_email():
+    data = request.json
+    username = data.get("username")
+    email = get_email_by_username(username)
+
+    session["2fa_user"] = username  # ✅ Всегда устанавливаем пользователя
+
+    if not email:
+        return jsonify({"skip_2fa": True})  # ✅ Пропустить 2FA, если нет email
+
+    code = str(random.randint(100000, 999999))
+    session["2fa_code"] = code
+    session["2fa_expire"] = time.time() + 300  # 5 минут
+
+    msg = Message("Your OTP Code", recipients=[email])
+    msg.body = f"Your one-time password is: {code}"
+    mail.send(msg)
+
+    return jsonify({"message": "OTP sent", "masked_email": mask_email(email)})
+
+
+
+
+# 🔹 Проверка 2FA кода
+@app.route("/verify-2fa-code", methods=["POST"])
+def verify_2fa_code():
+    data = request.json
+    input_code = data.get("code")
+    username = session.get("2fa_user")
+    correct_code = session.get("2fa_code")
+    expire_time = session.get("2fa_expire")
+
+    if not username:
+        return jsonify({"error": "No 2FA session"}), 400
+
+    # Проверка: если у пользователя нет email или пароль == "111111", пропустить 2FA
+    email = get_email_by_username(username)
+    temp_password = request.cookies.get("tempPassword") or "unknown"
+
+    if not email or temp_password == "111111":
+        session["username"] = username
+        session.pop("2fa_code", None)
+        session.pop("2fa_user", None)
+        session.pop("2fa_expire", None)
+        return jsonify({"success": True})
+
+    # Стандартная проверка
+    if not correct_code or not expire_time:
+        return jsonify({"error": "Invalid 2FA session"}), 400
+
+    if time.time() > expire_time:
+        return jsonify({"error": "Code expired"}), 401
+
+    if input_code == correct_code:
+        session.pop("2fa_code", None)
+        session.pop("2fa_user", None)
+        session.pop("2fa_expire", None)
+        session["username"] = username
+        return jsonify({"success": True})
+    else:
+        return jsonify({"error": "Invalid code"}), 401
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def handle_login():
@@ -4067,6 +4158,139 @@ def claim_task(username, task_id):
             return jsonify(result), 200
 
     return jsonify({"error": "Task not found"}), 404
+
+waiting_players = {}
+
+# Активные игры: {game_id: {'players': [id1, id2], 'prize': ...}}
+games = {}
+
+
+GAMES_FILE = "data/games.json"
+
+def save_games():
+    with open(GAMES_FILE, "w") as f:
+        json.dump(games, f, indent=2)
+# --- Socket.IO логика ---
+@socketio.on('join')
+def handle_join(user_id):
+    join_room(user_id)
+    print(f"[SocketIO] User joined room: {user_id}")
+
+# --- API: начать поиск ---
+@app.route('/api/game-start-searching', methods=['POST'])
+def game_start_searching():
+    data = request.json
+    user_id = data['id']
+    name = data['name']
+    prize = data['prize']
+
+    waiting_players[user_id] = {"name": name, "prize": prize}
+
+    # Попробовать найти соперника
+    if len(waiting_players) >= 2:
+        ids = list(waiting_players.keys())[:2]
+        p1, p2 = ids[0], ids[1]
+        game_id = str(uuid.uuid4())
+
+        games[game_id] = {
+            "players": [p1, p2],
+            "prize": prize,
+            "names": {
+                p1: waiting_players[p1]['name'],
+                p2: waiting_players[p2]['name']
+            }
+        }
+
+        # удалить из очереди
+        del waiting_players[p1]
+        del waiting_players[p2]
+
+        # уведомить игроков
+        for pid in [p1, p2]:
+            socketio.emit("game_found", {
+                "game_id": game_id,
+                "players": [p1, p2],
+                "prize": prize
+            }, to=pid)
+
+    return jsonify({"status": "searching"})
+
+@app.route("/api/game-process", methods=["POST"])
+def game_process():
+    data = request.json
+    game_id = data.get("game_id")
+    if not game_id:
+        return jsonify({"error": "Missing game_id"}), 400
+
+    game = games.get(game_id)
+    if not game:
+        return jsonify({"error": "Game not found"}), 404
+
+    # Уже есть результат
+    if "result" in game:
+        return jsonify({"status": "already_processed"}), 200
+
+    # Генерация шансов и победителя
+    p1, p2 = game["players"]
+    name1 = game["names"][p1]
+    name2 = game["names"][p2]
+
+    percent1 = random.randint(1, 99)
+    percent2 = 100 - percent1
+    chances = {name1: percent1, name2: percent2}
+    winner = name1 if percent1 > percent2 else name2
+    loser = name2 if winner == name1 else name1
+
+    prize = game.get("prize", 0)
+    if not isinstance(prize, (int, float)) or prize <= 0:
+        return jsonify({"error": "Invalid prize"}), 400
+
+    # Добавляем транзакции
+    winner_tx = add_transaction_internal(
+        username=winner,
+        amount=prize,
+        description=f"🏆 Prize from game {game_id}"
+    )
+    loser_tx = add_transaction_internal(
+        username=loser,
+        amount=-prize,
+        description=f"❌ Lost prize for game {game_id}"
+    )
+
+    result = {
+        "chances": chances,
+        "winner": winner,
+        "prize": prize,
+        "transaction": {
+            "winner": winner_tx,
+            "loser": loser_tx
+        }
+    }
+
+    game["result"] = result
+    save_games()
+
+    return jsonify({"status": "processed"}), 200
+
+
+
+@app.route("/api/game-result", methods=["GET"])
+def game_result():
+    game_id = request.args.get("game_id")
+
+    if not game_id:
+        return jsonify({"error": "Missing game_id"}), 400
+
+    game = games.get(game_id)
+    if not game:
+        return jsonify({"error": "Game not found"}), 404
+
+    if "result" not in game:
+        return jsonify({"status": "not_ready"}), 200
+
+    return jsonify(game["result"]), 200
+
+
 
         
 if __name__ == '__main__':

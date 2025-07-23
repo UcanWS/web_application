@@ -3176,7 +3176,7 @@ async function renderTasksSection() {
     }
     const avgPercent = Math.min(Math.round(userAvg.average_percent), 100);
     const submittedCount = userAvg.submitted_count || 0;
-    const totalTasks = userAvg.total_tasks || 8;
+    const totalTasks = userAvg.total_tasks || 0;
 
     const title = document.createElement('span');
     title.className = 'average-progress-title';
@@ -6413,4 +6413,193 @@ function startCountdownTasks(deadline, elementId) {
 
   updateTimer();
   setInterval(updateTimer, 1000);
+}
+
+let playerId = currentUser;
+let playerName = currentUser;
+let currentGameId = null;
+let searchTime = 0;
+let searchInterval = null;
+let prize = null;
+let resultPolling = null;
+
+socket.on("connect", () => {
+  console.log("✅ Socket connected:", socket.id);
+  socket.emit("join", playerId);
+});
+
+socket.on("game_found", (data) => {
+  if (data.players.includes(playerId)) {
+    onGameFound(data);
+  }
+});
+
+function openGameSearch() {
+  showPage("game");
+  showGameSection("searching");
+}
+
+function showGameSection(sectionId) {
+  const sections = ["searching", "game-found", "game-ui"];
+  sections.forEach((id) => {
+    const section = document.getElementById(id);
+    section.style.display = id === sectionId ? "block" : "none";
+    if (id === "game-found" && sectionId === "game-found") {
+      section.classList.add("game-found-shake");
+      setTimeout(() => section.classList.remove("game-found-shake"), 500);
+    }
+  });
+  showPage("game");
+}
+
+function startGameSearch() {
+  const prizeInput = document.getElementById("prize-input");
+  prize = prizeInput.value.trim();
+
+  if (!prize || isNaN(prize) || Number(prize) <= 0) {
+    showError("Please enter a valid prize amount.");
+    return;
+  }
+
+  document.getElementById("search-status").textContent = "Searching for opponent...";
+  showGameSection("searching");
+  document.getElementById("search-controls").style.display = "none";
+  document.getElementById("search-timer-container").style.display = "block";
+  document.getElementById("searching").classList.add("searching-pulse");
+
+  fetch("/api/game-start-searching", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id: playerId,
+      name: playerName,
+      prize: Number(prize),
+    }),
+  })
+    .then((res) => res.json())
+    .then(() => {
+      startSearchTimer();
+    })
+    .catch((err) => {
+      console.error("Search error:", err);
+      showError("Failed to start search. Try again.");
+      document.getElementById("search-controls").style.display = "block";
+      document.getElementById("searching").classList.remove("searching-pulse");
+    });
+}
+
+function startSearchTimer() {
+  searchTime = 0;
+  const timerElem = document.getElementById("search-timer");
+  timerElem.textContent = searchTime;
+  searchInterval = setInterval(() => {
+    searchTime++;
+    timerElem.textContent = searchTime;
+  }, 1000);
+}
+
+function showError(message) {
+  const errorDiv = document.createElement("div");
+  errorDiv.className = "error-message";
+  errorDiv.textContent = message;
+  document.getElementById("searching").appendChild(errorDiv);
+  errorDiv.classList.add("error-shake");
+  setTimeout(() => errorDiv.remove(), 3000);
+}
+
+function playMatchFoundSound() {
+  const audio = new Audio("/static/music/match-found.wav");
+  audio.volume = 1.0;
+  audio.play().catch((err) => console.warn("Autoplay failed:", err));
+}
+
+function onGameFound(data) {
+  clearInterval(searchInterval);
+  currentGameId = data.game_id;
+  showGameSection("game-found");
+  playMatchFoundSound();
+  document.getElementById("game-found").classList.add("game-found-pulse");
+
+  let countdown = 7;
+  const countdownElem = document.getElementById("countdown");
+  countdownElem.textContent = countdown;
+
+  const countdownInterval = setInterval(() => {
+    countdown--;
+    countdownElem.textContent = countdown;
+    countdownElem.classList.add("countdown-pulse");
+    setTimeout(() => countdownElem.classList.remove("countdown-pulse"), 500);
+    if (countdown === 0) {
+      clearInterval(countdownInterval);
+      showGameSection("game-ui");
+      document.getElementById("game-ui").classList.add("game-ui-slide");
+      runGameProcess();
+    }
+  }, 1000);
+}
+
+function runGameProcess() {
+  document.getElementById("game-status").textContent = "🎯 Processing result...";
+
+  fetch("/api/game-process", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ game_id: currentGameId }),
+  })
+    .then((res) => res.json())
+    .then(() => {
+      startResultPolling(); // 👈 теперь получаем результат отдельно
+    })
+    .catch((err) => {
+      console.error("Game process fetch failed:", err);
+      document.getElementById("game-status").textContent = "❌ Error occurred.";
+    });
+}
+
+function startResultPolling() {
+  resultPolling = setInterval(() => {
+    fetch(`/api/game-result?game_id=${currentGameId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "not_ready") return;
+
+        clearInterval(resultPolling);
+
+        const chances = data.chances || {};
+        const chanceText = Object.entries(chances)
+          .map(([name, percent]) => `${name}: ${percent}%`)
+          .join("<br>");
+
+        document.getElementById("chance-display").innerHTML = `
+          <p class="chance-animation">${chanceText}</p>
+        `;
+        document.getElementById("winner-display").innerHTML = `
+          <p class="winner-animation">🏆 <strong>${data.winner}</strong> wins <strong>${data.prize}</strong></p>
+        `;
+      })
+      .catch((err) => {
+        console.error("Result polling failed:", err);
+      });
+  }, 2000); // каждые 2 секунды
+}
+
+function clearGameUI() {
+  if (searchInterval) {
+    clearInterval(searchInterval);
+    searchInterval = null;
+  }
+  if (resultPolling) {
+    clearInterval(resultPolling);
+    resultPolling = null;
+  }
+
+  document.getElementById("game-status").textContent = "";
+  document.getElementById("chance-display").innerHTML = "";
+  document.getElementById("winner-display").innerHTML = "";
+  document.getElementById("prize-input").value = "";
+  document.getElementById("search-status").textContent = "";
+  document.getElementById("search-timer-container").style.display = "none";
+  document.getElementById("search-controls").style.display = "block";
+  document.getElementById("searching").classList.remove("searching-pulse");
+  showGameSection("searching");
 }

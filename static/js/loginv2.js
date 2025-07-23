@@ -95,6 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
     manageModal.classList.add("hidden");
   });
 
+
+
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   showGlobalLoader();
@@ -119,28 +121,26 @@ loginForm.addEventListener("submit", async (e) => {
     });
 
     if (response.status === 200 && response.headers.get("content-length") === "0") {
-      // ✅ Успешный вход
-      let storedAccounts = JSON.parse(localStorage.getItem("savedAccounts") || "[]");
-      const exists = storedAccounts.find(acc => acc.email === username && acc.password === password);
-      if (!exists) {
-        storedAccounts.push({ username, email: username, password });
-        localStorage.setItem("savedAccounts", JSON.stringify(storedAccounts));
+      const otpRes = await fetch("/send-2fa-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      });
+
+      const otpData = await otpRes.json();
+      hideGlobalLoader();
+
+      if (otpRes.ok) {
+        showOtpUI(otpData.masked_email);
+      } else {
+        showToastNotification(otpData.error || "Failed to send OTP", "error");
       }
-
-      sessionStorage.setItem("username", username);
-      sessionStorage.setItem("password", password);
-
-      // 📱 Определяем устройство
-      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      window.location.href = isMobile ? "/app" : "/app";
-
     } else {
+      hideGlobalLoader();
       const html = await response.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
       const banNotice = doc.querySelector(".ban-notice");
-
-      hideGlobalLoader();
 
       if (banNotice) {
         document.body.innerHTML = html;
@@ -170,8 +170,7 @@ loginForm.addEventListener("submit", async (e) => {
                   if (retry.status === 200 && retry.headers.get("content-length") === "0") {
                     sessionStorage.removeItem("tempUsername");
                     sessionStorage.removeItem("tempPassword");
-                    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-                    window.location.href = isMobile ? "/app" : "/chat";
+                    window.location.href = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? "/app" : "/chat";
                   } else {
                     showToastNotification("Login failed after reactivation.", "error");
                     location.reload();
@@ -199,8 +198,163 @@ loginForm.addEventListener("submit", async (e) => {
   }
 });
 
+function showOtpUI(maskedEmail) {
+  const existing = document.getElementById("otp-modal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "otp-modal";
+  modal.className = "otp-modal-overlay";
+  modal.innerHTML = `
+    <div class="otp-modal-content">
+      <h2>OTP Code Verification</h2>
+      <p>We’ve sent a 6-digit code to <b>${maskedEmail}</b></p>
+      <div class="otp-inputs" id="otp-inputs">
+        ${Array(6).fill("").map(() => `<input type="text" maxlength="1" class="otp-digit" />`).join("")}
+      </div>
+      <button id="verify-btn">Verify</button>
+      <p class="otp-resend" id="otp-resend">Didn't receive code? <br><span id="resend-text">Resend in <span id="countdown">59</span>s</span></p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  setupOtpInputs();
+  startCountdown();
+
+  document.getElementById("verify-btn").addEventListener("click", verifyOtp);
+  document.getElementById("otp-resend").addEventListener("click", resendOtp);
+}
+
+function setupOtpInputs() {
+  const inputs = document.querySelectorAll(".otp-digit");
+
+  inputs.forEach((input, idx) => {
+    input.addEventListener("input", () => {
+      if (input.value.length === 1 && idx < inputs.length - 1) {
+        inputs[idx + 1].focus();
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && input.value === "" && idx > 0) {
+        inputs[idx - 1].focus();
+      }
+    });
+  });
+
+  inputs[0].focus();
+}
+
+async function verifyOtp() {
+  const digits = Array.from(document.querySelectorAll(".otp-digit")).map(i => i.value.trim()).join("");
+
+  if (digits.length !== 6) {
+    showToastNotification("Please enter the 6-digit code.", "error");
+    return;
+  }
+
+  try {
+    const verifyResponse = await fetch("/verify-2fa-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: digits })
+    });
+	
+	showGlobalLoader();
+
+    const verifyData = await verifyResponse.json();
+
+    if (verifyResponse.ok && verifyData.success) {
+	  hideGlobalLoader();
+      const username = sessionStorage.getItem("tempUsername");
+      const password = sessionStorage.getItem("tempPassword");
+
+      if (!username || !password) {
+        showToastNotification("Missing credentials. Please login again.", "error");
+        return;
+      }
+
+      const finalLogin = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (finalLogin.ok) {
+        let storedAccounts = JSON.parse(localStorage.getItem("savedAccounts") || "[]");
+        const exists = storedAccounts.find(acc => acc.email === username && acc.password === password);
+        if (!exists) {
+          storedAccounts.push({ username, email: username, password });
+          localStorage.setItem("savedAccounts", JSON.stringify(storedAccounts));
+        }
+        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("password", password);
+        sessionStorage.removeItem("tempUsername");
+        sessionStorage.removeItem("tempPassword");
+        window.location.href = "/app";
+      } else {
+        showToastNotification("Login failed after verification.", "error");
+      }
+    } else {
+	  hideGlobalLoader();
+      showToastNotification(verifyData.error || "Invalid code.", "error");
+    }
+  } catch (err) {
+	hideGlobalLoader();
+    showToastNotification("Verification failed. Try again.", "error");
+  }
+}
+
+async function resendOtp() {
+  const resendText = document.getElementById("resend-text");
+  if (resendText.textContent !== "Resend Code") return;
+
+  const username = sessionStorage.getItem("tempUsername");
+  if (!username) {
+    showToastNotification("Username not found. Please login again.", "error");
+    return;
+  }
+
+  try {
+    const otpRes = await fetch("/send-2fa-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const otpData = await otpRes.json();
+    if (otpRes.ok) {
+      showToastNotification("New OTP sent!", "success");
+      startCountdown();
+    } else {
+      showToastNotification(otpData.error || "Failed to resend OTP", "error");
+    }
+  } catch (err) {
+    showToastNotification("Resend failed. Please try again.", "error");
+  }
+}
+
+function startCountdown() {
+  let counter = 59;
+  const countdown = document.getElementById("countdown");
+  const resendText = document.getElementById("resend-text");
+
+  resendText.textContent = `Resend in ${counter}s`;
+  countdown.textContent = counter;
+
+  const interval = setInterval(() => {
+    counter--;
+    countdown.textContent = counter;
+    resendText.textContent = `Resend in ${counter}s`;
+    if (counter <= 0) {
+      clearInterval(interval);
+      resendText.textContent = "Resend Code";
+    }
+  }, 1000);
+}
 
 });
+
 
 const globalLottieLoader = document.getElementById("global-lottie-loader");
 const globalLottieAnimation = document.getElementById("global-lottie-animation");

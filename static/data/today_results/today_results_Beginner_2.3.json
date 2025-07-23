@@ -1,284 +1,13 @@
 {
-    "Muhammadali": {
-        "Reading Tasks": {
-            "submitted": true,
-            "time": "2025-07-17 15:39:39",
-            "correct": 5,
-            "incorrect": 0,
-            "skipped": 0,
-            "total": 5,
-            "percent": 100.0,
-            "details": [
-                {
-                    "question_id": "3.1",
-                    "text": "When do most dreams happen?",
-                    "user_answer": "During deep sleep",
-                    "correct_answer": "During deep sleep",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.2",
-                    "text": "What can you see in a dream?",
-                    "user_answer": "Pictures and stories",
-                    "correct_answer": "Pictures and stories",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.3",
-                    "text": "Why do some people keep a dream notebook?",
-                    "user_answer": "To remember their dreams",
-                    "correct_answer": "To remember their dreams",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.4",
-                    "text": "What helps you dream better?",
-                    "user_answer": "Turning off your phone and relaxing",
-                    "correct_answer": "Turning off your phone and relaxing",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.5",
-                    "text": "What might happen in a dream?",
-                    "user_answer": "You fly to the moon",
-                    "correct_answer": "You fly to the moon",
-                    "is_correct": true
-                }
-            ]
-        },
-        "Listening Tasks": {
-            "submitted": true,
-            "time": "2025-07-17 15:41:40",
-            "correct": 8,
-            "incorrect": 0,
-            "skipped": 0,
-            "total": 8,
-            "percent": 100.0,
-            "details": [
-                {
-                    "question_id": "1.1",
-                    "text": "A: What time is it? B: It's at ____.",
-                    "user_answer": "one twenty-five",
-                    "correct_answer": "one twenty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.2",
-                    "text": "A: What time is your bus? B: It's at ____.",
-                    "user_answer": "eleven fifty",
-                    "correct_answer": "eleven fifty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.3",
-                    "text": "A: What time's the meeting? B: It's from ____.",
-                    "user_answer": "six o'clock to seven thirty",
-                    "correct_answer": "six o'clock to seven thirty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.4",
-                    "text": "A: What time is the class? B: It's ____.",
-                    "user_answer": "two thirty-five",
-                    "correct_answer": "two thirty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.5",
-                    "text": "A: What time's your train? B: It's at ____.",
-                    "user_answer": "twelve forty",
-                    "correct_answer": "twelve forty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.6",
-                    "text": "A: What time is the party? B: It's from ____.",
-                    "user_answer": "eight fifteen to eleven forty-five",
-                    "correct_answer": "eight fifteen to eleven forty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.7",
-                    "text": "A: What time’s the film? B: It's at ____.",
-                    "user_answer": "six fifteen",
-                    "correct_answer": "six fifteen",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.8",
-                    "text": "A: What time is the next class? B: It's at ____.",
-                    "user_answer": "two thirty",
-                    "correct_answer": "two thirty",
-                    "is_correct": true
-                }
-            ]
-        },
-        "Grammar Tasks": {
-            "submitted": true,
-            "time": "2025-07-17 16:37:48",
-            "correct": 17,
-            "incorrect": 4,
-            "skipped": 0,
-            "total": 21,
-            "percent": 80.95238095238095,
-            "details": [
-                {
-                    "question_id": "5.1",
-                    "text": "What time is it? (10:25) ____",
-                    "user_answer": "It's Ten twenty-five",
-                    "correct_answer": "It's ten twenty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "5.2",
-                    "text": "What time is your meeting? (2:30) ____",
-                    "user_answer": "It's Two thirty",
-                    "correct_answer": "It's two thirty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "5.3",
-                    "text": "What time is the class? (9:45) ____",
-                    "user_answer": "It's nine forty-five",
-                    "correct_answer": "It's nine forty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "5.4",
-                    "text": "What time is your appointment? (1:15) ____",
-                    "user_answer": "It's One fifty",
-                    "correct_answer": "It's one fifteen",
-                    "is_correct": false
-                },
-                {
-                    "question_id": "5.5",
-                    "text": "What time is the train? (6:50) ____",
-                    "user_answer": "It's six fifteen",
-                    "correct_answer": "It's six fifty",
-                    "is_correct": false
-                },
-                {
-                    "question_id": "5.6",
-                    "text": "What time is the event? (8:10) ____",
-                    "user_answer": "It's eight ten",
-                    "correct_answer": "It's eight ten",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "6.1",
-                    "text": "____ time is it now?",
-                    "user_answer": "What",
-                    "correct_answer": "What",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "6.2",
-                    "text": "____ is the meeting held?",
-                    "user_answer": "Where",
-                    "correct_answer": "Where",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "6.3",
-                    "text": "____ do you set the alarm?",
-                    "user_answer": "How",
-                    "correct_answer": "How",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "6.4",
-                    "text": "____’s responsible for the schedule?",
-                    "user_answer": "Who",
-                    "correct_answer": "Who",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "6.5",
-                    "text": "____ time does the class start?",
-                    "user_answer": "What",
-                    "correct_answer": "What",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "7.1",
-                    "text": "A: What time is this / these clock? B: It’s two o’clock.",
-                    "user_answer": "this",
-                    "correct_answer": "this",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "7.2",
-                    "text": "A: Who’s that / those setting the time? B: It’s John.",
-                    "user_answer": "that",
-                    "correct_answer": "that",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "7.3",
-                    "text": "A: What time are those / this clocks? B: They’re five past ten.",
-                    "user_answer": "those",
-                    "correct_answer": "those",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "7.4",
-                    "text": "A: What time is this / these? B: It’s quarter past six.",
-                    "user_answer": "this",
-                    "correct_answer": "this",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "7.5",
-                    "text": "A: Who are that / those people checking the time? B: They’re students.",
-                    "user_answer": "those",
-                    "correct_answer": "those",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "8.1",
-                    "text": "The meeting’s at noon. ____",
-                    "user_answer": "It's meeting's at noon.",
-                    "correct_answer": "It's at noon.",
-                    "is_correct": false
-                },
-                {
-                    "question_id": "8.2",
-                    "text": "Tom and Jerry are late. ____",
-                    "user_answer": "They're late.",
-                    "correct_answer": "They're late.",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "8.3",
-                    "text": "The clock’s slow. ____",
-                    "user_answer": "It's clock's slow.",
-                    "correct_answer": "It's slow.",
-                    "is_correct": false
-                },
-                {
-                    "question_id": "8.4",
-                    "text": "Anna’s on time. ____",
-                    "user_answer": "She's on time.",
-                    "correct_answer": "She's on time.",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "8.5",
-                    "text": "You and I are early. ____",
-                    "user_answer": "We're early.",
-                    "correct_answer": "We're early.",
-                    "is_correct": true
-                }
-            ]
-        },
+    "Muhammadiso": {
         "Homework": {
             "submitted": true,
-            "time": "2025-07-17 16:52:50",
-            "correct": 8,
-            "incorrect": 2,
-            "skipped": 1,
-            "total": 11,
-            "percent": 78,
+            "time": "2025-07-21 02:53:41",
+            "correct": 1,
+            "incorrect": 3,
+            "skipped": 15,
+            "total": 19,
+            "percent": 5.263157894736842,
             "details": [
                 {
                     "question_id": "0.1",
@@ -290,9 +19,9 @@
                 {
                     "question_id": "0.2",
                     "text": "A: _________ are you from? B: From Turkey.",
-                    "user_answer": "Where",
+                    "user_answer": "What",
                     "correct_answer": "Where",
-                    "is_correct": true
+                    "is_correct": false
                 },
                 {
                     "question_id": "0.3",
@@ -304,173 +33,114 @@
                 {
                     "question_id": "0.4",
                     "text": "A: _________ 'sthat? B: It's Charlie. He’s my friend.",
-                    "user_answer": "Who",
+                    "user_answer": "Where",
                     "correct_answer": "Who",
-                    "is_correct": true
+                    "is_correct": false
                 },
                 {
                     "question_id": "0.5",
                     "text": "A: _________ 's this in English? B: It’s a notepad.",
-                    "user_answer": "What",
+                    "user_answer": "Who",
                     "correct_answer": "What",
-                    "is_correct": true
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.1",
+                    "text": "A: What time is it? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "one twenty-five",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "A: What time is your bus? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "eleven fifty",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "A: What time's the meeting? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "six o'clock to seven thirty",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "A: What time is the class? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "two thirty-five",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "A: What time's your train? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "twelve forty",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "A: What time is the party? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "eight fifteen to eleven forty-five",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.7",
+                    "text": "A: What time’s the film? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "six fifteen",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.8",
+                    "text": "A: What time is the next class? B: It's ______.",
+                    "user_answer": "",
+                    "correct_answer": "two thirty",
+                    "is_correct": false
                 },
                 {
                     "question_id": "4.1",
                     "text": "12 ____",
-                    "user_answer": "Twenty",
+                    "user_answer": "",
                     "correct_answer": "twelve",
                     "is_correct": false
                 },
                 {
                     "question_id": "4.2",
                     "text": "31 ____",
-                    "user_answer": "thirty-one",
+                    "user_answer": "",
                     "correct_answer": "thirty-one",
-                    "is_correct": true
+                    "is_correct": false
                 },
                 {
                     "question_id": "4.3",
                     "text": "12 ____",
-                    "user_answer": "Twenty",
+                    "user_answer": "",
                     "correct_answer": "twelve",
                     "is_correct": false
                 },
                 {
                     "question_id": "4.4",
                     "text": "11 ____",
-                    "user_answer": "Eleven",
+                    "user_answer": "",
                     "correct_answer": "eleven",
-                    "is_correct": true
+                    "is_correct": false
                 },
                 {
                     "question_id": "4.5",
                     "text": "189 ____",
-                    "user_answer": "One hundred eighty-nine",
+                    "user_answer": "",
                     "correct_answer": "one hundred eighty-nine",
-                    "is_correct": true
+                    "is_correct": false
                 },
                 {
                     "question_id": "4.6",
                     "text": "50 ____",
-                    "user_answer": "fifty",
+                    "user_answer": "",
                     "correct_answer": "fifty",
-                    "is_correct": true
-                }
-            ]
-        }
-    },
-    "Abdulmalik": {
-        "Reading Tasks": {
-            "submitted": true,
-            "time": "2025-07-17 15:43:11",
-            "correct": 5,
-            "incorrect": 0,
-            "skipped": 0,
-            "total": 5,
-            "percent": 100.0,
-            "details": [
-                {
-                    "question_id": "3.1",
-                    "text": "When do most dreams happen?",
-                    "user_answer": "During deep sleep",
-                    "correct_answer": "During deep sleep",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.2",
-                    "text": "What can you see in a dream?",
-                    "user_answer": "Pictures and stories",
-                    "correct_answer": "Pictures and stories",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.3",
-                    "text": "Why do some people keep a dream notebook?",
-                    "user_answer": "To remember their dreams",
-                    "correct_answer": "To remember their dreams",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.4",
-                    "text": "What helps you dream better?",
-                    "user_answer": "Turning off your phone and relaxing",
-                    "correct_answer": "Turning off your phone and relaxing",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "3.5",
-                    "text": "What might happen in a dream?",
-                    "user_answer": "You fly to the moon",
-                    "correct_answer": "You fly to the moon",
-                    "is_correct": true
-                }
-            ]
-        },
-        "Listening Tasks": {
-            "submitted": true,
-            "time": "2025-07-17 15:45:32",
-            "correct": 8,
-            "incorrect": 0,
-            "skipped": 0,
-            "total": 8,
-            "percent": 100.0,
-            "details": [
-                {
-                    "question_id": "1.1",
-                    "text": "A: What time is it? B: It's at ____.",
-                    "user_answer": "one twenty-five",
-                    "correct_answer": "one twenty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.2",
-                    "text": "A: What time is your bus? B: It's at ____.",
-                    "user_answer": "eleven fifty",
-                    "correct_answer": "eleven fifty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.3",
-                    "text": "A: What time's the meeting? B: It's from ____.",
-                    "user_answer": "six o'clock to seven thirty",
-                    "correct_answer": "six o'clock to seven thirty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.4",
-                    "text": "A: What time is the class? B: It's ____.",
-                    "user_answer": "two thirty-five",
-                    "correct_answer": "two thirty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.5",
-                    "text": "A: What time's your train? B: It's at ____.",
-                    "user_answer": "twelve forty",
-                    "correct_answer": "twelve forty",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.6",
-                    "text": "A: What time is the party? B: It's from ____.",
-                    "user_answer": "eight fifteen to eleven forty-five",
-                    "correct_answer": "eight fifteen to eleven forty-five",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.7",
-                    "text": "A: What time’s the film? B: It's at ____.",
-                    "user_answer": "six fifteen",
-                    "correct_answer": "six fifteen",
-                    "is_correct": true
-                },
-                {
-                    "question_id": "1.8",
-                    "text": "A: What time is the next class? B: It's at ____.",
-                    "user_answer": "two thirty",
-                    "correct_answer": "two thirty",
-                    "is_correct": true
+                    "is_correct": false
                 }
             ]
         }

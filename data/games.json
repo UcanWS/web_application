@@ -1,0 +1,37 @@
+{
+  "83882317-50a1-4f47-b5af-5f6b985cb525": {
+    "players": [
+      "Elbek",
+      "Abdulmalik"
+    ],
+    "prize": 666,
+    "names": {
+      "Elbek": "Elbek",
+      "Abdulmalik": "Abdulmalik"
+    },
+    "result": {
+      "chances": {
+        "Elbek": 38,
+        "Abdulmalik": 62
+      },
+      "winner": "Abdulmalik",
+      "prize": 666,
+      "transaction": {
+        "winner": {
+          "message": "Transaction added",
+          "username": "Abdulmalik",
+          "balance_before": -5334.0,
+          "amount": 666,
+          "new_balance": -4668.0
+        },
+        "loser": {
+          "message": "Transaction added",
+          "username": "Elbek",
+          "balance_before": -666.0,
+          "amount": -666,
+          "new_balance": -1332.0
+        }
+      }
+    }
+  }
+}

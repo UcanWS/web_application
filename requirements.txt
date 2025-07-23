@@ -5,3 +5,4 @@ werkzeug
 eventlet
 user-agents
 google-generativeai
+Flask-Mail>=0.9.1
