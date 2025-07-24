@@ -164,11 +164,6 @@
   <i class="fas fa-tasks"></i>
   <span>Tasks</span>
 </div>
-<div class="service-card" onclick="openGameSearch()">
-  <i class="fas fa-dice"></i>
-  <span>Game</span>
-</div>
-
 
   </div>
 </div>
@@ -224,57 +219,6 @@
 <div id="tasks" class="page">
  <div id="tasks-container"></div>
 </div>
-
-<div id="game" class="page">
-  <div id="searching" class="glass-container fade-in">
-    <div id="header-searching" class="header">
-      <i class="fas fa-magnifying-glass icon"></i>
-      <span>Matchmaking</span>
-    </div>
-    <div id="search-controls" class="control-panel">
-      <label for="prize-input" id="prize-label"><i class="fas fa-gift"></i> Enter Prize</label>
-      <input type="text" id="prize-input" placeholder="e.g. 100 coins" />
-      <button id="start-button" onclick="startGameSearch()">
-        <i class="fas fa-play"></i> Start Search
-      </button>
-    </div>
-    <p id="search-status" class="status-text"></p>
-    <div id="search-timer-container" style="display:none;">
-      <p class="timer"><i class="fas fa-clock"></i> Time Elapsed: <span id="search-timer">0</span> sec</p>
-    </div>
-  </div>
-
-  <div id="game-found" class="glass-container fade-in">
-    <div id="header-found" class="header">
-      <i class="fas fa-check-circle text-success"></i>
-      <span>Game Found!</span>
-    </div>
-    <div id="opponent-info"></div>
-    <div id="match-controls" style="display:none;">
-      <button id="accept-button" onclick="acceptMatch()"><i class="fas fa-check"></i> Accept</button>
-      <button id="decline-button" onclick="declineMatch()"><i class="fas fa-times"></i> Decline</button>
-    </div>
-    <p id="countdown-text"><i class="fas fa-hourglass-start"></i> Game will start in <span id="countdown">7</span> sec...</p>
-  </div>
-
-  <div id="game-ui" class="glass-container fade-in">
-    <div id="header-ui" class="header">
-      <i class="fas fa-trophy"></i>
-      <span>Game In Progress</span>
-    </div>
-    <p id="game-status">🎯 Processing result...</p>
-    <div id="chance-display"></div>
-    <div id="winner-display"></div>
-    <button id="clear-button" onclick="clearGameUI()">
-      <i class="fas fa-rotate-left"></i> Clear
-    </button>
-  </div>
-</div>
-
-
-
-
-
 
 <div id="exams" class="page">
 
@@ -471,7 +415,7 @@
         </div>
       </div>
     </div>
-	  <div class="app-version">Version o2.2</div>
+	  <div class="app-version">Version so.2</div>
   </div>
 </div>
 

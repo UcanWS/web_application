@@ -199,6 +199,58 @@ loginForm.addEventListener("submit", async (e) => {
 });
 
 function showOtpUI(maskedEmail) {
+  const username = sessionStorage.getItem("tempUsername");
+  const password = sessionStorage.getItem("tempPassword");
+
+  if (!username || !password) {
+    showToastNotification("Session expired. Please login again.", "error");
+    return;
+  }
+
+  const otpKey = `otpVerifiedUntil_${username}`;
+  const otpUntil = parseInt(localStorage.getItem(otpKey) || "0");
+  const alreadyVerified = otpUntil > Date.now();
+
+  if (alreadyVerified) {
+    // ✅ Пропускаем OTP и логиним автоматически
+    showGlobalLoader();
+
+    fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    }).then(async res => {
+      hideGlobalLoader();
+
+      if (res.ok) {
+        let storedAccounts = JSON.parse(localStorage.getItem("savedAccounts") || "[]");
+        const exists = storedAccounts.find(acc =>
+          acc.username === username &&
+          acc.email === username &&
+          acc.password === password
+        );
+        if (!exists) {
+          storedAccounts.push({ username, email: username, password });
+          localStorage.setItem("savedAccounts", JSON.stringify(storedAccounts));
+        }
+
+        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("password", password);
+        sessionStorage.removeItem("tempUsername");
+        sessionStorage.removeItem("tempPassword");
+        window.location.href = "/app";
+      } else {
+        showToastNotification("Auto-login failed. Please try again.", "error");
+      }
+    }).catch(() => {
+      hideGlobalLoader();
+      showToastNotification("Auto-login failed. Please try again.", "error");
+    });
+
+    return; // ⛔ не показываем OTP
+  }
+
+  // ❌ Показываем ввод OTP
   const existing = document.getElementById("otp-modal");
   if (existing) existing.remove();
 
@@ -224,6 +276,7 @@ function showOtpUI(maskedEmail) {
   document.getElementById("verify-btn").addEventListener("click", verifyOtp);
   document.getElementById("otp-resend").addEventListener("click", resendOtp);
 }
+
 
 function setupOtpInputs() {
   const inputs = document.querySelectorAll(".otp-digit");
@@ -259,13 +312,14 @@ async function verifyOtp() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: digits })
     });
-	
-	showGlobalLoader();
+
+    showGlobalLoader();
 
     const verifyData = await verifyResponse.json();
 
     if (verifyResponse.ok && verifyData.success) {
-	  hideGlobalLoader();
+      hideGlobalLoader();
+
       const username = sessionStorage.getItem("tempUsername");
       const password = sessionStorage.getItem("tempPassword");
 
@@ -273,6 +327,11 @@ async function verifyOtp() {
         showToastNotification("Missing credentials. Please login again.", "error");
         return;
       }
+
+      // ✅ Сохраняем срок верификации для конкретного username
+      const otpKey = `otpVerifiedUntil_${username}`;
+      const expiration = Date.now() + 1000 * 60 * 60 * 24; // 24 часа
+      localStorage.setItem(otpKey, expiration.toString());
 
       const finalLogin = await fetch("/login", {
         method: "POST",
@@ -282,11 +341,16 @@ async function verifyOtp() {
 
       if (finalLogin.ok) {
         let storedAccounts = JSON.parse(localStorage.getItem("savedAccounts") || "[]");
-        const exists = storedAccounts.find(acc => acc.email === username && acc.password === password);
+        const exists = storedAccounts.find(acc =>
+          acc.username === username &&
+          acc.email === username &&
+          acc.password === password
+        );
         if (!exists) {
           storedAccounts.push({ username, email: username, password });
           localStorage.setItem("savedAccounts", JSON.stringify(storedAccounts));
         }
+
         sessionStorage.setItem("username", username);
         sessionStorage.setItem("password", password);
         sessionStorage.removeItem("tempUsername");
@@ -296,41 +360,12 @@ async function verifyOtp() {
         showToastNotification("Login failed after verification.", "error");
       }
     } else {
-	  hideGlobalLoader();
+      hideGlobalLoader();
       showToastNotification(verifyData.error || "Invalid code.", "error");
     }
   } catch (err) {
-	hideGlobalLoader();
+    hideGlobalLoader();
     showToastNotification("Verification failed. Try again.", "error");
-  }
-}
-
-async function resendOtp() {
-  const resendText = document.getElementById("resend-text");
-  if (resendText.textContent !== "Resend Code") return;
-
-  const username = sessionStorage.getItem("tempUsername");
-  if (!username) {
-    showToastNotification("Username not found. Please login again.", "error");
-    return;
-  }
-
-  try {
-    const otpRes = await fetch("/send-2fa-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-
-    const otpData = await otpRes.json();
-    if (otpRes.ok) {
-      showToastNotification("New OTP sent!", "success");
-      startCountdown();
-    } else {
-      showToastNotification(otpData.error || "Failed to resend OTP", "error");
-    }
-  } catch (err) {
-    showToastNotification("Resend failed. Please try again.", "error");
   }
 }
 

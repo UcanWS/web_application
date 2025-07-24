@@ -3026,13 +3026,36 @@ nav:not(.nav-hidden) {
 
 .idea-status {
   display: inline-block;
-  background: orange;
-  padding: 4px 12px;
-  border-radius: 8px;
+  min-width: 100px;
+  text-align: center;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
-  color: #222;
   margin-bottom: 8px;
+  color: #fff;
+  background: #999; /* fallback */
+}
+
+/* Статусы */
+.idea-status.in-review {
+  background: linear-gradient(90deg, #f5b942, #fce38a); /* жёлто-золотистый */
+  color: #222;
+}
+
+.idea-status.approved {
+  background: linear-gradient(90deg, #4caf50, #81c784); /* зелёный */
+  color: white;
+}
+
+.idea-status.rejected {
+  background: linear-gradient(90deg, #e53935, #ef5350); /* красный */
+  color: white;
+}
+
+.idea-status.pending {
+  background: linear-gradient(90deg, #607d8b, #90a4ae); /* серый */
+  color: white;
 }
 
 .idea-card .idea-description {
@@ -3099,10 +3122,6 @@ textarea, input[type="file"] {
   border-radius: 12px;
   color: white;
   font-weight: 600;
-}
-
-.hidden {
-  display: none !important;
 }
 
 .idea-media {
@@ -10549,135 +10568,45 @@ body.shake {
   gap: 8px;
 }
 
-.page {
-  padding: 30px 20px;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.glass-container {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 30px 25px;
-  margin: 30px auto;
-  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.35);
-  max-width: 520px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.fade-in {
-  animation: fadeInScale 0.6s ease-out;
-}
-
-@keyframes fadeInScale {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
+.status-text-skeleton {
+  position: relative;
+  display: inline-block;
   font-weight: bold;
-  color: #00ffd5;
-  margin-bottom: 20px;
-  text-shadow: 0 0 8px #00ffe0;
+  font-size: 13px;
+  color: transparent;
+  overflow: hidden;
+  letter-spacing: 0.5px;
 }
 
-.icon {
-  margin-right: 10px;
+.status-text-skeleton::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(200, 200, 200, 0.1) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(200, 200, 200, 0.1) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 300% 100%;
+  animation: statusSkeletonGlow 2s infinite ease-in-out;
 }
 
-#prize-label {
-  font-size: 18px;
-  margin-bottom: 10px;
-  display: block;
-  font-weight: 500;
-  color: #00ffd5;
+@keyframes statusSkeletonGlow {
+  0% {
+    background-position: -200% 0;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-#prize-input {
-  width: 85%;
-  padding: 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font-size: 16px;
-  margin-top: 10px;
-  transition: background 0.3s ease, border 0.3s ease;
-}
 
-#prize-input:focus {
-  outline: none;
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #00f0ff;
-}
-
-#start-button,
-#accept-button,
-#decline-button,
-#clear-button {
-  background: linear-gradient(45deg, #00c9ff, #92fe9d);
-  color: #0f0f0f;
-  padding: 14px 28px;
-  margin-top: 20px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 16px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0, 255, 255, 0.3);
-  transition: all 0.3s ease-in-out;
-}
-
-#start-button:hover,
-#accept-button:hover,
-#decline-button:hover,
-#clear-button:hover {
-  transform: scale(1.05);
-  background: linear-gradient(45deg, #92fe9d, #00c9ff);
-}
-
-.status-text,
-#game-status,
-#countdown-text {
-  font-size: 18px;
-  margin-top: 20px;
-  font-weight: 500;
-  color: #ffffff;
-  text-shadow: 0 0 5px #00ffe1;
-}
-
-#search-timer {
-  font-size: 32px;
-  font-weight: bold;
-  color: #00ffe0;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.75; }
-}
-
-.countdown-pulse {
-  animation: pulse 1s ease-in-out;
-}
-
-#winner-display, #chance-display {
-  margin-top: 20px;
-  font-size: 20px;
-  animation: fadeIn 1s ease-in-out;
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(15px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.text-success {
-  color: #00ff88;
-}

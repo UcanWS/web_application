@@ -3637,7 +3637,7 @@ def check_strike():
     last_by_unit = user_data["lastStrikeByUnit"]
 
     # 1) Сброс, если сделал все задачи и percent<80
-    if submitted_count == total_tasks and unit_percent < 80.0:
+    if total_tasks > 0 and submitted_count == total_tasks and unit_percent < 80.0:
         print(f"[check-strike] Сброс: пользователь сделал все задачи "
               f"и percent={unit_percent}% < 80%")
         user_data["strikes"] = 0
@@ -3646,6 +3646,8 @@ def check_strike():
         save_strikes(strikes_data)
         print(f"[check-strike] После сброса: {user_data}")
         return jsonify(user_data)
+    elif total_tasks == 0:
+        print("[check-strike] Пропущен сброс: в юните нет заданий")
 
     # 2) Сброс, если перешёл на новый юнит, пропустив предыдущий без штриха
     try:
@@ -3655,15 +3657,12 @@ def check_strike():
 
     if idx > 0:
         prev_unit = Units[idx - 1]
-        # Если предыдущего unit нет в lastStrikeByUnit → сбрасываем
         if prev_unit not in last_by_unit:
             print(f"[check-strike] Сброс: пропущен unit {prev_unit} без штриха")
             user_data["strikes"] = 0
             last_by_unit.clear()
-            # Продолжаем дальше, чтобы дать шанс на current_unit
         else:
             print(f"[check-strike] Предыдущий unit {prev_unit} успешно пройден")
-
 
     # 3) Начисляем штрих по current_unit, если percent>=80 и ещё нет сегодня
     if unit_percent >= 80.0:
@@ -3677,11 +3676,11 @@ def check_strike():
     else:
         print(f"[check-strike] percent={unit_percent}% < 80, штрихи не изменены")
 
-    # Сохраняем состояние
     strikes_data[username] = user_data
     save_strikes(strikes_data)
     print(f"[check-strike] Конечное состояние: {user_data}")
     return jsonify(user_data)
+
 
 
 
@@ -4158,140 +4157,6 @@ def claim_task(username, task_id):
             return jsonify(result), 200
 
     return jsonify({"error": "Task not found"}), 404
-
-waiting_players = {}
-
-# Активные игры: {game_id: {'players': [id1, id2], 'prize': ...}}
-games = {}
-
-
-GAMES_FILE = "data/games.json"
-
-def save_games():
-    with open(GAMES_FILE, "w") as f:
-        json.dump(games, f, indent=2)
-# --- Socket.IO логика ---
-@socketio.on('join')
-def handle_join(user_id):
-    join_room(user_id)
-    print(f"[SocketIO] User joined room: {user_id}")
-
-# --- API: начать поиск ---
-@app.route('/api/game-start-searching', methods=['POST'])
-def game_start_searching():
-    data = request.json
-    user_id = data['id']
-    name = data['name']
-    prize = data['prize']
-
-    waiting_players[user_id] = {"name": name, "prize": prize}
-
-    # Попробовать найти соперника
-    if len(waiting_players) >= 2:
-        ids = list(waiting_players.keys())[:2]
-        p1, p2 = ids[0], ids[1]
-        game_id = str(uuid.uuid4())
-
-        games[game_id] = {
-            "players": [p1, p2],
-            "prize": prize,
-            "names": {
-                p1: waiting_players[p1]['name'],
-                p2: waiting_players[p2]['name']
-            }
-        }
-
-        # удалить из очереди
-        del waiting_players[p1]
-        del waiting_players[p2]
-
-        # уведомить игроков
-        for pid in [p1, p2]:
-            socketio.emit("game_found", {
-                "game_id": game_id,
-                "players": [p1, p2],
-                "prize": prize
-            }, to=pid)
-
-    return jsonify({"status": "searching"})
-
-@app.route("/api/game-process", methods=["POST"])
-def game_process():
-    data = request.json
-    game_id = data.get("game_id")
-    if not game_id:
-        return jsonify({"error": "Missing game_id"}), 400
-
-    game = games.get(game_id)
-    if not game:
-        return jsonify({"error": "Game not found"}), 404
-
-    # Уже есть результат
-    if "result" in game:
-        return jsonify({"status": "already_processed"}), 200
-
-    # Генерация шансов и победителя
-    p1, p2 = game["players"]
-    name1 = game["names"][p1]
-    name2 = game["names"][p2]
-
-    percent1 = random.randint(1, 99)
-    percent2 = 100 - percent1
-    chances = {name1: percent1, name2: percent2}
-    winner = name1 if percent1 > percent2 else name2
-    loser = name2 if winner == name1 else name1
-
-    prize = game.get("prize", 0)
-    if not isinstance(prize, (int, float)) or prize <= 0:
-        return jsonify({"error": "Invalid prize"}), 400
-
-    # Добавляем транзакции
-    winner_tx = add_transaction_internal(
-        username=winner,
-        amount=prize,
-        description=f"🏆 Prize from game {game_id}"
-    )
-    loser_tx = add_transaction_internal(
-        username=loser,
-        amount=-prize,
-        description=f"❌ Lost prize for game {game_id}"
-    )
-
-    result = {
-        "chances": chances,
-        "winner": winner,
-        "prize": prize,
-        "transaction": {
-            "winner": winner_tx,
-            "loser": loser_tx
-        }
-    }
-
-    game["result"] = result
-    save_games()
-
-    return jsonify({"status": "processed"}), 200
-
-
-
-@app.route("/api/game-result", methods=["GET"])
-def game_result():
-    game_id = request.args.get("game_id")
-
-    if not game_id:
-        return jsonify({"error": "Missing game_id"}), 400
-
-    game = games.get(game_id)
-    if not game:
-        return jsonify({"error": "Game not found"}), 404
-
-    if "result" not in game:
-        return jsonify({"status": "not_ready"}), 200
-
-    return jsonify(game["result"]), 200
-
-
-
         
 if __name__ == '__main__':
     # Отключаем use_reloader, чтобы не пытаться читать WERKZEUG_SERVER_FD
