@@ -238,6 +238,19 @@ function showPage(id) {
 	case 'tasks':
     loadTasks();
     break;
+	
+	case 'personal-analyzing':
+    loadPersonalSummary(currentUser, currentLevel, currentUnit);
+    break;
+	
+	case 'squid-game':
+    createVideoPlayer('static/horror/trailer-squid-game.mp4', 'video-player-squid');
+	startCountdownSquidTimer("2025-08-01T00:00:00", "countdown-timer");  
+    break;
+	
+	case 'liveLesson':
+    openLiveLesson();
+    break;
   }
 }
 
@@ -3123,10 +3136,19 @@ async function renderTasksSection() {
   section.style.alignItems = 'center';
   section.style.minHeight = '150px';
 
-  const spinner = document.createElement('div');
-  spinner.className = 'lds-spinner';
-  for (let i = 0; i < 12; i++) spinner.appendChild(document.createElement('div'));
-  section.appendChild(spinner);
+  const loader = document.createElement('div');
+  loader.className = 'container-exam-loading';
+  loader.innerHTML = `
+    <div class="loader">
+      <div class="crystal"></div>
+      <div class="crystal"></div>
+      <div class="crystal"></div>
+      <div class="crystal"></div>
+      <div class="crystal"></div>
+      <div class="crystal"></div>
+    </div>
+  `;
+  section.appendChild(loader);
   container.appendChild(section);
 
   try {
@@ -3143,7 +3165,6 @@ async function renderTasksSection() {
     const avgData = await avgRes.json();
     const userAvg = avgData[currentUser] || { average_percent: 0, submitted_count: 0, total_tasks: today_tasks.length };
 
-    // Check for Writing AI block
     const writingAIBlock = today_tasks.find(task => task.title === 'Writing AI');
     if (writingAIBlock) {
       const writingTask = {
@@ -3242,16 +3263,34 @@ async function renderTasksSection() {
 
       const card = document.createElement('div');
       card.className = 'task-progress-card';
-      if (isCompleted) card.classList.add('disabled');
-      if (!isCompleted) {
+
+      const isWriting = block.type === 'writing';
+
+      if (isCompleted && !isWriting) {
+        card.classList.add('disabled');
+      }
+
+      if (!isCompleted || isWriting) {
+        card.classList.add('clickable');
         card.onclick = () => {
-          if (block.type === 'writing') {
+          console.log('Attempting to open task:', title);
+          console.log('Task result:', result);
+          console.log('Block data:', block);
+
+          if (!block.questions || block.questions.length === 0) {
+            console.warn('No questions found for:', title);
+            alert(`Cannot open ${title} - no questions found.`);
+            return;
+          }
+
+          if (isWriting) {
+            console.log('Opening writing task...');
             openWritingTaskPage(title, block.questions);
           } else {
+            console.log('Opening non-writing task...');
             openTodayTaskPage(title, block.questions);
           }
         };
-        card.classList.add('clickable');
       }
 
       const key = title.toLowerCase();
@@ -3275,11 +3314,10 @@ async function renderTasksSection() {
       } else if (key.includes('writing')) {
         iconClass = 'fa-pen';
         iconColor = 'linear-gradient(135deg, #f06292, #d81b60)';
+      } else if (key.includes('fun')) {
+        iconClass = 'fa-play';
+        iconColor = 'linear-gradient(135deg, #4caf50, #8bc34a)';
       }
-	  else if (key.includes('fun')) {
-            iconClass = 'fa-play';
-            iconColor = 'linear-gradient(135deg, #4caf50, #8bc34a)';
-          }
 
       const icon = document.createElement('div');
       icon.className = 'task-progress-icon';
@@ -3293,7 +3331,6 @@ async function renderTasksSection() {
       titleDiv.className = 'task-progress-title';
       titleDiv.textContent = title;
 
-      // Only add task count if the task is submitted
       let taskCount = null;
       if (result?.submitted) {
         taskCount = document.createElement('div');
@@ -3332,7 +3369,7 @@ async function renderTasksSection() {
       progressBarWrapper.appendChild(progressBar);
       progressContainer.append(progressBarWrapper, progressText);
       textGroup.append(titleDiv);
-      if (taskCount) textGroup.append(taskCount); // Append taskCount only if it exists
+      if (taskCount) textGroup.append(taskCount);
       textGroup.append(progressContainer);
 
       const award = document.createElement('div');
@@ -3345,6 +3382,17 @@ async function renderTasksSection() {
       }
 
       card.append(icon, textGroup, award);
+
+      if (isWriting && result?.ai_detected) {
+        const errorOverlay = document.createElement('div');
+        errorOverlay.className = 'ai-error-overlay';
+        const errorContent = document.createElement('div');
+        errorContent.className = 'ai-error-overlay-content';
+        errorContent.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> AI Detected';
+        errorOverlay.appendChild(errorContent);
+        card.appendChild(errorOverlay);
+      }
+
       section.appendChild(card);
     });
 
@@ -3375,7 +3423,6 @@ async function renderTasksSection() {
     renderNoTasksPlaceholder(container);
   }
 }
-
 
 function finishWritingAI(title, questions) {
   initExamSecurity(false);
@@ -3430,49 +3477,44 @@ function finishWritingAI(title, questions) {
       if (!ok) throw new Error(data.error || 'Submission failed');
 
       const { feedback, scores, score } = data;
+      const suggestions = feedback.suggestion || {};
       const resultHTML = [];
 
-      resultHTML.push(`<h2 class="writing-result-header">Writing Task Result: ${score}%</h2>`);
 
       questions.forEach(q => {
-        resultHTML.push(`<div class="exam-subquestion">`);
-        resultHTML.push(`<p class="question-text"><strong>${q.id}.</strong> ${q.text}</p>`);
 
         if (feedback && scores) {
           resultHTML.push(`<div class="writing-feedback-card">`);
           resultHTML.push(`<div class="score-circle">${score}%</div>`);
           resultHTML.push(`<div class="accordion-writingai">`);
 
-const feedbackMap = [
-  { label: "Task Achievement & Structure", key: "task_structure", iconClass: "fas fa-tasks" },
-  { label: "Organization", key: "organization", iconClass: "fas fa-layer-group" },
-  { label: "Grammar", key: "grammar", iconClass: "fas fa-pen-nib" },
-  { label: "Vocabulary", key: "vocabulary", iconClass: "fas fa-book" }
-];
+          const feedbackMap = [
+            { label: "Task Achievement & Structure", key: "task_structure", iconClass: "fas fa-tasks" },
+            { label: "Organization", key: "organization", iconClass: "fas fa-layer-group" },
+            { label: "Grammar", key: "grammar", iconClass: "fas fa-pen-nib" },
+            { label: "Vocabulary", key: "vocabulary", iconClass: "fas fa-book" }
+          ];
 
-feedbackMap.forEach(({ label, key, iconClass }) => {
-  resultHTML.push(`
-    <div class="accordion-item">
-      <button class="accordion-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('open');">
-        <span class="feedback-icon"><i class="${iconClass}"></i></span>
-        <span class="label">${label}</span>
-        <span class="score">${scores[key]}/25</span>
-      </button>
-      <div class="accordion-body">
-        ${feedback[key].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}
-      </div>
-    </div>
-  `);
-});
-
-
+          feedbackMap.forEach(({ label, key, iconClass }) => {
+            resultHTML.push(`
+              <div class="accordion-item">
+                <button class="accordion-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('open');">
+                  <span class="feedback-icon"><i class="${iconClass}"></i></span>
+                  <span class="label">${label}</span>
+                  <span class="score">${scores[key]}/25</span>
+                </button>
+                <div class="accordion-body">
+                  <p>${feedback[key].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
+                  ${suggestions[key] ? `<div class="suggestion-block"><strong><i class="fas fa-lightbulb"></i> Suggestion</strong>${suggestions[key]}</div>` : ''}
+                </div>
+              </div>
+            `);
+          });
 
           resultHTML.push(`</div></div>`);
         } else {
           resultHTML.push(`<p class="feedback-warning">No feedback available.</p>`);
         }
-
-        resultHTML.push(`</div>`);
       });
 
       content.innerHTML = resultHTML.join('');
@@ -3565,26 +3607,27 @@ feedbackMap.forEach(({ label, key, iconClass }) => {
 
 
 
-function openWritingTaskPage(title, questions) {
+
+
+async function openWritingTaskPage(title, questions) {
   initExamSecurity(true);
   hideNavigation();
   showPage('todaytasks');
+
   const header = document.getElementById('header-today');
   const unit = document.getElementById('todaytasks-unit');
   header.textContent = title;
   unit.textContent = `Unit ${currentUnit}`;
 
-  // Удаляем летние элементы
   document.querySelectorAll('.moon, .summer-tree, .star, .firefly').forEach(el => el.remove());
   document.getElementById('todaytasks-header').classList.remove('summer-scene');
 
-  // Добавляем дождь и молнию
   const rainAndLightningHTML = `
     <div class="lightning-flash"></div>
     ${[10, 20, 30, 40, 50, 60, 70].map((left, i) =>
       `<span class="rain-drop" style="left: ${left}%; animation-delay: ${i * 0.2}s;"></span>`
     ).join('')}
-    ${Array.from({length: 3}).map(() =>
+    ${Array.from({ length: 3 }).map(() =>
       `<div class="lightning-drop" style="left: ${Math.random() * 90 + 5}%; animation-delay: ${Math.random() * 3}s;"></div>`
     ).join('')}
   `;
@@ -3592,6 +3635,17 @@ function openWritingTaskPage(title, questions) {
 
   const content = document.getElementById('todaytasks-content');
   content.innerHTML = '';
+
+  let resultData = null;
+  try {
+    const res = await fetch(`/api/get-results?level=${encodeURIComponent(currentLevel)}&unit=${encodeURIComponent(currentUnit)}`);
+    const json = await res.json();
+    resultData = json?.[currentUser]?.['Writing AI'];
+  } catch (err) {
+    console.error('Error loading results:', err);
+  }
+
+  const submitted = resultData?.submitted;
 
   questions.forEach((q, qi) => {
     const wrapper = document.createElement('div');
@@ -3602,47 +3656,99 @@ function openWritingTaskPage(title, questions) {
     heading.innerHTML = `${qi + 1}. ${q.text}`;
     wrapper.appendChild(heading);
 
-    const textarea = document.createElement('textarea');
-    textarea.className = 'writing-task-textarea';
-    textarea.placeholder = 'Write your essay here (30+ words)...';
-    textarea.name = `q${q.id}`;
-    textarea.dataset.qid = q.id;
+    if (submitted) {
+      initExamSecurity(false);
+      const result = resultData.details?.find(d => d.question_id === `Writing Topic ID ${qi + 1}`);
+      if (result) {
+        const feedback = result.feedback || {};
+        const suggestion = feedback.suggestion || {};
+        const scores = result.scores_breakdown || {};
 
-    textarea.addEventListener('blur', () => {
-      const text = textarea.value.trim();
-      const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
-      if (wordCount < 30) {
-        showToastNotification(`Your writing must be at least 30 words. Currently: ${wordCount}`, 'warning');
+        const scoreBlock = `
+          <div class="writing-score-block">Score: ${result.score}/100</div>
+        `;
+
+        const feedbackBlock = Object.entries(feedback)
+          .filter(([k]) => k !== 'suggestion')
+          .map(([category, text]) => `
+            <div class="writing-feedback-card">
+              <h4>${category.charAt(0).toUpperCase() + category.slice(1)}</h4>
+              <p>${text}</p>
+              ${suggestion[category] ? `<div class="suggestion-block"><strong>Suggestion:</strong> ${suggestion[category]}</div>` : ''}
+            </div>
+          `).join('');
+
+        wrapper.insertAdjacentHTML('beforeend', scoreBlock + feedbackBlock);
+      } else {
+        wrapper.innerHTML += `<div class="writing-feedback-card"><p>No result available.</p></div>`;
       }
-    });
+    } else {
+      const textareaWrapper = document.createElement('div');
+      textareaWrapper.style.position = 'relative';
 
-    wrapper.appendChild(textarea);
+      const textarea = document.createElement('textarea');
+      textarea.className = 'writing-task-textarea';
+      textarea.placeholder = 'Write your essay here (30+ words)...';
+      textarea.name = `q${q.id}`;
+      textarea.dataset.qid = q.id;
+
+      const wordCounter = document.createElement('div');
+      wordCounter.className = 'word-count';
+      wordCounter.textContent = '0 words';
+      wordCounter.style.position = 'absolute';
+      wordCounter.style.bottom = '15px';
+      wordCounter.style.right = '10px';
+      wordCounter.style.fontSize = '12px';
+      wordCounter.style.color = '#666';
+
+      textarea.addEventListener('input', () => {
+        const wordCount = textarea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+        wordCounter.textContent = `${wordCount} word${wordCount === 1 ? '' : 's'}`;
+      });
+
+      textarea.addEventListener('blur', () => {
+        const wordCount = textarea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+        if (wordCount < 30) {
+          showToastNotification(`Your writing must be at least 30 words. Currently: ${wordCount}`, 'warning');
+        }
+      });
+
+      textareaWrapper.appendChild(textarea);
+      textareaWrapper.appendChild(wordCounter);
+      wrapper.appendChild(textareaWrapper);
+    }
+
     content.appendChild(wrapper);
   });
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Плавающая кнопка завершения
   let floatingBtn = document.getElementById('floating-finish-btn');
-  if (!floatingBtn) {
+  if (!floatingBtn && !submitted) {
     floatingBtn = document.createElement('button');
     floatingBtn.id = 'floating-finish-btn';
     floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
     document.body.appendChild(floatingBtn);
   }
-  floatingBtn.style.display = 'block';
-  floatingBtn.onclick = () => {
-    floatingBtn.style.display = 'none';
-    finishWritingAI(title, questions);
-  };
+  if (floatingBtn) {
+    floatingBtn.style.display = submitted ? 'none' : 'block';
+    floatingBtn.onclick = () => {
+      floatingBtn.style.display = 'none';
+      finishWritingAI(title, questions);
+    };
+  }
 
   document.getElementById('done-tasks-btn').style.display = 'none';
-  document.getElementById('finish-tasks-btn').style.display = 'inline-block';
-  document.getElementById('finish-tasks-btn').onclick = () => {
+  const finishBtn = document.getElementById('finish-tasks-btn');
+  finishBtn.style.display = submitted ? 'none' : 'inline-block';
+  finishBtn.onclick = () => {
     floatingBtn.style.display = 'none';
-    finishWritingAI(title, questions);
   };
 }
+
+
+
+
 
 
 
@@ -6414,3 +6520,303 @@ function startCountdownTasks(deadline, elementId) {
   updateTimer();
   setInterval(updateTimer, 1000);
 }
+
+let currentLevelForAnalysis = null;
+let currentUnitForAnalysis = null;
+
+async function loadPersonalSummary(username, level, unit) {
+  const summaryEl = document.getElementById('personal-summary');
+  const suggestionsBtn = document.getElementById('detailed-suggestions-btn');
+  const resultBox = document.getElementById('detailed-analysis');
+
+  summaryEl.innerHTML = 'Loading...';
+  suggestionsBtn.style.display = 'none';
+
+  try {
+    const res = await fetch(`/api/get-personal-suggestions?username=${username}&level=${level}&unit=${unit}`);
+    const data = await res.json();
+
+    if (data.error) {
+      summaryEl.innerHTML = `<p style="color:red;">${data.error}</p>`;
+      resultBox.innerHTML = '';
+    } else {
+      currentLevelForAnalysis = level;
+      currentUnitForAnalysis = data.current_unit;
+
+      summaryEl.innerHTML = `
+        <p><span class="unit-badge">Previous Unit:</span> ${data.previous_unit}</p>
+        <p><span class="unit-badge">Current Unit:</span> ${data.current_unit}</p>
+        <ul>
+          <li data-label="Grammar">Grammar change: ${data.grammar_change}</li>
+          <li data-label="Vocabulary">Vocabulary change: ${data.vocabulary_change}</li>
+          <li data-label="Organization">Organization change: ${data.organization_change}</li>
+          <li data-label="Task Structure">Task structure change: ${data.task_structure_change}</li>
+        </ul>
+        <p class="comment"><span class="unit-badge">Summary:</span> ${data.comment}</p>
+      `;
+
+      const storageKey = `analysis_${username}_${level}_${data.current_unit}`;
+      const savedAnalysis = localStorage.getItem(storageKey);
+
+      if (savedAnalysis) {
+        const a = JSON.parse(savedAnalysis);
+        resultBox.innerHTML = `
+          <h4>AI Detailed Feedback:</h4>
+          <ul>
+            <li data-label="Grammar">Grammar: ${a.grammar.change} — ${a.grammar.comment}</li>
+            <li data-label="Vocabulary">Vocabulary: ${a.vocabulary.change} — ${a.vocabulary.comment}</li>
+            <li data-label="Organization">Organization: ${a.organization.change} — ${a.organization.comment}</li>
+            <li data-label="Task Structure">Task Structure: ${a.task_structure.change} — ${a.task_structure.comment}</li>
+          </ul>
+          <p class="summary"><span class="unit-badge">Summary:</span> ${a.overall_comment}</p>
+        `;
+      } else {
+        resultBox.innerHTML = '';
+        suggestionsBtn.style.display = 'inline-block';
+      }
+    }
+  } catch (err) {
+    summaryEl.innerHTML = `<p style="color:red;">Failed to load summary</p>`;
+    console.error(err);
+  }
+}
+
+document.getElementById('detailed-suggestions-btn').addEventListener('click', async () => {
+  const resultBox = document.getElementById('detailed-analysis');
+  resultBox.innerHTML = 'Analyzing...';
+  document.getElementById('updateModal').style.display = 'flex';
+  startUpdateStatusText();
+
+  if (!currentLevelForAnalysis || !currentUnitForAnalysis) {
+    resultBox.innerHTML = `<p style="color:red;">Missing level or unit data</p>`;
+	document.getElementById('updateModal').style.display = 'none';
+      stopUpdateStatusText();
+    return;
+  }
+
+  const storageKey = `analysis_${currentUser}_${currentLevelForAnalysis}_${currentUnitForAnalysis}`;
+
+  try {
+    const res = await fetch(`/api/compare-essays-ai-get?username=${currentUser}&level=${currentLevelForAnalysis}&unit=${currentUnitForAnalysis}`);
+    const data = await res.json();
+
+    if (!data.success) {
+      resultBox.innerHTML = `<p style="color:red;">${data.error}</p>`;
+	  document.getElementById('updateModal').style.display = 'none';
+      stopUpdateStatusText();
+    } else {
+		document.getElementById('updateModal').style.display = 'none';
+      stopUpdateStatusText();
+      const a = data.analysis;
+
+      localStorage.setItem(storageKey, JSON.stringify(a));
+
+      resultBox.innerHTML = `
+        <h4>AI Detailed Feedback:</h4>
+        <ul>
+          <li data-label="Grammar">Grammar: ${a.grammar.change} — ${a.grammar.comment}</li>
+          <li data-label="Vocabulary">Vocabulary: ${a.vocabulary.change} — ${a.vocabulary.comment}</li>
+          <li data-label="Organization">Organization: ${a.organization.change} — ${a.organization.comment}</li>
+          <li data-label="Task Structure">Task Structure: ${a.task_structure.change} — ${a.task_structure.comment}</li>
+        </ul>
+        <p class="summary"><span class="unit-badge">Summary:</span> ${a.overall_comment}</p>
+      `;
+
+      document.getElementById('detailed-suggestions-btn').style.display = 'none';
+    }
+  } catch (err) {
+    resultBox.innerHTML = `<p style="color:red;">Failed to load detailed analysis</p>`;
+	document.getElementById('updateModal').style.display = 'none';
+      stopUpdateStatusText();
+    console.error(err);
+  }
+});
+
+function createVideoPlayer(videoPath, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Если уже есть плеер в этом контейнере — удаляем его
+  const existingPlayer = container.querySelector('.video-player');
+  if (existingPlayer) {
+    existingPlayer.remove();
+  }
+
+  const player = document.createElement('div');
+  player.className = 'video-player';
+  player.innerHTML = `
+    <div class="player-container">
+      <div class="video-wrapper">
+        <video class="video-element">
+          <source src="${videoPath}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="controls-overlay">
+        <div class="top-controls">
+          <img src="static/icons/squid-game.webp" alt="Squid Game" class="series-icon">
+        </div>
+        <div class="bottom-controls">
+          <div class="right-controls">
+            <button class="play-pause-btn"><i class="fas fa-play"></i></button>
+            <button class="volume-btn"><i class="fas fa-volume-up"></i></button>
+            <button class="fullscreen-btn"><i class="fas fa-expand"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(player);
+
+  const video = player.querySelector('.video-element');
+  const playPauseBtn = player.querySelector('.play-pause-btn');
+
+  playPauseBtn.addEventListener('click', () => {
+    if (video.paused) {
+      video.play();
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    } else {
+      video.pause();
+      playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    }
+  });
+
+  player.querySelector('.volume-btn').addEventListener('click', () => {
+    video.muted = !video.muted;
+  });
+
+  player.querySelector('.fullscreen-btn').addEventListener('click', () => {
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) { /* Safari */
+      video.webkitRequestFullscreen();
+    } else if (video.msRequestFullscreen) { /* IE11 */
+      video.msRequestFullscreen();
+    }
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const activeCountdownIntervals = {};
+
+function startCountdownSquidTimer(targetDateStr, elementId) {
+  const targetDate = new Date(targetDateStr).getTime();
+  const container = document.getElementById(elementId);
+
+  // Очистить предыдущий интервал, если он уже есть для этого элемента
+  if (activeCountdownIntervals[elementId]) {
+    clearInterval(activeCountdownIntervals[elementId]);
+  }
+
+  let previousDigits = "";
+
+  function animateDigitChange(oldChar, newChar, index) {
+    const span = document.createElement('span');
+    span.className = 'countdown-digit';
+    span.textContent = newChar;
+    span.style.animation = 'countdownDigitIn 0.4s ease-out';
+    return span;
+  }
+
+  function renderStatusMessage(text) {
+    container.innerHTML = '';
+    const span = document.createElement('span');
+    span.className = 'countdown-digit';
+    span.textContent = text;
+    container.appendChild(span);
+  }
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance <= 0) {
+      const passedSince = now - targetDate;
+
+      if (passedSince < 60 * 1000) {
+        renderStatusMessage('In progress');
+      } else {
+        renderStatusMessage('Passed');
+      }
+
+      clearInterval(activeCountdownIntervals[elementId]);
+      delete activeCountdownIntervals[elementId];
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    const formatted = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+    container.innerHTML = '';
+
+    for (let i = 0; i < formatted.length; i++) {
+      const newChar = formatted[i];
+      const oldChar = previousDigits[i] || '';
+
+      if (newChar !== oldChar) {
+        const digitEl = animateDigitChange(oldChar, newChar, i);
+        container.appendChild(digitEl);
+      } else {
+        const span = document.createElement('span');
+        span.className = 'countdown-digit';
+        span.textContent = newChar;
+        container.appendChild(span);
+      }
+    }
+
+    previousDigits = formatted;
+  }
+
+  // Сохраняем интервал для этого элемента
+  activeCountdownIntervals[elementId] = setInterval(updateCountdown, 1000);
+  updateCountdown();
+}
+
+async function openLiveLesson() {
+  const unit = currentUnit;
+  const container = document.getElementById("liveLessonBlock");
+  const wrapper = document.getElementById("liveLesson");
+
+  if (!container || !wrapper) return;
+
+  wrapper.style.display = 'block';
+  container.innerHTML = `
+    <div class="tab-title">Loading Live Lesson Unit ${unit}...</div>
+    <div class="unit-content"><p>Loading...</p></div>
+  `;
+
+  try {
+    const response = await fetch(`/static/liveLessons/Unit${unit}.html`);
+    const rawHTML = await response.text();
+
+    const titleMatch   = rawHTML.match(/<!--\s*tab-title\s*-->([\s\S]*?)<!--\s*\/tab-title\s*-->/);
+    const contentMatch = rawHTML.match(/<!--\s*content\s*-->([\s\S]*?)<!--\s*\/content\s*-->/);
+
+    const tabTitle = titleMatch ? titleMatch[1].trim() : `Unit ${unit}`;
+    const content  = contentMatch ? contentMatch[1].trim() : rawHTML;
+
+    container.innerHTML = `
+      <div class="tab-title">${tabTitle}</div>
+      <div class="unit-content grammar-section">
+        ${content}
+      </div>
+    `;
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = `
+      <div class="tab-title">Live Lesson: Unit ${unit}</div>
+      <div class="unit-content">
+        <p class="error">Could not load content.</p>
+      </div>
+    `;
+  }
+}
+
+  document.getElementById("current-unit-value").addEventListener("click", function() {
+    showPage("liveLesson");
+  });

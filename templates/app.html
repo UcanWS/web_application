@@ -164,7 +164,10 @@
   <i class="fas fa-tasks"></i>
   <span>Tasks</span>
 </div>
-
+<div class="service-card" onclick="showPage('personal-analyzing')">
+  <i class="fas fa-user-check"></i>
+  <span>Personal Analyzing</span>
+</div>
   </div>
 </div>
   
@@ -205,21 +208,69 @@
 </div>
 
       </div>
+	  <div class="carousel-item">
+  <div class="squid-game-event" onclick="showPage('squid-game')">
+    <img class="squid-event-image" src="/static/icons/squid-game-preview.png" alt="Squid Game Event">
+    <div class="squid-event-overlay">
+      <div class="squid-event-title">Squid Game Event</div>
+      <div class="squid-event-subtext">
+        Double Points Active — <strong>Earn 2× more</strong><br>on every action today!
+      </div>
+    </div>
+  </div>
+</div>
+
     </div>
   </div>
 
 	
   </div>
 
+<div id="liveLesson" class="page"> 
+  <div id="liveLessonBlock"></div>
+</div>
+
+
 <div id="leaderboard" class="page">
 
   <div id="leaderboard-container"></div>
 </div>
 
+<div id="personal-analyzing" class="page">
+  <h2>Personal Analyzing</h2>
+
+  <div id="personal-summary">
+    <!-- краткий анализ (grammar_change, vocabulary_change и т.д.) -->
+  </div>
+
+  <button id="detailed-suggestions-btn">Get Detailed Suggestions</button>
+
+  <div id="detailed-analysis" style="margin-top: 1rem;">
+    <!-- подробный анализ от Gemini -->
+  </div>
+</div>
+
+
 <div id="tasks" class="page">
  <div id="tasks-container"></div>
 </div>
 
+  <div id="squid-game" class="page">
+    <div class="fancy-logo"><h2>Horizon Events / Squid Game</h2> </div>
+  
+  <div id="video-player-squid"></div>
+  
+<div class="description-block">
+  <img src="static/icons/squid-game.webp" alt="Squid Game" class="series-icon">
+  <div class="details">2025 31 August • Several games • 18+ • Thriller</div>
+  <div class="summary">Hundreds of cash-strapped players accept a strange invitation to compete in children's games. Inside, a tempting prize awaits—with deadly high stakes.</div>
+  <div class="starring">Players: <span>Muhammadali</span><span>Abdulmalik</span><span>Elbek</span><span>Behruz</span><span>Zakariyo</span><span>Dilafruz</span><span>Muzdalifa</span><span>Frontman</span></div>
+  <div class="creators">Creators: <span>Horizon</span></div>
+  
+  <div class="countdown" id="countdown-timer"></div>
+</div>
+  </div>
+  
 <div id="exams" class="page">
 
 <div id="exams-container"></div>
@@ -804,5 +855,6 @@
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script src="/static/js/app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </body>
 </html>

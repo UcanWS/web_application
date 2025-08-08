@@ -328,6 +328,13 @@
       "message": "Right",
       "timestamp": "2025-07-13T05:12:28.703935",
       "read": true
+    },
+    {
+      "sender": "Abdulmalik",
+      "receiver": "Muhammadiso",
+      "message": "\u0414\u0446",
+      "timestamp": "2025-07-29T09:52:53.228200",
+      "read": false
     }
   ],
   "Abdulmalik_Muhammadali": [
@@ -956,6 +963,122 @@
       "receiver": "071-BKK",
       "message": "CHUCHINI USHLAMA",
       "timestamp": "2025-07-12T13:25:58.726065",
+      "read": false
+    }
+  ],
+  "Abdulmalik_Elbek": [
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Metan jura",
+      "timestamp": "2025-07-29T11:37:19.140883",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Cipron jora qalsaysan",
+      "timestamp": "2025-07-29T11:37:42.077897",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Ayenga aytorasan chichqoq",
+      "timestamp": "2025-07-29T11:39:17.134528",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Gaz juram erke misan?",
+      "timestamp": "2025-07-29T11:39:47.338950",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "",
+      "timestamp": "2025-07-29T11:40:29.476527",
+      "read": true,
+      "media_url": "/private_uploads/1753789229_20250716_153417.jpg"
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Buvin Shelbek chundinmi Gazbalaoni porsolini",
+      "timestamp": "2025-07-29T11:40:57.684446",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "\ud83d\udc9f\ud83d\udc98",
+      "timestamp": "2025-07-29T11:42:57.083917",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "\ud83d\udc8b\ud83d\udc8b\ud83d\udc8b\ud83d\udc8b\ud83d\udc8b",
+      "timestamp": "2025-07-29T11:43:04.181837",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "\ud83d\udc91",
+      "timestamp": "2025-07-29T11:44:32.344815",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Keling gey boling jonim abdulmalikjonim",
+      "timestamp": "2025-07-29T11:45:06.523424",
+      "read": true
+    },
+    {
+      "sender": "Abdulmalik",
+      "receiver": "Elbek",
+      "message": "Yban san shebe",
+      "timestamp": "2025-07-29T11:45:21.717227",
+      "read": true
+    },
+    {
+      "sender": "Abdulmalik",
+      "receiver": "Elbek",
+      "message": "Crucifix kesaman kot haromi",
+      "timestamp": "2025-07-29T11:45:37.782540",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "Geysiz ku blaman trans boling",
+      "timestamp": "2025-07-29T11:45:38.876577",
+      "read": true
+    },
+    {
+      "sender": "Abdulmalik",
+      "receiver": "Elbek",
+      "message": "Pashol nahuy yban",
+      "timestamp": "2025-07-29T11:46:00.822833",
+      "read": true
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "",
+      "timestamp": "2025-07-29T11:46:18.566547",
+      "read": true,
+      "media_url": "/private_uploads/1753789578_175378955979562839832839493732.jpg"
+    },
+    {
+      "sender": "Elbek",
+      "receiver": "Abdulmalik",
+      "message": "\ud83d\udd95",
+      "timestamp": "2025-07-29T11:46:49.554363",
       "read": false
     }
   ]

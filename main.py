@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for, session , send_file, abort , flash
 from flask_socketio import SocketIO, emit, join_room
 import os
@@ -3867,7 +3868,7 @@ def submit_writing_task():
         username = data.get('username')
         title = data.get('title')
         answers = data.get('answers', {})
-        questions = data.get('questions', [{}])  # Default to empty dict if missing
+        questions = data.get('questions', [{}])
 
         if not all([level, unit, username, title]):
             return jsonify({'success': False, 'error': 'Missing required fields'}), 400
@@ -3882,10 +3883,7 @@ def submit_writing_task():
 
         word_count = len(writing_answer.strip().split())
         if word_count < 30 or word_count > 200:
-            return jsonify({
-                'success': False,
-                'error': f'Essay must be between 30 and 200 words (current: {word_count})'
-            }), 400
+            return jsonify({'success': False, 'error': f'Essay must be between 30 and 200 words (current: {word_count})'}), 400
 
         all_results = load_results(level, unit)
         user_results = all_results.setdefault(username, {})
@@ -3896,16 +3894,19 @@ def submit_writing_task():
         topic = questions[0].get('text', 'Write an essay on a given topic. Aim for 30+ words.')
         print(f'[Writing] Topic used for evaluation: {topic}')
 
+        # Gemini Prompt with scoring and suggestion logic
         prompt = (
-            f"Evaluate the following essay based on the topic: \"{topic}\".\n"
-            f"The writer is an English learner at the {level} level.\n\n"
-            f"Please evaluate the essay based on these criteria and provide feedback and score for each out of 25:\n"
-            f"1. Task Achievement & Structure\n"
-            f"2. Organization\n"
-            f"3. Grammar\n"
-            f"4. Vocabulary\n"
-            f"Respond as JSON in this format:\n"
+            f"The following essay is written by an English learner at the {level} level. "
+            f"Topic: \"{topic}\"\n\n"
+            f"Essay:\n{writing_answer}\n\n"
+            f"First, determine whether the essay was likely written by an AI or a human. "
+            f"If the essay seems AI-generated, respond with this JSON:\n"
             f"{{\n"
+            f"  \"ai_detected\": true\n"
+            f"}}\n"
+            f"Otherwise, respond with a detailed evaluation as JSON in this format:\n"
+            f"{{\n"
+            f"  \"ai_detected\": false,\n"
             f"  \"feedback\": {{\n"
             f"    \"task_structure\": \"string\",\n"
             f"    \"organization\": \"string\",\n"
@@ -3917,50 +3918,70 @@ def submit_writing_task():
             f"    \"organization\": number,\n"
             f"    \"grammar\": number,\n"
             f"    \"vocabulary\": number\n"
+            f"  }},\n"
+            f"  \"suggestion\": {{\n"
+            f"    \"task_structure\": \"short suggestion in Uzbek\",\n"
+            f"    \"organization\": \"short suggestion in Uzbek\",\n"
+            f"    \"grammar\": \"short suggestion in Uzbek\",\n"
+            f"    \"vocabulary\": \"short suggestion in Uzbek\"\n"
             f"  }}\n"
-            f"}}\n\n"
-            f"Essay:\n{writing_answer}"
+            f"}}\n"
+            f"Each score must be from 0 to 25. "
+            f"If any score is below 25, explain the reason in the feedback, and provide a practical short suggestion "
+            f"in Uzbek for that category and feedback also must be in Uzbek."
         )
 
         try:
             response = client.generate_content(
                 contents=prompt,
-                generation_config={
-                    'response_mime_type': 'application/json'
-                }
+                generation_config={'response_mime_type': 'application/json'}
             )
             response_text = response.text
             print(f'[Writing] Raw Gemini response: {response_text}')
 
-            # Fix invalid escape sequences
             response_text = re.sub(r'(?<!\\)\\(?![\\"/bfnrt])', r'\\\\', response_text)
-            # Remove extraneous tokens (e.g., "concentric") after feedback object
             response_text = re.sub(r'("[^"]*"\s*:\s*"[^"]*"\s*)\s*\w+\s*}', r'\1}', response_text)
 
             try:
                 gemini_result = json.loads(response_text)
+            except json.JSONDecodeError as e:
+                print(f'[Writing] ? JSON parsing error: {str(e)}. Response text: {response_text}')
+                return jsonify({'success': False, 'error': f'Invalid AI response: JSON parsing failed ({str(e)})'}), 500
+
+            ai_detected = gemini_result.get("ai_detected", False)
+            if ai_detected:
+                feedback = {
+                    'task_structure': 'AI Detected',
+                    'organization': 'AI Detected',
+                    'grammar': 'AI Detected',
+                    'vocabulary': 'AI Detected'
+                }
+                scores = {
+                    'task_structure': 0,
+                    'organization': 0,
+                    'grammar': 0,
+                    'vocabulary': 0
+                }
+                total_score = 0
+            else:
                 feedback = gemini_result.get('feedback', {})
                 scores = gemini_result.get('scores', {})
+                suggestions = gemini_result.get('suggestion', {})
 
+                # Score clamping for safe total
                 ts_score = min(max(scores.get('task_structure', 0), 0), 25)
                 org_score = min(max(scores.get('organization', 0), 0), 25)
                 grammar_score = min(max(scores.get('grammar', 0), 0), 25)
                 vocab_score = min(max(scores.get('vocabulary', 0), 0), 25)
                 total_score = ts_score + org_score + grammar_score + vocab_score
 
-            except json.JSONDecodeError as e:
-                print(f'[Writing] âŒ JSON parsing error: {str(e)}. Response text: {response_text}')
-                return jsonify({
-                    'success': False,
-                    'error': f'Invalid AI response: JSON parsing failed ({str(e)})'
-                }), 500
+                # Attach suggestions if present
+                if suggestions:
+                    feedback['suggestion'] = suggestions
 
         except Exception as e:
-            print(f'[Writing] âŒ Error calling Gemini API: {str(e)}')
-            return jsonify({
-                'success': False,
-                'error': 'Failed to get feedback from Gemini'
-            }), 500
+            print(f'[Writing] ? Error calling Gemini API: {str(e)}')
+            return jsonify({'success': False, 'error': 'Failed to get feedback from Gemini'}), 500
 
         record = {
             'submitted': True,
@@ -3984,6 +4005,9 @@ def submit_writing_task():
             }]
         }
 
+        if ai_detected:
+            record['ai_detected'] = True
+
         user_results[title] = record
         save_results(level, unit, all_results)
 
@@ -3992,14 +4016,18 @@ def submit_writing_task():
             reward_given = True
             try:
                 add_tx_url = url_for('add_transaction', _external=True)
-                resp = requests.post(add_tx_url, json={
-                    'username': username,
-                    'amount': 100,
-                    'description': f"Reward for completing '{title}' with {int(total_score)}%"
-                }, timeout=5)
+                resp = requests.post(
+                    add_tx_url,
+                    json={
+                        'username': username,
+                        'amount': 100,
+                        'description': f"Reward for completing '{title}' with {int(total_score)}%"
+                    },
+                    timeout=5
+                )
                 resp.raise_for_status()
             except Exception as e:
-                print(f'[Writing] âŒ Error awarding points: {str(e)}')
+                print(f'[Writing] ? Error awarding points: {str(e)}')
                 reward_given = False
 
         return jsonify({
@@ -4011,11 +4039,8 @@ def submit_writing_task():
         }), 200
 
     except Exception as e:
-        print(f'[Writing] âŒ Error submitting writing task: {str(e)}')
-        return jsonify({
-            'success': False,
-            'error': 'Internal server error'
-        }), 500
+        print(f'[Writing] ? Error submitting writing task: {str(e)}')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 IDEAS_FOLDER = 'data/ideas/files'       # ÐŸÐ°Ð¿ÐºÐ° Ð´Ð»Ñ Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ñ„Ð°Ð¹Ð»Ð¾Ð²
 IDEAS_DATA = 'data/ideas'               # ÐŸÐ°Ð¿ÐºÐ° Ð´Ð»Ñ Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ñ JSON
@@ -4075,7 +4100,7 @@ DATA_PACK_TASKS = 'data/tasks'  # Ð·Ð°Ð¼ÐµÐ½Ð¸Ð»Ð¸ BASE_DIR
 def get_task_file_path(username):
     return os.path.join(DATA_PACK_TASKS, username, 'task-list.json')
 
-def load_tasks(username):
+def load_tasks_pack(username):
     path = get_task_file_path(username)
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f:
@@ -4090,12 +4115,12 @@ def save_tasks(username, tasks):
 
 @app.route('/api/tasks-list/<username>', methods=['GET'])
 def get_tasks(username):
-    tasks = load_tasks(username)
+    tasks = load_tasks_pack(username)
     return jsonify(tasks), 200
 
 @app.route('/api/task-status/<username>', methods=['GET'])
 def get_task_status(username):
-    tasks = load_tasks(username)
+    tasks = load_tasks_pack(username)
     total = len(tasks)
     completed = sum(1 for t in tasks if t.get('completed') == True)
     pending = total - completed
@@ -4118,7 +4143,7 @@ def create_task(username):
     except ValueError:
         return jsonify({"error": "Reward must be a number (e.g., 700)"}), 400
 
-    tasks = load_tasks(username)
+    tasks = load_tasks_pack(username)
 
     new_task = {
         "id": len(tasks) + 1,
@@ -4136,7 +4161,7 @@ def create_task(username):
 
 @app.route('/api/claim-task/<username>/<int:task_id>', methods=['POST'])
 def claim_task(username, task_id):
-    tasks = load_tasks(username)
+    tasks = load_tasks_pack(username)
 
     for task in tasks:
         if task['id'] == task_id:
@@ -4157,6 +4182,142 @@ def claim_task(username, task_id):
             return jsonify(result), 200
 
     return jsonify({"error": "Task not found"}), 404
+    
+@app.route('/api/get-personal-suggestions', methods=['GET'])
+def get_personal_suggestions():
+    username = request.args.get('username')
+    level    = request.args.get('level')
+    unit     = request.args.get('unit')
+
+    if not all([username, level, unit]):
+        return jsonify({"error": "Missing username, level or unit"}), 400
+
+    try:
+        current_w, current_d = map(int, unit.split('.'))
+    except ValueError:
+        return jsonify({"error": "Invalid unit format"}), 400
+
+    def is_before_or_equal(u):
+        try:
+            w, d = map(int, u.split('.'))
+            return (w < current_w) or (w == current_w and d <= current_d)
+        except:
+            return False
+
+    writing_units = [u for u in Units if is_before_or_equal(u)]
+    writing_history = []
+
+    for u in writing_units:
+        results = load_results(level, u)
+        user_data = results.get(username, {})
+        writing_task = user_data.get("Writing AI", {})
+
+        if writing_task.get("submitted"):
+            writing_history.append({
+                "unit": u,
+                "scores": writing_task.get("scores", {}),
+                "percent": writing_task.get("percent", 0)
+            })
+
+    if len(writing_history) < 2:
+        return jsonify({"error": "Not enough writing tasks submitted"}), 200
+
+    prev, curr = writing_history[-2], writing_history[-1]
+
+    diff = {
+        "grammar_change": curr["scores"].get("grammar", 0) - prev["scores"].get("grammar", 0),
+        "vocabulary_change": curr["scores"].get("vocabulary", 0) - prev["scores"].get("vocabulary", 0),
+        "organization_change": curr["scores"].get("organization", 0) - prev["scores"].get("organization", 0),
+        "task_structure_change": curr["scores"].get("task_structure", 0) - prev["scores"].get("task_structure", 0),
+        "previous_unit": prev["unit"],
+        "current_unit": curr["unit"]
+    }
+
+    comments = []
+
+    if diff["grammar_change"] > 0:
+        comments.append("Grammatika yaxshilandi.")
+    elif diff["grammar_change"] < 0:
+        comments.append("Grammatika yomonlashdi.")
+
+    if diff["vocabulary_change"] > 0:
+        comments.append("Lug'at boyligi oshdi.")
+    elif diff["vocabulary_change"] < 0:
+        comments.append("Lug'at boyligi kamaydi.")
+
+    if diff["organization_change"] > 0:
+        comments.append("Tuzilish yaxshilandi.")
+    elif diff["organization_change"] < 0:
+        comments.append("Tuzilish yomonlashdi.")
+
+    if diff["task_structure_change"] > 0:
+        comments.append("Insho strukturasi yaxshilandi.")
+    elif diff["task_structure_change"] < 0:
+        comments.append("Insho strukturasi yomonlashdi.")
+
+    return jsonify({**diff, "comment": " ".join(comments)}), 200
+
+@app.route('/api/compare-essays-ai-get', methods=['GET'])
+def compare_essays_ai_get():
+    username = request.args.get('username')
+    level = request.args.get('level')
+    unit = request.args.get('unit')  # òåêóùèé þíèò (íàïðèìåð: 3.2)
+
+    if not all([username, level, unit]):
+        return jsonify({'error': 'Missing username, level or unit'}), 400
+
+    # Ñïèñîê þíèòîâ äî òåêóùåãî
+    try:
+        current_index = Units.index(unit)
+        if current_index < 1:
+            return jsonify({'error': 'No previous unit to compare with'}), 400
+        prev_unit = Units[current_index - 1]
+    except Exception as e:
+        return jsonify({'error': f'Invalid unit: {e}'}), 400
+
+    # Ïîëó÷àåì ðåçóëüòàòû äëÿ òåêóùåãî è ïðåäûäóùåãî þíèòà
+    curr_data = load_results(level, unit).get(username, {}).get('Writing AI')
+    prev_data = load_results(level, prev_unit).get(username, {}).get('Writing AI')
+
+    if not curr_data or not prev_data:
+        return jsonify({'error': 'Missing essay data in current or previous unit'}), 404
+
+    curr_essay = curr_data['details'][0]
+    prev_essay = prev_data['details'][0]
+
+    # Ñîñòàâëÿåì prompt
+    prompt = (
+        f"You are an AI language teacher evaluating the progress of an English learner at the {level} level.\n\n"
+        f"--- Previous Essay ---\n"
+        f"Topic: {prev_essay.get('text')}\n"
+        f"{prev_essay.get('user_answer')}\n\n"
+        f"--- Current Essay ---\n"
+        f"Topic: {curr_essay.get('text')}\n"
+        f"{curr_essay.get('user_answer')}\n\n"
+        f"Compare both essays and return JSON:\n"
+        f"{{\n"
+        f"  \"grammar\": {{\"change\": number, \"comment\": \"Uzbek\"}},\n"
+        f"  \"vocabulary\": {{\"change\": number, \"comment\": \"Uzbek\"}},\n"
+        f"  \"organization\": {{\"change\": number, \"comment\": \"Uzbek\"}},\n"
+        f"  \"task_structure\": {{\"change\": number, \"comment\": \"Uzbek\"}},\n"
+        f"  \"overall_comment\": \"Uzbek summary\"\n"
+        f"}}"
+    )
+
+    try:
+        response = client.generate_content(
+            contents=prompt,
+            generation_config={'response_mime_type': 'application/json'}
+        )
+        response_text = response.text.strip()
+        result = json.loads(response_text)
+        return jsonify({'success': True, 'analysis': result}), 200
+
+    except Exception as e:
+        print(f'[Compare AI GET] Error: {e}')
+        return jsonify({'error': 'Failed to compare essays with AI'}), 500
+
+
         
 if __name__ == '__main__':
     # ÐžÑ‚ÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ use_reloader, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð½Ðµ Ð¿Ñ‹Ñ‚Ð°Ñ‚ÑŒÑÑ Ñ‡Ð¸Ñ‚Ð°Ñ‚ÑŒ WERKZEUG_SERVER_FD

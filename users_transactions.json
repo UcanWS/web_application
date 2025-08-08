@@ -101,6 +101,62 @@
             "description": "Won game cdc8fc40-0540-4a15-ad00-4e5730410b9d",
             "time": "2025-07-23T07:09:36.904467",
             "balance_before": 1179.0
+        },
+        {
+            "id": "bd8799e3-c25a-4201-a2f0-96aa3561751d",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T06:35:29.245269",
+            "balance_before": 150000.0,
+            "can_cancel": false
+        },
+        {
+            "id": "715c053e-e660-4803-bb02-5d9f5b16ee1f",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T06:47:32.653897",
+            "balance_before": 147500.0,
+            "can_cancel": false
+        },
+        {
+            "id": "db0db66d-1d37-4712-b6c8-a665c4758f0b",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T06:47:37.869428",
+            "balance_before": 145000.0,
+            "can_cancel": false
+        },
+        {
+            "id": "2e317de9-8e1f-473c-816b-f9fa2e82f5b4",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T06:47:44.688914",
+            "balance_before": 142500.0,
+            "can_cancel": false
+        },
+        {
+            "id": "1bee19c3-8193-4138-8b64-a327e0664a36",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T06:47:48.966226",
+            "balance_before": 140000.0,
+            "can_cancel": false
+        },
+        {
+            "id": "ffcd8b4d-39ae-4b18-8fe8-ccf09e670040",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T06:47:53.377665",
+            "balance_before": 137500.0,
+            "can_cancel": false
+        },
+        {
+            "id": "8a02c576-d485-427e-9372-0a3bb7748d44",
+            "amount": 15000,
+            "description": "\ud83c\udf81 Escaped Horror with Reward",
+            "time": "2025-07-27T06:47:58.792817",
+            "balance_before": 135000.0,
+            "can_cancel": false
         }
     ],
     "Elbek": [
@@ -265,6 +321,134 @@
             "description": "\u274c Lost prize for game 83882317-50a1-4f47-b5af-5f6b985cb525",
             "time": "2025-07-23T07:15:46.685464",
             "balance_before": -666.0
+        },
+        {
+            "id": "1a227bad-46ad-4083-ade8-f18347b14fab",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T16:39:42.272400",
+            "balance_before": 668668.0,
+            "can_cancel": false
+        },
+        {
+            "id": "8b6c71ea-d8fb-414c-94d4-f4a0f67dc542",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-27T16:39:44.196855",
+            "balance_before": 666168.0,
+            "can_cancel": false
+        },
+        {
+            "id": "9829ca5b-bad3-417c-a388-b4097474a6f8",
+            "amount": 1300,
+            "description": "\ud83c\udf81 Escaped Horror with Reward",
+            "time": "2025-07-27T16:40:23.966943",
+            "balance_before": 663668.0,
+            "can_cancel": false
+        },
+        {
+            "id": "dbe81823-f377-4f35-aa81-85d627a3f73f",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-27T16:40:25.675325",
+            "balance_before": 664968.0,
+            "can_cancel": false
+        },
+        {
+            "id": "4636f2f0-9fcc-443f-ad87-52f3e32d60cf",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-07-29T16:38:36.446625",
+            "balance_before": 661468.0,
+            "can_cancel": false
+        },
+        {
+            "id": "63ddf5be-a1f2-41f9-abf6-2644ca73345d",
+            "amount": 1300,
+            "description": "\ud83c\udf81 Escaped Horror with Reward",
+            "time": "2025-07-29T16:38:52.339281",
+            "balance_before": 658968.0,
+            "can_cancel": false
+        },
+        {
+            "id": "a78728d2-8e72-4e67-bdce-7cfc6ada89bc",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-07-29T16:38:53.094041",
+            "balance_before": 660268.0,
+            "can_cancel": false
+        },
+        {
+            "id": "3e651311-292e-4937-b746-6f36123cbea5",
+            "amount": 800,
+            "description": "\ud83d\udcab Cosmic Treasure Claimed",
+            "time": "2025-07-29T16:39:04.331820",
+            "balance_before": 656768.0,
+            "can_cancel": false
+        },
+        {
+            "id": "2da5db4e-f4a5-47cd-9751-de635f1e4eae",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-07T21:01:14.080989",
+            "balance_before": 657568.0,
+            "can_cancel": false
+        },
+        {
+            "id": "a4572075-1d84-42a8-9d6e-bb9023376121",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-07T21:01:19.139618",
+            "balance_before": 655068.0,
+            "can_cancel": false
+        },
+        {
+            "id": "a77dbde7-74d0-4c9d-beca-f7f09f93ca74",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-07T21:01:25.096896",
+            "balance_before": 652568.0,
+            "can_cancel": false
+        },
+        {
+            "id": "e3dcc292-0645-4738-bfd9-a6c2b3f677a8",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-08-07T21:01:33.703905",
+            "balance_before": 650068.0,
+            "can_cancel": false
+        },
+        {
+            "id": "e4eed695-fcad-4b77-9838-db2d21c86088",
+            "amount": -3500,
+            "description": "\ud83c\udf0c Cosmic Ladder Entry",
+            "time": "2025-08-07T21:01:37.969876",
+            "balance_before": 646568.0,
+            "can_cancel": false
+        },
+        {
+            "id": "102cbd0b-7b81-4e8e-80b8-99a0125f5201",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-07T21:01:44.992101",
+            "balance_before": 643068.0,
+            "can_cancel": false
+        },
+        {
+            "id": "01d45764-6734-417d-a45b-15742491f4b4",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-07T21:01:49.324431",
+            "balance_before": 640568.0,
+            "can_cancel": false
+        },
+        {
+            "id": "1562f7ab-1d34-49d7-8f7a-a257a05efba5",
+            "amount": 2500,
+            "description": "\ud83c\udf81 Escaped Horror with Reward",
+            "time": "2025-08-07T21:01:53.152946",
+            "balance_before": 638068.0,
+            "can_cancel": false
         }
     ],
     "Abdulmalik": [
@@ -291,6 +475,56 @@
             "description": "\ud83c\udfc6 Prize from game 83882317-50a1-4f47-b5af-5f6b985cb525",
             "time": "2025-07-23T07:15:46.681717",
             "balance_before": -5334.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing AI' with 100%",
+            "time": "2025-07-25T18:03:31.402314",
+            "balance_before": 10668.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing AI' with 100%",
+            "time": "2025-07-25T18:08:51.320954",
+            "balance_before": 10768.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing AI' with 95%",
+            "time": "2025-07-25T18:12:28.509974",
+            "balance_before": 10868.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing AI' with 100%",
+            "time": "2025-07-25T18:16:22.830105",
+            "balance_before": 10968.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Writing AI' with 95%",
+            "time": "2025-07-25T18:43:17.932169",
+            "balance_before": 11068.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Vocabulary Tasks' with 91%",
+            "time": "2025-07-29T16:21:30.666226",
+            "balance_before": 11168.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Grammar Tasks' with 100%",
+            "time": "2025-07-29T16:36:06.562302",
+            "balance_before": 11268.0
+        }
+    ],
+    "Legenda": [
+        {
+            "amount": 0,
+            "description": "Purchased from shop with coins : Abdulmalik Zaparil Pack.",
+            "time": "2025-07-27T16:55:19.975826",
+            "balance_before": 0.0
         }
     ]
 }

@@ -23,6 +23,15 @@
       "type": "Zapal",
       "image": "/static/images/Elbek.png",
       "time": "2025-07-10T15:02:37.895747"
+    },
+    {
+      "id": 11,
+      "name": "Abdulmalik Zaparil Pack.",
+      "cost": 132,
+      "type": "Zapal",
+      "image": "/static/images/Abdulmalik.jpg",
+      "time": "2025-07-27T16:55:19.980455",
+      "quantity": 6
     }
   ],
   "Abdulmalik": [

@@ -9,10 +9,8 @@
     }
   },
   "Muhammadiso": {
-    "strikes": 40,
-    "lastStrikeByUnit": {
-      "3.2": "2025-07-17"
-    }
+    "strikes": 0,
+    "lastStrikeByUnit": {}
   },
   "Abdulmalik": {
     "strikes": 0,

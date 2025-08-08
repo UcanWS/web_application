@@ -1,0 +1,1068 @@
+{
+    "Abdulmalik": {
+        "Vocabulary Tasks": {
+            "submitted": true,
+            "time": "2025-07-29 16:21:30",
+            "correct": 11,
+            "incorrect": 1,
+            "skipped": 0,
+            "total": 12,
+            "percent": 91.66666666666666,
+            "details": [
+                {
+                    "question_id": "4.1",
+                    "text": "pplea",
+                    "user_answer": "apple",
+                    "correct_answer": "apple",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "kooB",
+                    "user_answer": "Book",
+                    "correct_answer": "Book",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "teacher",
+                    "user_answer": "theacer",
+                    "correct_answer": "teacher",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.4",
+                    "text": "computer",
+                    "user_answer": "computer",
+                    "correct_answer": "computer",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.5",
+                    "text": "table",
+                    "user_answer": "table",
+                    "correct_answer": "table",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.1",
+                    "text": "I have an ____. It is sweet and red.",
+                    "user_answer": "apple",
+                    "correct_answer": "apple",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "My favorite color is ____. It is the color of a strawberry.",
+                    "user_answer": "red",
+                    "correct_answer": "red",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "Our ____ is very nice. She helps us learn English.",
+                    "user_answer": "teacher",
+                    "correct_answer": "teacher",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.4",
+                    "text": "I go to ____ every day from Monday to Friday.",
+                    "user_answer": "school",
+                    "correct_answer": "school",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.5",
+                    "text": "I write with a ____. It is blue.",
+                    "user_answer": "pen",
+                    "correct_answer": "pen",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.6",
+                    "text": "I read a ____. It is about animals.",
+                    "user_answer": "book",
+                    "correct_answer": "book",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.7",
+                    "text": "My ____ is brown. I put my books on it.",
+                    "user_answer": "desk",
+                    "correct_answer": "desk",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Listening Tasks": {
+            "submitted": true,
+            "time": "2025-07-29 16:31:34",
+            "correct": 5,
+            "incorrect": 2,
+            "skipped": 0,
+            "total": 7,
+            "percent": 71.42857142857143,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "Pedro has got a big ____.",
+                    "user_answer": "head",
+                    "correct_answer": "head",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "Has she got a friendly ____?",
+                    "user_answer": "face",
+                    "correct_answer": "face",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "Her hands are ____ small.",
+                    "user_answer": "very",
+                    "correct_answer": "very",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "We haven't got brown ____",
+                    "user_answer": "hi",
+                    "correct_answer": "hair",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "My legs are ____ long.",
+                    "user_answer": "really",
+                    "correct_answer": "really",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "He's got short ____",
+                    "user_answer": "ans",
+                    "correct_answer": "arms",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.7",
+                    "text": "I've got tired ____ after that long walk.",
+                    "user_answer": "feet",
+                    "correct_answer": "feet",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Grammar Tasks": {
+            "submitted": true,
+            "time": "2025-07-29 16:36:06",
+            "correct": 9,
+            "incorrect": 0,
+            "skipped": 0,
+            "total": 9,
+            "percent": 100.0,
+            "details": [
+                {
+                    "question_id": "1.1",
+                    "text": "Choose the correct sentence.",
+                    "user_answer": "He is a teacher.",
+                    "correct_answer": "He is a teacher.",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "Choose the correct form of 'to be': I ___ a student.",
+                    "user_answer": "am",
+                    "correct_answer": "am",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "What is the plural form of 'book'?",
+                    "user_answer": "books",
+                    "correct_answer": "books",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "Which word is a pronoun?",
+                    "user_answer": "She",
+                    "correct_answer": "She",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.6",
+                    "text": "Choose the correct question: ___ your name?",
+                    "user_answer": "What is",
+                    "correct_answer": "What is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.7",
+                    "text": "Which word completes the sentence: 'He ___ from Canada.'",
+                    "user_answer": "is",
+                    "correct_answer": "is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.8",
+                    "text": "Which sentence is correct?",
+                    "user_answer": "They are happy.",
+                    "correct_answer": "They are happy.",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.9",
+                    "text": "Select the correct sentence.",
+                    "user_answer": "My name is Anna.",
+                    "correct_answer": "My name is Anna.",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.10",
+                    "text": "Choose the correct order: '___ is this?'",
+                    "user_answer": "What",
+                    "correct_answer": "What",
+                    "is_correct": true
+                }
+            ]
+        },
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-29 16:43:48",
+            "correct": 25,
+            "incorrect": 4,
+            "skipped": 9,
+            "total": 38,
+            "percent": 65.78947368421053,
+            "details": [
+                {
+                    "question_id": "0.1",
+                    "text": "Hello, ____",
+                    "user_answer": "Murat.",
+                    "correct_answer": "I'm Luz",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.2",
+                    "text": "Hi, I'm ____",
+                    "user_answer": "I'm Luz",
+                    "correct_answer": "Murat.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.3",
+                    "text": "Nice ____",
+                    "user_answer": "to meet you",
+                    "correct_answer": "to meet you",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "0.4",
+                    "text": "And ____",
+                    "user_answer": "you.",
+                    "correct_answer": "you.",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "0.5",
+                    "text": "Are you here to ____ ",
+                    "user_answer": "study?",
+                    "correct_answer": "study?",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "0.6",
+                    "text": "No, ____",
+                    "user_answer": "I'm not.",
+                    "correct_answer": "I'm not.",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "0.7",
+                    "text": "Are you here on ____ .",
+                    "user_answer": "biznesmi?",
+                    "correct_answer": "business?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.8",
+                    "text": "Yes, ____ .",
+                    "user_answer": "I am",
+                    "correct_answer": "I am",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.1",
+                    "text": "How do you say 'Salom' in English?",
+                    "user_answer": "Hello",
+                    "correct_answer": "Hello",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "What do you say when you leave? (Ketayotganingizda nima deysiz?)",
+                    "user_answer": "Bye",
+                    "correct_answer": "Bye",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "Choose the correct phrase: '___ name is Anna.' (To‘g‘ri variantni tanlang: '___ name is Anna.')",
+                    "user_answer": "My",
+                    "correct_answer": "My",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "What is the correct response to 'Nice to meet you'? (Bu jumlaga to‘g‘ri javobni toping)",
+                    "user_answer": "I am fine!",
+                    "correct_answer": "Nice to meet you too!",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "How do you introduce yourself? (O‘zingizni qanday tanishtirasiz?)",
+                    "user_answer": "My name is Anna.",
+                    "correct_answer": "My name is Anna.",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.1",
+                    "text": "What is the first letter of the English alphabet? (Ingliz alifbosining birinchi harfi?)",
+                    "user_answer": "A",
+                    "correct_answer": "A",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "Which letter comes after 'C'? (C dan keyin qaysi harf keladi?)",
+                    "user_answer": "D",
+                    "correct_answer": "D",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "What is the last letter of the English alphabet? (Alifbodagi oxirgi harf?)",
+                    "user_answer": "Z",
+                    "correct_answer": "Z",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "Which letter is a vowel? (Qaysi harf unli?)",
+                    "user_answer": "E",
+                    "correct_answer": "E",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.1",
+                    "text": "What number comes after 5? (5 dan keyin qaysi son keladi?)",
+                    "user_answer": "6",
+                    "correct_answer": "6",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.2",
+                    "text": "What is '10' in English? (10 sonining inglizchasi?)",
+                    "user_answer": "Ten",
+                    "correct_answer": "Ten",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "3.3",
+                    "text": "How old are you? — I'm __ years old. (Bo‘shliqni to‘ldiring)",
+                    "user_answer": "15",
+                    "correct_answer": "15",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.1",
+                    "text": "What’s your name? — __ name is Sam.",
+                    "user_answer": "My",
+                    "correct_answer": "My",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "Where are you from? — I’m from __.",
+                    "user_answer": "Uzbekistan",
+                    "correct_answer": "Uzbekistan",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "What do you do? — I’m a __.",
+                    "user_answer": "student",
+                    "correct_answer": "student",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.1",
+                    "text": "I __ a teacher. (Bo‘shliqni to‘ldiring)",
+                    "user_answer": "am",
+                    "correct_answer": "am",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "She __ 20 years old.",
+                    "user_answer": "is",
+                    "correct_answer": "is",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "You __ my friend.",
+                    "user_answer": "are",
+                    "correct_answer": "are",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.1",
+                    "text": "What do you say if you didn’t hear? (Eshitmagan bo‘lsangiz nima deysiz?)",
+                    "user_answer": "Can you repeat, please?",
+                    "correct_answer": "Can you repeat, please?",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.2",
+                    "text": "How do you ask the meaning of a word? (So‘z ma’nosini qanday so‘raysiz?)",
+                    "user_answer": "What does 'apple' mean?",
+                    "correct_answer": "What does 'apple' mean?",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "6.3",
+                    "text": "Which one is polite? (Qaysi ibora xushmuomalalik bilan?)",
+                    "user_answer": "Excuse me",
+                    "correct_answer": "Excuse me",
+                    "is_correct": true
+                },
+                {
+                    "question_id": "7.1",
+                    "text": "____, I'm Chris.",
+                    "user_answer": "",
+                    "correct_answer": "Hello",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.2",
+                    "text": "____, I'm David.",
+                    "user_answer": "",
+                    "correct_answer": "Hi",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.3",
+                    "text": "____ to meet you.",
+                    "user_answer": "",
+                    "correct_answer": "Nice",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.4",
+                    "text": "Chris: ____ you.",
+                    "user_answer": "",
+                    "correct_answer": "And",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.5",
+                    "text": "Are ____ here on holiday?",
+                    "user_answer": "",
+                    "correct_answer": "you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.6",
+                    "text": "David: ____, I'm not.",
+                    "user_answer": "",
+                    "correct_answer": "No",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.7",
+                    "text": "I'm here to ____ and you?",
+                    "user_answer": "",
+                    "correct_answer": "study",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.8",
+                    "text": "Are you here on ____ ?",
+                    "user_answer": "",
+                    "correct_answer": "holiday",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.9",
+                    "text": "Chris: ____, I'm.",
+                    "user_answer": "",
+                    "correct_answer": "Yes",
+                    "is_correct": false
+                }
+            ]
+        }
+    },
+    "Legenda": {
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-29 16:34:02",
+            "correct": 0,
+            "incorrect": 8,
+            "skipped": 30,
+            "total": 38,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "0.1",
+                    "text": "Hello, ____",
+                    "user_answer": "business?",
+                    "correct_answer": "I'm Luz",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.2",
+                    "text": "Hi, I'm ____",
+                    "user_answer": "you.",
+                    "correct_answer": "Murat.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.3",
+                    "text": "Nice ____",
+                    "user_answer": "I'm not.",
+                    "correct_answer": "to meet you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.4",
+                    "text": "And ____",
+                    "user_answer": "I am",
+                    "correct_answer": "you.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.5",
+                    "text": "Are you here to ____ ",
+                    "user_answer": "I'm Luz",
+                    "correct_answer": "study?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.6",
+                    "text": "No, ____",
+                    "user_answer": "Murat.",
+                    "correct_answer": "I'm not.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.7",
+                    "text": "Are you here on ____ .",
+                    "user_answer": "study?",
+                    "correct_answer": "business?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.8",
+                    "text": "Yes, ____ .",
+                    "user_answer": "to meet you",
+                    "correct_answer": "I am",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.1",
+                    "text": "How do you say 'Salom' in English?",
+                    "user_answer": "",
+                    "correct_answer": "Hello",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "What do you say when you leave? (Ketayotganingizda nima deysiz?)",
+                    "user_answer": "",
+                    "correct_answer": "Bye",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "Choose the correct phrase: '___ name is Anna.' (To‘g‘ri variantni tanlang: '___ name is Anna.')",
+                    "user_answer": "",
+                    "correct_answer": "My",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "What is the correct response to 'Nice to meet you'? (Bu jumlaga to‘g‘ri javobni toping)",
+                    "user_answer": "",
+                    "correct_answer": "Nice to meet you too!",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "How do you introduce yourself? (O‘zingizni qanday tanishtirasiz?)",
+                    "user_answer": "",
+                    "correct_answer": "My name is Anna.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.1",
+                    "text": "What is the first letter of the English alphabet? (Ingliz alifbosining birinchi harfi?)",
+                    "user_answer": "",
+                    "correct_answer": "A",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "Which letter comes after 'C'? (C dan keyin qaysi harf keladi?)",
+                    "user_answer": "",
+                    "correct_answer": "D",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "What is the last letter of the English alphabet? (Alifbodagi oxirgi harf?)",
+                    "user_answer": "",
+                    "correct_answer": "Z",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "Which letter is a vowel? (Qaysi harf unli?)",
+                    "user_answer": "",
+                    "correct_answer": "E",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.1",
+                    "text": "What number comes after 5? (5 dan keyin qaysi son keladi?)",
+                    "user_answer": "",
+                    "correct_answer": "6",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.2",
+                    "text": "What is '10' in English? (10 sonining inglizchasi?)",
+                    "user_answer": "",
+                    "correct_answer": "Ten",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.3",
+                    "text": "How old are you? — I'm __ years old. (Bo‘shliqni to‘ldiring)",
+                    "user_answer": "",
+                    "correct_answer": "15",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.1",
+                    "text": "What’s your name? — __ name is Sam.",
+                    "user_answer": "",
+                    "correct_answer": "My",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "Where are you from? — I’m from __.",
+                    "user_answer": "",
+                    "correct_answer": "Uzbekistan",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "What do you do? — I’m a __.",
+                    "user_answer": "",
+                    "correct_answer": "student",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.1",
+                    "text": "I __ a teacher. (Bo‘shliqni to‘ldiring)",
+                    "user_answer": "",
+                    "correct_answer": "am",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "She __ 20 years old.",
+                    "user_answer": "",
+                    "correct_answer": "is",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "You __ my friend.",
+                    "user_answer": "",
+                    "correct_answer": "are",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.1",
+                    "text": "What do you say if you didn’t hear? (Eshitmagan bo‘lsangiz nima deysiz?)",
+                    "user_answer": "",
+                    "correct_answer": "Can you repeat, please?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.2",
+                    "text": "How do you ask the meaning of a word? (So‘z ma’nosini qanday so‘raysiz?)",
+                    "user_answer": "",
+                    "correct_answer": "What does 'apple' mean?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.3",
+                    "text": "Which one is polite? (Qaysi ibora xushmuomalalik bilan?)",
+                    "user_answer": "",
+                    "correct_answer": "Excuse me",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.1",
+                    "text": "____, I'm Chris.",
+                    "user_answer": "",
+                    "correct_answer": "Hello",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.2",
+                    "text": "____, I'm David.",
+                    "user_answer": "",
+                    "correct_answer": "Hi",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.3",
+                    "text": "____ to meet you.",
+                    "user_answer": "",
+                    "correct_answer": "Nice",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.4",
+                    "text": "Chris: ____ you.",
+                    "user_answer": "",
+                    "correct_answer": "And",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.5",
+                    "text": "Are ____ here on holiday?",
+                    "user_answer": "",
+                    "correct_answer": "you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.6",
+                    "text": "David: ____, I'm not.",
+                    "user_answer": "",
+                    "correct_answer": "No",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.7",
+                    "text": "I'm here to ____ and you?",
+                    "user_answer": "",
+                    "correct_answer": "study",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.8",
+                    "text": "Are you here on ____ ?",
+                    "user_answer": "",
+                    "correct_answer": "holiday",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.9",
+                    "text": "Chris: ____, I'm.",
+                    "user_answer": "",
+                    "correct_answer": "Yes",
+                    "is_correct": false
+                }
+            ]
+        }
+    },
+    "Elbek": {
+        "Homework": {
+            "submitted": true,
+            "time": "2025-07-29 16:34:56",
+            "correct": 0,
+            "incorrect": 8,
+            "skipped": 30,
+            "total": 38,
+            "percent": 0.0,
+            "details": [
+                {
+                    "question_id": "0.1",
+                    "text": "Hello, ____",
+                    "user_answer": "business?",
+                    "correct_answer": "I'm Luz",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.2",
+                    "text": "Hi, I'm ____",
+                    "user_answer": "I'm not.",
+                    "correct_answer": "Murat.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.3",
+                    "text": "Nice ____",
+                    "user_answer": "you.",
+                    "correct_answer": "to meet you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.4",
+                    "text": "And ____",
+                    "user_answer": "I am",
+                    "correct_answer": "you.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.5",
+                    "text": "Are you here to ____ ",
+                    "user_answer": "Murat.",
+                    "correct_answer": "study?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.6",
+                    "text": "No, ____",
+                    "user_answer": "I'm Luz",
+                    "correct_answer": "I'm not.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.7",
+                    "text": "Are you here on ____ .",
+                    "user_answer": "to meet you",
+                    "correct_answer": "business?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "0.8",
+                    "text": "Yes, ____ .",
+                    "user_answer": "study?",
+                    "correct_answer": "I am",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.1",
+                    "text": "How do you say 'Salom' in English?",
+                    "user_answer": "",
+                    "correct_answer": "Hello",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.2",
+                    "text": "What do you say when you leave? (Ketayotganingizda nima deysiz?)",
+                    "user_answer": "",
+                    "correct_answer": "Bye",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.3",
+                    "text": "Choose the correct phrase: '___ name is Anna.' (To‘g‘ri variantni tanlang: '___ name is Anna.')",
+                    "user_answer": "",
+                    "correct_answer": "My",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.4",
+                    "text": "What is the correct response to 'Nice to meet you'? (Bu jumlaga to‘g‘ri javobni toping)",
+                    "user_answer": "",
+                    "correct_answer": "Nice to meet you too!",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "1.5",
+                    "text": "How do you introduce yourself? (O‘zingizni qanday tanishtirasiz?)",
+                    "user_answer": "",
+                    "correct_answer": "My name is Anna.",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.1",
+                    "text": "What is the first letter of the English alphabet? (Ingliz alifbosining birinchi harfi?)",
+                    "user_answer": "",
+                    "correct_answer": "A",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.2",
+                    "text": "Which letter comes after 'C'? (C dan keyin qaysi harf keladi?)",
+                    "user_answer": "",
+                    "correct_answer": "D",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.3",
+                    "text": "What is the last letter of the English alphabet? (Alifbodagi oxirgi harf?)",
+                    "user_answer": "",
+                    "correct_answer": "Z",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "2.4",
+                    "text": "Which letter is a vowel? (Qaysi harf unli?)",
+                    "user_answer": "",
+                    "correct_answer": "E",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.1",
+                    "text": "What number comes after 5? (5 dan keyin qaysi son keladi?)",
+                    "user_answer": "",
+                    "correct_answer": "6",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.2",
+                    "text": "What is '10' in English? (10 sonining inglizchasi?)",
+                    "user_answer": "",
+                    "correct_answer": "Ten",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "3.3",
+                    "text": "How old are you? — I'm __ years old. (Bo‘shliqni to‘ldiring)",
+                    "user_answer": "",
+                    "correct_answer": "15",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.1",
+                    "text": "What’s your name? — __ name is Sam.",
+                    "user_answer": "",
+                    "correct_answer": "My",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.2",
+                    "text": "Where are you from? — I’m from __.",
+                    "user_answer": "",
+                    "correct_answer": "Uzbekistan",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "4.3",
+                    "text": "What do you do? — I’m a __.",
+                    "user_answer": "",
+                    "correct_answer": "student",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.1",
+                    "text": "I __ a teacher. (Bo‘shliqni to‘ldiring)",
+                    "user_answer": "",
+                    "correct_answer": "am",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.2",
+                    "text": "She __ 20 years old.",
+                    "user_answer": "",
+                    "correct_answer": "is",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "5.3",
+                    "text": "You __ my friend.",
+                    "user_answer": "",
+                    "correct_answer": "are",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.1",
+                    "text": "What do you say if you didn’t hear? (Eshitmagan bo‘lsangiz nima deysiz?)",
+                    "user_answer": "",
+                    "correct_answer": "Can you repeat, please?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.2",
+                    "text": "How do you ask the meaning of a word? (So‘z ma’nosini qanday so‘raysiz?)",
+                    "user_answer": "",
+                    "correct_answer": "What does 'apple' mean?",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "6.3",
+                    "text": "Which one is polite? (Qaysi ibora xushmuomalalik bilan?)",
+                    "user_answer": "",
+                    "correct_answer": "Excuse me",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.1",
+                    "text": "____, I'm Chris.",
+                    "user_answer": "",
+                    "correct_answer": "Hello",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.2",
+                    "text": "____, I'm David.",
+                    "user_answer": "",
+                    "correct_answer": "Hi",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.3",
+                    "text": "____ to meet you.",
+                    "user_answer": "",
+                    "correct_answer": "Nice",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.4",
+                    "text": "Chris: ____ you.",
+                    "user_answer": "",
+                    "correct_answer": "And",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.5",
+                    "text": "Are ____ here on holiday?",
+                    "user_answer": "",
+                    "correct_answer": "you",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.6",
+                    "text": "David: ____, I'm not.",
+                    "user_answer": "",
+                    "correct_answer": "No",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.7",
+                    "text": "I'm here to ____ and you?",
+                    "user_answer": "",
+                    "correct_answer": "study",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.8",
+                    "text": "Are you here on ____ ?",
+                    "user_answer": "",
+                    "correct_answer": "holiday",
+                    "is_correct": false
+                },
+                {
+                    "question_id": "7.9",
+                    "text": "Chris: ____, I'm.",
+                    "user_answer": "",
+                    "correct_answer": "Yes",
+                    "is_correct": false
+                }
+            ]
+        }
+    }
+}

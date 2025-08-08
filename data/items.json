@@ -83,7 +83,7 @@
     "id": 11,
     "name": "Abdulmalik Zaparil Pack.",
     "cost": 120,
-    "items_left": 1,
+    "items_left": 0,
     "type": "Zapal",
     "image": "/static/images/Abdulmalik.jpg"
   },

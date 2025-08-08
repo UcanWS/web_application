@@ -5,13 +5,23 @@
     "imageUrl": "images/NEW UPDATE o2.2.png"
   },
   {
-    "title": "Coming soon",
-    "thumbnail": "images/likes.png",
-    "videoUrl": "horror/2.mp4"
-  },
-  {
     "title": "Welcome Story",
     "thumbnail": "images/likes.png",
     "imageUrl": "horror/1.jpg"
+  },
+    {
+    "title": "MLBB - Mobile legends",
+    "thumbnail": "images/likes.png",
+    "videoUrl": "cdn/v1.mp4"
+  },
+    {
+    "title": "хз ват ит ис",
+    "thumbnail": "images/likes.png",
+    "videoUrl": "cdn/v3.mp4"
+  },
+  {
+    "title": "5x30",
+    "thumbnail": "images/likes.png",
+    "videoUrl": "cdn/v2.mp4"
   }
 ]
