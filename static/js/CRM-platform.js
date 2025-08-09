@@ -2477,37 +2477,84 @@ function loadUserInventory() {
 function renderInventory(items, user) {
   const list = document.getElementById('shop-inventory-list');
   list.innerHTML = '';
-  if (!items.length) return list.innerHTML = '<p>No items found.</p>';
+
+  if (!items.length) {
+    list.innerHTML = '<p>No items found.</p>';
+    return;
+  }
 
   items.forEach((it, idx) => {
     const card = document.createElement('div');
     card.className = 'inventory-item';
-    const imgSrc = it.image?.startsWith('/static/') ? it.image : '/static/images/default.png';
+
+    const imgSrc = it.image?.startsWith('/static/') 
+      ? it.image 
+      : '/static/images/default.png';
+
     card.innerHTML = `
-      <img src="${imgSrc}" alt="${it.name}" onerror="this.src='/static/images/default.png'" />
+      <img src="${imgSrc}" alt="${it.name}" 
+           onerror="this.src='/static/images/default.png'" />
+
       <div class="item-details">
         <div class="item-header">
           <h4>${it.name}</h4>
-          <button class="btn btn-delete" onclick="deleteItem('${user}', ${idx})">Delete</button>
+          <button class="btn btn-delete" 
+                  onclick="deleteItem('${user}', ${idx})">
+            <i class="fas fa-trash"></i> Delete
+          </button>
         </div>
-        <div class="detail-row">ID: ${it.id} | Type: ${it.type}</div>
-        <div class="detail-row">Cost: $<input id="price-${idx}" type="number" value="${it.cost}" /></div>
-        <div class="detail-row">Qty: <input id="qty-${idx}" type="number" value="${it.quantity || 1}" /></div>
-        <input id="file-${idx}" class="file-upload" type="file" />
+
         <div class="detail-row">
-          <button class="btn btn-edit" onclick="updateItem('${user}', ${idx})">Save</button>
+          <span>ID: ${it.id}</span> 
+          <span>Type: ${it.type}</span>
         </div>
+
+        <div class="detail-row">
+          <label>Cost:</label>
+          <input id="price-${idx}" type="number" value="${it.cost}" />
+        </div>
+
+        <div class="detail-row">
+          <label>Qty:</label>
+          <input id="qty-${idx}" type="number" value="${it.quantity || 1}" />
+        </div>
+
+        <input id="file-${idx}" class="file-upload" type="file" />
+
+        <div class="item-actions">
+          <button class="btn btn-edit" onclick="updateItem('${user}', ${idx})">
+            <i class="fas fa-save"></i> Save
+          </button>
+        </div>
+
         <div class="progress-bar">
-          <div class="stage" data-status="Product in packaging"><div class="stage-icon"><i class="fas fa-box"></i></div><span>Packaging</span></div>
-          <div class="stage" data-status="Shipped"><div class="stage-icon"><i class="fas fa-truck"></i></div><span>Shipped</span></div>
-          <div class="stage" data-status="In transit"><div class="stage-icon"><i class="fas fa-shipping-fast"></i></div><span>Transit</span></div>
-          <div class="stage" data-status="Delivered"><div class="stage-icon"><i class="fas fa-home"></i></div><span>Delivered</span></div>
+          <div class="stage" data-status="Product in packaging">
+            <div class="stage-icon"><i class="fas fa-box"></i></div>
+            <span>Packaging</span>
+          </div>
+          <div class="stage" data-status="Shipped">
+            <div class="stage-icon"><i class="fas fa-truck"></i></div>
+            <span>Shipped</span>
+          </div>
+          <div class="stage" data-status="In transit">
+            <div class="stage-icon"><i class="fas fa-shipping-fast"></i></div>
+            <span>Transit</span>
+          </div>
+          <div class="stage" data-status="Delivered">
+            <div class="stage-icon"><i class="fas fa-home"></i></div>
+            <span>Delivered</span>
+          </div>
         </div>
-      `;
+      </div>
+    `;
+
     list.appendChild(card);
 
-    card.querySelector(`#file-${idx}`).onchange = e => uploadImage(user, idx, e.target.files[0]);
+    // Обработчик загрузки изображения
+    card.querySelector(`#file-${idx}`).onchange = e => 
+      uploadImage(user, idx, e.target.files[0]);
 
+    // Прогресс-бар
     const bar = card.querySelector('.progress-bar');
     const current = it.status || 'Product in packaging';
     bar.querySelectorAll('.stage').forEach(s => {
@@ -2516,6 +2563,7 @@ function renderInventory(items, user) {
     });
   });
 }
+
 
 function deleteItem(user, idx) {
   fetch('/api/inventory-delete', {

@@ -815,10 +815,16 @@
     </div>
   </div>
 </div>
-
-
-
     </div>
+	<div class="menu-item" onclick="showPage('writing-top-list');">
+  <div class="menu-left">
+    <div class="menu-icon">
+      <i class="fas fa-crown"></i>
+    </div>
+    <span class="menu-text">Writing Top List</span>
+  </div>
+  <i class="fas fa-chevron-right menu-arrow"></i>
+</div>
   </div>
 
 <!-- Upload Page -->
@@ -840,6 +846,29 @@
 
 </div>
 
+<!-- Writing Top List Page (only this block) -->
+<div id="writing-top-list" class="page" style="display:none; padding:20px;">
+  <div class="wtl-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <h2 style="margin:0;display:flex;align-items:center;gap:10px;"><i class="fas fa-pen"></i> Writing Top List</h2>
+    <div id="wtl-position" class="wtl-position">#—</div>
+  </div>
+
+  <div class="wtl-controls" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+    <div class="wtl-meta">Unit: <span id="wtl-unit">-</span> — Level: <span id="wtl-level">-</span></div>
+    <button id="wtl-refresh" class="wtl-btn">Refresh</button>
+  </div>
+
+  <div class="wtl-chart-wrap" style="border-radius:14px;padding:12px;margin-bottom:14px;background:rgba(255,255,255,0.02);">
+    <canvas id="writing-chart" width="800" height="280"></canvas>
+  </div>
+
+  <div id="wtl-list" class="wtl-list"></div>
+
+  <div class="wtl-legend" style="margin-top:12px;color:#d6d9e6;font-size:13px;display:flex;gap:10px;align-items:center;">
+    <span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:linear-gradient(90deg,#4fc3f7,#0288d1);margin-right:6px"></span>
+    Score (relative)
+  </div>
+</div>
 
 
 
@@ -856,5 +885,7 @@
 <script src="/static/js/app.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Подключи Chart.js (вставить в <head> или перед твоим main.js) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

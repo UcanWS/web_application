@@ -107,7 +107,7 @@
     "id": 14,
     "name": "Basseyn Ticket",
     "cost": 99,
-    "items_left": 12,
+    "items_left": 11,
     "type": "Special",
     "image": "/static/images/special.gif"
   },

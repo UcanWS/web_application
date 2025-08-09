@@ -449,6 +449,46 @@
             "time": "2025-08-07T21:01:53.152946",
             "balance_before": 638068.0,
             "can_cancel": false
+        },
+        {
+            "id": "ac834f4f-d3b1-49e5-bfb1-859b2850dfe1",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-08T21:52:18.769580",
+            "balance_before": 640568.0,
+            "can_cancel": false
+        },
+        {
+            "id": "3329343b-bd0b-4e00-a712-0c2a6264b0ec",
+            "amount": -2500,
+            "description": "\ud83e\ude78 Entered Horror Games",
+            "time": "2025-08-08T21:52:22.683727",
+            "balance_before": 638068.0,
+            "can_cancel": false
+        },
+        {
+            "amount": -3000,
+            "description": "Debt proposed #31",
+            "time": "2025-08-08T21:53:08.614485",
+            "balance_before": 635568.0
+        },
+        {
+            "amount": -2000,
+            "description": "Exchange to coins",
+            "time": "2025-08-08T21:53:26.315734",
+            "balance_before": 632568.0
+        },
+        {
+            "amount": -630000,
+            "description": "Exchange to coins",
+            "time": "2025-08-08T22:23:16.671886",
+            "balance_before": 630568.0
+        },
+        {
+            "amount": 0,
+            "description": "Purchased from shop with coins : Basseyn Ticket",
+            "time": "2025-08-08T22:23:31.493304",
+            "balance_before": 568.0
         }
     ],
     "Abdulmalik": [

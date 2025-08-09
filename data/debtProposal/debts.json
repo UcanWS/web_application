@@ -1,5 +1,5 @@
 {
-  "next_id": 31,
+  "next_id": 32,
   "debts": [
     {
       "id": 1,
@@ -300,6 +300,16 @@
       "due_date": "2025-07-17T16:26:00.000Z",
       "status": "declined",
       "created_at": "2025-07-17T12:26:25.694023"
+    },
+    {
+      "id": 31,
+      "proposer": "Elbek",
+      "proposee": "Abdulmalik",
+      "amount": 3000,
+      "interest": 5,
+      "due_date": "2025-12-10T20:01:00.000Z",
+      "status": "pending",
+      "created_at": "2025-08-08T16:53:08.604980"
     }
   ]
 }

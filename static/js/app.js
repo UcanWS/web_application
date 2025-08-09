@@ -133,11 +133,20 @@ if (currentUser === 'Guest') {
       messagesDiv.appendChild(errorDiv);
     });
 
+let currentPageId = null; // глобальная переменная для отслеживания текущей страницы
+
 function showPage(id) {
   let [pageId, subPage] = id.split('/');
 
+  // 🔹 Если открываем ту же страницу без подстраницы — просто выходим
+  if (currentPageId === id) {
+    console.log(`Страница ${id} уже открыта — пропускаем повторный рендер`);
+    return;
+  }
+  currentPageId = id; // обновляем текущую страницу
+
   // Страницы, запрещённые для должников
-  const blockedPages = ['chat-list', 'progress', 'shop','coins-page'];
+  const blockedPages = ['chat-list', 'progress', 'shop', 'coins-page'];
   if (accountStatus === 'Debtor' && blockedPages.includes(pageId)) {
     showToastNotification(
       "It seems you don't have enough money to get access to this page.",
@@ -166,11 +175,11 @@ function showPage(id) {
   switch (pageId) {
     case 'chat-ui':
       scrollToBottom();
-	  hideNavigation();
+      hideNavigation();
       break;
-	  
-	case 'chat-list':
-	  showNavigation();
+
+    case 'chat-list':
+      showNavigation();
       break;
 
     case 'main':
@@ -213,46 +222,51 @@ function showPage(id) {
       onNotificationsPageOpen();
       showNotifIndicator(false);
       break;
-	  
-	case 'private-chatlist':
+
+    case 'private-chatlist':
       currentPrivateUser = null;
       showNavigation();
-      loadPrivateChatUsers(); // <-- загружаем юзеров
+      loadPrivateChatUsers();
       break;
-	  
-	case 'chat-ui-private':
+
+    case 'chat-ui-private':
       hideNavigation();
       break;
-	case 'settings':
-    fetchSessions();
-    break;
-	
-	case 'exams':
-    examsPageActive();
-    break;
-	
-	case 'upload':
-    loadIdeas();
-    break;
-	
-	case 'tasks':
-    loadTasks();
-    break;
-	
-	case 'personal-analyzing':
-    loadPersonalSummary(currentUser, currentLevel, currentUnit);
-    break;
-	
-	case 'squid-game':
-    createVideoPlayer('static/horror/trailer-squid-game.mp4', 'video-player-squid');
-	startCountdownSquidTimer("2025-08-01T00:00:00", "countdown-timer");  
-    break;
-	
-	case 'liveLesson':
-    openLiveLesson();
-    break;
+
+    case 'settings':
+      fetchSessions();
+      break;
+
+    case 'exams':
+      examsPageActive();
+      break;
+
+    case 'upload':
+      loadIdeas();
+      break;
+
+    case 'tasks':
+      loadTasks();
+      break;
+
+    case 'personal-analyzing':
+      loadPersonalSummary(currentUser, currentLevel, currentUnit);
+      break;
+
+    case 'squid-game':
+      createVideoPlayer('static/horror/trailer-squid-game.mp4', 'video-player-squid');
+      startCountdownSquidTimer("2025-08-31T00:00:00", "countdown-timer");  
+      break;
+
+    case 'liveLesson':
+      openLiveLesson();
+      break;
+	case 'writing-top-list':
+      showWritingTopList();
+      break;
   }
 }
+
 
 let currentPrivateUser = null;
 
@@ -2951,12 +2965,20 @@ function updateTaskCount() {
 
 function hideNavigation() {
   const nav = document.querySelector('nav');
-  nav.classList.add('nav-hidden');
+  if (nav) {
+    nav.classList.add('nav-hidden');
+  } else {
+    console.warn('Navigation element not found');
+  }
 }
 
 function showNavigation() {
   const nav = document.querySelector('nav');
-  nav.classList.remove('nav-hidden');
+  if (nav) {
+    nav.classList.remove('nav-hidden');
+  } else {
+    console.warn('Navigation element not found');
+  }
 }
 
 function toggleNavigation() {
@@ -4145,35 +4167,100 @@ function openTodayTaskPage(title, questions) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  document.getElementById('finish-tasks-btn').onclick = () => {
-    const btn = document.getElementById('floating-finish-btn');
-    if (btn) btn.style.display = 'none';
-    finishTodayTasks(title, questions);
-  };
+document.getElementById('finish-tasks-btn').onclick = () => {
+  const btn = document.getElementById('floating-finish-btn');
+  if (btn) btn.style.display = 'none';
+  showFinishModal(title, questions);
+};
 
-  document.getElementById('done-tasks-btn').onclick = () => {
-    showPage('today');
-    content.innerHTML = '';
-    document.getElementById('done-tasks-btn').style.display = 'none';
-    document.getElementById('finish-tasks-btn').style.display = 'inline-block';
-    const floating = document.getElementById('floating-finish-btn');
-    if (floating) floating.style.display = 'none';
-  };
+document.getElementById('done-tasks-btn').onclick = () => {
+  showPage('today');
+  content.innerHTML = '';
+  document.getElementById('done-tasks-btn').style.display = 'none';
+  document.getElementById('finish-tasks-btn').style.display = 'inline-block';
+  const floating = document.getElementById('floating-finish-btn');
+  if (floating) floating.style.display = 'none';
+};
 
-  let floatingBtn = document.getElementById('floating-finish-btn');
-  if (!floatingBtn) {
-    floatingBtn = document.createElement('button');
-    floatingBtn.id = 'floating-finish-btn';
-    floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
-    document.body.appendChild(floatingBtn);
-  }
-  floatingBtn.style.display = 'block';
-  floatingBtn.onclick = () => {
-    floatingBtn.style.display = 'none';
-    finishTodayTasks(title, questions);
-  };
+let floatingBtn = document.getElementById('floating-finish-btn');
+if (!floatingBtn) {
+  floatingBtn = document.createElement('button');
+  floatingBtn.id = 'floating-finish-btn';
+  floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
+  document.body.appendChild(floatingBtn);
+}
+floatingBtn.style.display = 'block';
+floatingBtn.onclick = () => {
+  floatingBtn.style.display = 'none';
+  showFinishModal(title, questions);
+};
 
   initCustomAudioPlayers();
+}
+
+// --------------------
+// Модалка Finish-modal
+// --------------------
+function showFinishModal(taskName, questions) {
+  let answeredCount = 0;
+  let totalCount = 0;
+
+  questions.forEach(q => {
+    const subList = Array.isArray(q.subquestions) ? q.subquestions : [q];
+    subList.forEach(sub => {
+      totalCount++;
+      if (sub.type === 'select-options') {
+        const selected = document.querySelector(`.custom-select-wrapper[data-qid="${sub.id}"]`)?.dataset.selected;
+        if (selected) answeredCount++;
+      } else if (sub.type === 'write-in-blank') {
+        const input = document.querySelector(`input[name="q${sub.id}"]`);
+        if (input && input.value.trim()) answeredCount++;
+      } else if (sub.type === 'box-choose') {
+        const blank = document.querySelector(`.box-choose-blank[data-qid="${sub.id}"]`);
+        if (blank && blank.classList.contains('filled')) answeredCount++;
+      } else if (['multiple_choice', 'true_false'].includes(sub.type)) {
+        const checked = document.querySelector(`input[name="q${sub.id}"]:checked`);
+        if (checked) answeredCount++;
+      } else if (sub.type === 'unscramble') {
+        const filled = document.querySelectorAll(`.unscramble-inputs[data-qid="${sub.id}"] .filled`).length;
+        if (filled > 0) answeredCount++;
+      } else if (sub.type === 'picture' || sub.type === 'listening') {
+        const input = document.querySelector(`input[name="q${sub.id}"]`);
+        if (input && input.value.trim()) answeredCount++;
+      }
+    });
+  });
+
+  const unansweredCount = totalCount - answeredCount;
+
+  // Удаляем старую модалку если есть
+  const oldModal = document.querySelector('.Finish-modal');
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'Finish-modal';
+  modal.innerHTML = `
+    <div class="Finish-modal-content">
+      <h2>Are you sure that you want to finish?</h2>
+      <p>Please note that once you finish the <b>${taskName}</b>, you will not be able to take it again</p>
+      ${unansweredCount > 0 ? `<div class="Finish-warning">You did not answer ${unansweredCount} out of ${totalCount} questions!</div>` : ''}
+      <div class="Finish-modal-buttons">
+        <button class="Finish-btn-no">No</button>
+        <button class="Finish-btn-yes">Yes</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector('.Finish-btn-no').onclick = () => {
+    modal.remove();
+    const btn = document.getElementById('floating-finish-btn');
+    if (btn) btn.style.display = 'block';
+  };
+  modal.querySelector('.Finish-btn-yes').onclick = () => {
+    modal.remove();
+    finishTodayTasks(taskName, questions);
+  };
 }
 
 function getInstructionForType(type) {
@@ -6820,3 +6907,263 @@ async function openLiveLesson() {
   document.getElementById("current-unit-value").addEventListener("click", function() {
     showPage("liveLesson");
   });
+  
+  // showWritingTopList() — единственная внешняя функция.
+// Требует: HTML-блок с id="writing-top-list" (как у тебя) и Chart.js подключён.
+function showWritingTopList() {
+  // конфиг / глобалы
+  const unit = (typeof currentUnit !== 'undefined' && currentUnit) ? currentUnit : (document.getElementById('todaytasks-unit')?.textContent || '1.0');
+  const level = (typeof currentLevel !== 'undefined' && currentLevel) ? currentLevel : 'Beginner';
+  const userName = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : (window.APP_USER || 'You');
+
+  const page = document.getElementById('writing-top-list');
+  if (!page) { console.warn('writing-top-list element not found'); return; }
+
+  // Обёртка .wtl-card (если нет) — для CSS эффекта
+  if (!page.querySelector('.wtl-card')) {
+    const inner = document.createElement('div');
+    inner.className = 'wtl-card';
+    while (page.firstChild) inner.appendChild(page.firstChild);
+    page.appendChild(inner);
+  }
+
+  // показать только эту страницу
+  document.querySelectorAll('.page').forEach(p => { if (p !== page) p.style.display = 'none'; });
+  page.style.display = 'block';
+  page.querySelector('.wtl-card').classList.add('show');
+
+  // элементы
+  const posEl = page.querySelector('#wtl-position');
+  const unitEl = page.querySelector('#wtl-unit');
+  const levelEl = page.querySelector('#wtl-level');
+  const listEl = page.querySelector('#wtl-list');
+  const refreshBtn = page.querySelector('#wtl-refresh');
+  let canvas = page.querySelector('#writing-chart');
+
+  // ensure elements exist
+  if (!listEl) {
+    const ln = document.createElement('div'); ln.id = 'wtl-list'; ln.className = 'wtl-list';
+    page.querySelector('.wtl-card').appendChild(ln);
+  }
+  if (!canvas) {
+    const wrap = document.createElement('div'); wrap.className = 'wtl-chart-wrap';
+    canvas = document.createElement('canvas'); canvas.id = 'writing-chart';
+    wrap.appendChild(canvas);
+    page.querySelector('.wtl-card').insertBefore(wrap, page.querySelector('#wtl-list'));
+  }
+
+  unitEl && (unitEl.textContent = unit);
+  levelEl && (levelEl.textContent = level);
+  posEl && (posEl.textContent = 'Loading...');
+
+  // Chart instance holder (global-ish to avoid duplicates)
+  if (!window._writingTopChart) window._writingTopChart = null;
+
+  // helpers
+  function findWritingKey(obj) {
+    if (!obj) return null;
+    return Object.keys(obj).find(k => k.toLowerCase().includes('writing')) || null;
+  }
+  function extractWritingScore(wobj) {
+    if (!wobj) return { raw: 0, percent: 0, meta: wobj };
+    if (typeof wobj.percent === 'number') return { raw: wobj.percent, percent: Math.max(0, Math.min(100, wobj.percent)), meta: wobj };
+    if (typeof wobj.score === 'number') return { raw: wobj.score, percent: null, meta: wobj };
+    if (Array.isArray(wobj.details) && wobj.details.length) {
+      let sum = 0, found = false;
+      for (const d of wobj.details) {
+        if (typeof d.score === 'number') { sum += d.score; found = true; }
+      }
+      if (found) return { raw: sum, percent: null, meta: wobj };
+      if (typeof wobj.total === 'number' && typeof wobj.correct === 'number') {
+        const p = wobj.total ? Math.round((wobj.correct / wobj.total) * 100) : 0;
+        return { raw: wobj.correct, percent: p, meta: wobj };
+      }
+    }
+    if (typeof wobj.correct === 'number' && typeof wobj.total === 'number') {
+      const p = wobj.total ? Math.round((wobj.correct / wobj.total) * 100) : 0;
+      return { raw: wobj.correct, percent: p, meta: wobj };
+    }
+    return { raw: 0, percent: 0, meta: wobj };
+  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  // draw list
+  function renderList(entries, currentPlace) {
+    const list = page.querySelector('#wtl-list');
+    list.innerHTML = '';
+    entries.forEach((e,idx) => {
+      const row = document.createElement('div');
+      row.className = 'wtl-item' + ((currentPlace && idx === currentPlace-1) ? ' current' : '');
+      row.innerHTML = `
+        <div class="left">
+          <div class="wtl-rank">${idx+1}</div>
+          <div class="wtl-user">
+            <div class="name">${escapeHtml(e.username)}</div>
+            <div class="meta">Raw: ${escapeHtml(String(e.raw))} — ${escapeHtml(String(e.percent))}%</div>
+          </div>
+        </div>
+        <div class="wtl-score">${escapeHtml(String(e.percent))}%</div>
+      `;
+      if (currentPlace && idx === currentPlace-1) row.classList.add('current');
+      list.appendChild(row);
+    });
+  }
+
+  // build chart with Chart.js
+  async function buildChart(entries) {
+    // destroy previous chart
+    if (window._writingTopChart) {
+      window._writingTopChart.destroy();
+      window._writingTopChart = null;
+    }
+
+    // prepare labels and data
+    const labels = entries.map(e => e.username.length > 14 ? e.username.slice(0,13) + '…' : e.username);
+    const data = entries.map(e => e.percent);
+
+    // Chart.js dataset with gradient background
+    const ctx = canvas.getContext('2d');
+
+    // create chart (responsive)
+    window._writingTopChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Writing AI %',
+          data,
+          // backgroundColor will be a function to create gradient per render
+          backgroundColor: function(context) {
+            const chart = context.chart;
+            const {ctx, chartArea} = chart;
+            if (!chartArea) return '#64b5f6';
+            const grad = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            grad.addColorStop(0, '#64b5f6');
+            grad.addColorStop(1, '#0288d1');
+            return grad;
+          },
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 900, easing: 'easeOutCubic' },
+        scales: {
+          x: {
+            ticks: { color: '#d6d9e6' },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { color: '#d6d9e6', stepSize: 20 },
+            grid: { color: 'rgba(255,255,255,0.06)' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const idx = ctx.dataIndex;
+                const original = entries[idx];
+                // show percent and raw
+                return ` ${original.percent}% — raw: ${original.raw}`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // make canvas container height adaptive
+    const wrap = page.querySelector('.wtl-chart-wrap') || canvas.parentElement;
+    if (wrap) {
+      wrap.style.height = Math.max(240, Math.min(420, labels.length * 36)) + 'px';
+    }
+  }
+
+  // main fetch->process->render
+  async function fetchAndRender() {
+    posEl && (posEl.textContent = 'Loading...');
+    page.querySelector('#wtl-list').innerHTML = '';
+
+    let json;
+    try {
+      const res = await fetch(`/api/get-results?level=${encodeURIComponent(level)}&unit=${encodeURIComponent(unit)}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      json = await res.json();
+    } catch (err) {
+      posEl && (posEl.textContent = '#—');
+      page.querySelector('#wtl-list').innerHTML = `<div style="padding:12px;color:#ffdede">Error: ${escapeHtml(err.message)}</div>`;
+      if (window._writingTopChart) window._writingTopChart.destroy();
+      return;
+    }
+
+    // extract writing AI per user
+    const arr = [];
+    for (const [username, userObj] of Object.entries(json || {})) {
+      const wkey = findWritingKey(userObj);
+      if (!wkey) continue;
+      const wobj = userObj[wkey];
+      const ex = extractWritingScore(wobj);
+      arr.push({ username, raw: ex.raw, percent: ex.percent, meta: ex.meta, time: ex.meta?.time || null });
+    }
+
+    if (!arr.length) {
+      posEl && (posEl.textContent = '#—');
+      page.querySelector('#wtl-list').innerHTML = `<div style="padding:12px;color:#ffdede">No Writing AI results for this unit.</div>`;
+      if (window._writingTopChart) window._writingTopChart.destroy();
+      return;
+    }
+
+    // normalize percent if missing
+    const needNorm = arr.some(e => e.percent === null || typeof e.percent !== 'number');
+    if (needNorm) {
+      const maxRaw = Math.max(...arr.map(e => Math.max(1, e.raw)));
+      arr.forEach(e => e.percent = Math.round((e.raw / maxRaw) * 100));
+    } else {
+      arr.forEach(e => { if (typeof e.percent !== 'number') e.percent = 0; });
+    }
+
+    // sort desc by percent, then by time
+    arr.sort((a,b) => {
+      if (b.percent !== a.percent) return b.percent - a.percent;
+      if (a.time && b.time) return new Date(b.time) - new Date(a.time);
+      return a.username.localeCompare(b.username);
+    });
+
+    // find current user's position
+    let idx = arr.findIndex(e => e.username === userName);
+    if (idx === -1) {
+      const low = userName.toLowerCase();
+      idx = arr.findIndex(e => e.username.toLowerCase() === low);
+    }
+    const place = idx === -1 ? null : idx + 1;
+    posEl && (posEl.textContent = place ? `#${place}` : '#—');
+
+    // render list + chart
+    renderList(arr, place);
+    await buildChart(arr);
+  }
+
+  // attach refresh
+  if (refreshBtn) refreshBtn.onclick = fetchAndRender;
+
+  // responsive redraw on resize (Chart.js handles resize but we might want to re-create gradient)
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (window._writingTopChart) window._writingTopChart.resize();
+    }, 200);
+  });
+
+  // initial load
+  fetchAndRender();
+
+  // expose reload function
+  window.reloadWritingTopList = fetchAndRender;
+}
