@@ -334,6 +334,13 @@
       "receiver": "Muhammadiso",
       "message": "\u0414\u0446",
       "timestamp": "2025-07-29T09:52:53.228200",
+      "read": true
+    },
+    {
+      "sender": "Muhammadiso",
+      "receiver": "Abdulmalik",
+      "message": "Bye",
+      "timestamp": "2025-08-12T11:47:32.304604",
       "read": false
     }
   ],

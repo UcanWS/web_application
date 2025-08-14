@@ -39,7 +39,7 @@ messages = []  # Store messages locally
 
 API_KEY_EXPIRATION = 10
 
-exam_duration = 11 * 60  # 30 minutes in seconds
+exam_duration = 60 * 60  # 30 minutes in seconds
 exam_start_time = None  # Global variable to store exam start time
 exam_started = False  # Р¤Р»Р°Рі РЅР°С‡Р°Р»Р° СЌРєР·Р°РјРµРЅР°
 exam_end_time = None
@@ -1594,7 +1594,7 @@ def start_exam():
     exam_start_time = time.time()
 
     # Р Р°СЃСЃС‡РёС‚С‹РІР°РµРј РІСЂРµРјСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ СЌРєР·Р°РјРµРЅР° + 10 СЃРµРєСѓРЅРґ
-    exam_end_time = exam_start_time + exam_duration + 10  
+    exam_end_time = exam_start_time + exam_duration + 3
 
     # РћС‡РёС‰Р°РµРј СЃРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№, РєРѕС‚РѕСЂС‹Рµ РїСЂРѕС€Р»Рё СЌРєР·Р°РјРµРЅ
     exam_passed.clear()
@@ -3183,6 +3183,7 @@ def get_results_today():
 
 @app.route('/api/get-today-questions', methods=['GET'])
 def get_today_questions():
+    time.sleep(3)
     level = request.args.get('level')
     unit  = request.args.get('unit')
 
@@ -3736,31 +3737,34 @@ def get_results_average():
     if not level or not unit:
         return jsonify({"error": "Missing level or unit"}), 400
 
-    # 1) РЎРѕР±РёСЂР°РµРј РІСЃРµ С„Р°Р№Р»С‹ Р·Р°РґР°С‡ (Р±РµР· exam)
+    # 1) Собираем все файлы задач (включая exam), включая подпапки
     unit_dir = os.path.join(BASE_TASKS_DIR, level, unit)
     if not os.path.isdir(unit_dir):
         return jsonify({"error": "Unit directory not found"}), 404
 
-    all_files = [
-        f for f in os.listdir(unit_dir)
-        if f.endswith('.json') and 'exam' not in f.lower()
-    ]
+    all_files = []
+    for root, dirs, files in os.walk(unit_dir):
+        for f in files:
+            if f.endswith('.json'):
+                all_files.append(os.path.join(root, f))
+
+    # Сортируем для стабильности порядка
+    all_files.sort()
     total_tasks = len(all_files)
 
-    # 2) Р—Р°РіСЂСѓР¶Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚С‹ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
+    # 2) Загружаем результаты пользователей
     submissions = load_results(level, unit)
     result = {}
 
     for user, tasks in submissions.items():
         percents = []
 
-        # Check each task in all_files
+        # Проверяем каждую задачу
         for task_file in all_files:
-            task_key = os.path.splitext(task_file)[0]  # Remove .json extension
-            percent = 0.0  # Default to 0% for unsubmitted tasks
+            task_key = os.path.splitext(os.path.basename(task_file))[0]  # имя файла без .json
+            percent = 0.0  # по умолчанию 0%
 
             if isinstance(tasks, dict):
-                # Handle case where tasks is a dictionary
                 if task_key in tasks:
                     value = tasks[task_key]
                     if isinstance(value, dict) and 'percent' in value:
@@ -3774,7 +3778,6 @@ def get_results_average():
                         except (ValueError, TypeError):
                             percent = 0.0
             elif isinstance(tasks, list):
-                # Handle case where tasks is a list
                 for item in tasks:
                     if isinstance(item, dict) and 'percent' in item and item.get('task') == task_key:
                         try:
@@ -3785,17 +3788,17 @@ def get_results_average():
 
             percents.append(percent)
 
-        submitted_count = sum(1 for p in percents if p > 0)  # Count non-zero submissions
+        submitted_count = sum(1 for p in percents if p > 0)
         total_percent = sum(percents)
         average_percent = (total_percent / total_tasks) if total_tasks > 0 else 0.0
 
         result[user] = {
-            "average_percent": round(average_percent, 2),  # Round for cleaner output
+            "average_percent": round(average_percent, 2),
             "submitted_count": submitted_count,
             "total_tasks": total_tasks
         }
 
-    # 3) Р•СЃР»Рё СЋР·РµСЂ Р±РµР· Р·Р°РїРёСЃРµР№ вЂ” РІРѕР·РІСЂР°С‰Р°РµРј 0/total_tasks
+    # 3) Если юзер без записей
     if username and username not in result:
         result[username] = {
             "average_percent": 0.0,
@@ -3804,8 +3807,8 @@ def get_results_average():
         }
 
     return jsonify(result), 200
-    
 
+    
 @app.route("/api/stories")
 def get_stories():
     json_path = os.path.join("data", "stories.json")

@@ -157,6 +157,12 @@
             "time": "2025-07-27T06:47:58.792817",
             "balance_before": 135000.0,
             "can_cancel": false
+        },
+        {
+            "amount": 700,
+            "description": "Claimed reward for task: Write essay",
+            "time": "2025-08-13T20:15:42.512595",
+            "balance_before": 150000.0
         }
     ],
     "Elbek": [
@@ -488,6 +494,12 @@
             "amount": 0,
             "description": "Purchased from shop with coins : Basseyn Ticket",
             "time": "2025-08-08T22:23:31.493304",
+            "balance_before": 568.0
+        },
+        {
+            "amount": 100,
+            "description": "Reward for completing 'Bonus' with 80%",
+            "time": "2025-08-12T14:14:45.453982",
             "balance_before": 568.0
         }
     ],

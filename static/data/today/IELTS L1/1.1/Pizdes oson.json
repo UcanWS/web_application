@@ -1,0 +1,64 @@
+[
+  {
+    "id": 5,
+    "type": "reading",
+    "text": "<h1>Shaytonlarning qo‘rqinchli tomoni</h1>\n<p>Shaytonlarning eng qo‘rqinchli tomoni shundaki, ular ko‘rinmay turib inson qalbiga yomon fikrlar soladi. Bu vasvasalar odamni yaxshi amallardan to‘xtatib, gunoh ishlarga undaydi. Ular insonning eng zaif paytida — yolg‘izlikda, g‘azablanganda yoki qayg‘uda bo‘lganida kuchliroq ta’sir qiladi.</p>\n\n<p>Yana bir qo‘rqinchli jihati — ular odamning ichki his-tuyg‘ularini yaxshi biladi. Ular shaxsiy zaifliklardan foydalanib, odamni asta-sekin yomon yo‘lga boshlaydi. Ba’zi odamlar, shaytonning ta’siri ostida ekanini anglamay ham qoladi.</p>\n\n<p>Shaytonlar insonlarni nafaqat dunyoda, balki oxiratda ham baxtsiz qilishni maqsad qilgan. Shu sababli ular bilan kurashish, ularning hiylalarini tanib olish juda muhimdir.</p>",
+    "subquestions": [
+      {
+        "id": "5.1",
+        "type": "multiple_choice",
+        "text": "Shaytonlar odam qalbiga nima soladi?",
+        "options": [
+          "Yaxshi fikrlar",
+          "Yomon fikrlar",
+          "Dunyo boyliklari"
+        ],
+        "correct": "Yomon fikrlar"
+      },
+      {
+        "id": "5.2",
+        "type": "multiple_choice",
+        "text": "Qaysi paytlarda shaytonlarning ta’siri kuchayadi?",
+        "options": [
+          "Odam baxtli bo‘lganda",
+          "Odam yolg‘izlikda, g‘azabda yoki qayg‘uda bo‘lganda",
+          "Odam ibodat qilganda"
+        ],
+        "correct": "Odam yolg‘izlikda, g‘azabda yoki qayg‘uda bo‘lganda"
+      },
+      {
+        "id": "5.3",
+        "type": "multiple_choice",
+        "text": "Shaytonlar odamning qaysi tomonini yaxshi biladi?",
+        "options": [
+          "Ichki his-tuyg‘ularini",
+          "Jismoniy kuchini",
+          "Mol-mulkini"
+        ],
+        "correct": "Ichki his-tuyg‘ularini"
+      },
+      {
+        "id": "5.4",
+        "type": "multiple_choice",
+        "text": "Ba’zi odamlar shayton ta’sirida ekanini biladimi?",
+        "options": [
+          "Ha, har doim biladi",
+          "Yo‘q, ba’zan anglamay qoladi",
+          "Faqat ulamolar biladi"
+        ],
+        "correct": "Yo‘q, ba’zan anglamay qoladi"
+      },
+      {
+        "id": "5.5",
+        "type": "multiple_choice",
+        "text": "Shaytonlar odamni qaysi yo‘llarga boshlaydi?",
+        "options": [
+          "Yaxshi yo‘llarga",
+          "Yomon yo‘llarga",
+          "Neytral yo‘llarga"
+        ],
+        "correct": "Yomon yo‘llarga"
+      }
+    ]
+  }
+]

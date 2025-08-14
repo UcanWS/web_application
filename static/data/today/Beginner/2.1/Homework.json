@@ -15,37 +15,37 @@
     {
       "id": "0.1",
       "type": "box-choose",
-      "text": "First name ____",
+      "text": "First name _____",
       "correct": "Eva"
     },
     {
       "id": "0.2",
       "type": "box-choose",
-      "text": "Last name ____",
+      "text": "Last name _____",
       "correct": "Sanz"
     },
     {
       "id": "0.3",
       "type": "box-choose",
-      "text": "Country ____",
+      "text": "Country _____",
       "correct": "Spain"
     },
     {
       "id": "0.4",
       "type": "box-choose",
-      "text": "Home address ____",
+      "text": "Home address _____",
       "correct": "Avenida Lusitana, 13, Granada"
     },
     {
       "id": "0.5",
       "type": "box-choose",
-      "text": "Phone number ____",
+      "text": "Phone number _____",
       "correct": "0034 758 3902281"
     },
     {
       "id": "0.6",
       "type": "box-choose",
-      "text": "Signature ____",
+      "text": "Signature _____",
       "correct": "Eva Sanz"
     }
   ]
@@ -58,35 +58,35 @@
       {
         "id": "1.1",
         "type": "multiple_choice",
-        "text": "___'s your name?",
+        "text": "____'s your name?",
         "options": ["What", "How", "Where"],
         "correct": "What"
       },
       {
         "id": "1.2",
         "type": "multiple_choice",
-        "text": "____ do you spell that?",
+        "text": "_____ do you spell that?",
         "options": ["What", "How", "Where"],
         "correct": "How"
       },
       {
         "id": "1.3",
         "type": "multiple_choice",
-        "text": "_____ are you from?",
+        "text": "______ are you from?",
         "options": ["What", "How", "Where"],
         "correct": "Where"
       },
       {
         "id": "1.4",
         "type": "multiple_choice",
-        "text": "___ in Russia?",
+        "text": "____ in Russia?",
         "options": ["What", "How", "Where"],
         "correct": "Where"
       },
       {
         "id": "1.5",
         "type": "multiple_choice",
-        "text": "____'s your phone number?",
+        "text": "_____'s your phone number?",
         "options": ["What", "How", "Where","Is","Are","Am"],
         "correct": "What"
       }
@@ -102,79 +102,79 @@
     {
       "id": "2.1",
       "type": "write-in-blank",
-      "text": "Hi, Chris. Louise here. How are ___?",
+      "text": "Hi, Chris. Louise here. How are ____?",
       "correct": "you"
     },
     {
       "id": "2.2",
       "type": "write-in-blank",
-      "text": "___’m fine, thanks.",
+      "text": "____’m fine, thanks.",
       "correct": "I"
     },
     {
       "id": "2.3",
       "type": "write-in-blank",
-      "text": "And ___?",
+      "text": "And ____?",
       "correct": "you"
     },
     {
       "id": "2.4",
       "type": "write-in-blank",
-      "text": "Great, thanks. Are ___ at home?",
+      "text": "Great, thanks. Are ____ at home?",
       "correct": "you"
     },
     {
       "id": "2.5",
       "type": "write-in-blank",
-      "text": "No, ___’m on business in the USA with Jack.",
+      "text": "No, ____’m on business in the USA with Jack.",
       "correct": "I"
     },
     {
       "id": "2.6",
       "type": "write-in-blank",
-      "text": "___’re in New York.",
+      "text": "____’re in New York.",
       "correct": "We"
     },
     {
       "id": "2.7",
       "type": "write-in-blank",
-      "text": "No, ___ isn’t.",
+      "text": "No, ____ isn’t.",
       "correct": "she"
     },
     {
       "id": "2.8",
       "type": "write-in-blank",
-      "text": "___’s on holiday with friends.",
+      "text": "____’s on holiday with friends.",
       "correct": "She"
     },
     {
       "id": "2.9",
       "type": "write-in-blank",
-      "text": "Really? Where are ___?",
+      "text": "Really? Where are ____?",
       "correct": "they"
     },
     {
       "id": "2.10",
       "type": "write-in-blank",
-      "text": "___’re in Izmir.",
+      "text": "____’re in Izmir.",
       "correct": "They"
     },
     {
       "id": "2.11",
       "type": "write-in-blank",
-      "text": "___’s in Turkey.",
+      "text": "____’s in Turkey.",
       "correct": "It"
     },
     {
       "id": "2.12",
       "type": "write-in-blank",
-      "text": "No, ___ isn’t.",
+      "text": "No, ____ isn’t.",
       "correct": "he"
     },
     {
       "id": "2.13",
       "type": "write-in-blank",
-      "text": "___’s at home with my mother.",
+      "text": "____’s at home with my mother.",
       "correct": "He"
     }
   ]

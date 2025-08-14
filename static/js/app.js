@@ -264,6 +264,9 @@ function showPage(id) {
 	case 'writing-top-list':
       showWritingTopList();
       break;
+	case 'my-certificates':
+      loadCertificates(currentLevel);
+      break;
   }
 }
 
@@ -364,8 +367,6 @@ async function loadPrivateChatUsers() {
     listContainer.innerHTML = `<p>Error loading users: ${err}</p>`;
   }
 }
-
-
 
 // Генерация room_id в JS
 function getRoomId(user1, user2) {
@@ -3133,9 +3134,6 @@ function updateExamDisplay() {
 
 
 
-// ----------------------------
-// 1. Рендер списка Today’s Tasks с лоадером и центрированием
-// ----------------------------
 async function renderTasksSection() {
   const container = document.getElementById('today');
   container.querySelectorAll('.tasks-section, .no-tasks-placeholder').forEach(el => el.remove());
@@ -3161,14 +3159,10 @@ async function renderTasksSection() {
   const loader = document.createElement('div');
   loader.className = 'container-exam-loading';
   loader.innerHTML = `
-    <div class="loader">
-      <div class="crystal"></div>
-      <div class="crystal"></div>
-      <div class="crystal"></div>
-      <div class="crystal"></div>
-      <div class="crystal"></div>
-      <div class="crystal"></div>
-    </div>
+<div class="container-exam-loading">
+  <div class="loader"></div>
+</div>
+
   `;
   section.appendChild(loader);
   container.appendChild(section);
@@ -3251,19 +3245,9 @@ async function renderTasksSection() {
 
     const typePriority = ['homework', 'grammar', 'vocabulary', 'listening', 'reading', 'writing'];
 
-    let examTask = null;
-    let filteredTasks = today_tasks.filter(block => {
-      const lowerTitle = block.title.toLowerCase();
-      if (lowerTitle.includes('final exam') || lowerTitle.includes('weekly exam')) {
-        examTask = block;
-        return false;
-      }
-      return true;
-    });
+    const filteredTasks = today_tasks;
 
-    const showExam = typeof remainingTime === 'number' && remainingTime >= 0;
-
-    if (!filteredTasks.length && !examTask && !showExam) {
+    if (!filteredTasks.length) {
       renderNoTasksPlaceholder(container);
       return;
     }
@@ -3292,28 +3276,46 @@ async function renderTasksSection() {
         card.classList.add('disabled');
       }
 
-      if (!isCompleted || isWriting) {
-        card.classList.add('clickable');
-        card.onclick = () => {
-          console.log('Attempting to open task:', title);
-          console.log('Task result:', result);
-          console.log('Block data:', block);
+// Хелпер: определяет, относится ли блок к экзамену по названию/пути/имени файла
+function isExamBasedBlock(blk) {
+  const examRe = /(^|[\\/])exam\b/i; // начало строки или после / или \, слово "Exam" (без учета регистра)
+  return (
+    examRe.test(blk?.filename || '') ||
+    examRe.test(blk?.file || '') ||
+    examRe.test(blk?.path || '') ||
+    examRe.test(blk?.title || '')
+  );
+}
 
-          if (!block.questions || block.questions.length === 0) {
-            console.warn('No questions found for:', title);
-            alert(`Cannot open ${title} - no questions found.`);
-            return;
-          }
+// ...
+if (!isCompleted || isWriting) {
+  card.classList.add('clickable');
+  card.onclick = () => {
+    console.log('Attempting to open task:', title);
+    console.log('Task result:', result);
+    console.log('Block data:', block);
 
-          if (isWriting) {
-            console.log('Opening writing task...');
-            openWritingTaskPage(title, block.questions);
-          } else {
-            console.log('Opening non-writing task...');
-            openTodayTaskPage(title, block.questions);
-          }
-        };
-      }
+    if (!block.questions || block.questions.length === 0) {
+      console.warn('No questions found for:', title);
+      showToastNotification(`Cannot open ${title} - no questions found.`);
+      return;
+    }
+
+    // --- Определение типа открытия (исправлено) ---
+    const openType = isExamBasedBlock(block) ? "Exam based" : "Default";
+    console.log("Open type:", openType);
+
+    if (isWriting) {
+      console.log('Opening writing task...');
+      openWritingTaskPage(title, block.questions, openType);
+    } else {
+      console.log('Opening non-writing task...');
+      openTodayTaskPage(title, block.questions, openType);
+    }
+  };
+}
+
+
 
       const key = title.toLowerCase();
       let iconClass = 'fa-star';
@@ -3417,25 +3419,6 @@ async function renderTasksSection() {
 
       section.appendChild(card);
     });
-
-    if (examTask || showExam) {
-      window.examTaskTitle = examTask?.title || 'Exam';
-
-      const finalExamContainer = document.createElement('div');
-      finalExamContainer.className = 'accordion';
-      finalExamContainer.innerHTML = `
-        <div class="accordion-header" onclick="toggleAccordion(this)">
-          <span>${examTask?.title || 'Exam'}</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="accordion-content" id="final-exam-item">
-          <!-- Контент загружается через updateExamDisplay() -->
-        </div>
-      `;
-      section.appendChild(finalExamContainer);
-
-      updateExamDisplay();
-    }
 
     updateTaskCount();
   } catch (err) {
@@ -3782,44 +3765,427 @@ async function openWritingTaskPage(title, questions) {
 // 2. Открытие страницы с вопросами и рендер
 // ----------------------------
 
-function openTodayTaskPage(title, questions) {
+// ----------------------------
+// openTodayTaskPage — фикс: goToIndex объявлен до регистрации обработчиков
+// ----------------------------
+window.examTimerInterval = window.examTimerInterval || null;
+
+async function openTodayTaskPage(title, questions, openType = "Default") {
+  const pageRoot = document.getElementById('todaytasks');
+  const headerContainer = document.getElementById('todaytasks-header');
+  const headerH1 = document.getElementById('header-today');
+  const unitEl = document.getElementById('todaytasks-unit');
+  const content = document.getElementById('todaytasks-content');
+
+  // Глобальное место для итоговых ответов — очищаем при новом открытии набора
+  window._todaytasks_answers = window._todaytasks_answers || {};
+  window._todaytasks_answers = {};
+
+  // answersMap хранит ответы в пределах одного вызова openTodayTaskPage
+  const answersMap = {}; // ключ: qid (например "12"), значение: { type: 'text'|'radio'|'select'|'box'|'unscramble', value: ... }
+
+  // Очистка старого таймера
+  if (window.examTimerInterval) {
+    clearInterval(window.examTimerInterval);
+    window.examTimerInterval = null;
+  }
+  const prevTimer = document.getElementById('exam-timer');
+  if (prevTimer) prevTimer.remove();
+
+  if (unitEl) unitEl.style.display = '';
+
+  // Exam-based проверка (как было)
+  if (openType === "Exam based") {
+    maxViolations = 1;
+    initExamSecurity(true);
+    try {
+      const timesRes = await fetch('/api/get_exam_times');
+      if (!timesRes.ok) throw new Error('Failed to fetch exam times');
+      const timesData = await timesRes.json();
+      const { current_time, exam_start_time } = timesData;
+      if (!exam_start_time || current_time < exam_start_time) {
+        showPage('today');
+        showToastNotification("Exam has not started yet.");
+        return;
+      }
+    } catch (err) {
+      console.error('[Exam] Error fetching exam times', err);
+      showPage('today');
+      showToastNotification("Error checking exam status.");
+      return;
+    }
+  }
+
+  // Анимация входа на страницу
   hideNavigation();
   showPage('todaytasks');
-  const header = document.getElementById('header-today');
-  const unit = document.getElementById('todaytasks-unit');
-  header.textContent = title;
-  unit.textContent = `Unit ${currentUnit}`;
+  if (pageRoot) {
+    pageRoot.classList.remove('todaytasks-enter');
+    void pageRoot.offsetWidth;
+    pageRoot.classList.add('todaytasks-enter');
+    pageRoot.addEventListener('animationend', function _once() {
+      pageRoot.classList.remove('todaytasks-enter');
+      pageRoot.removeEventListener('animationend', _once);
+    });
+  }
 
-  // Remove summer elements
+  if (headerH1) headerH1.textContent = title;
+  if (unitEl && typeof currentUnit !== 'undefined') unitEl.textContent = `Unit ${currentUnit}`;
+
+  // Удаляем декоративные элементы
   document.querySelectorAll('.moon, .summer-tree, .star, .firefly').forEach(el => el.remove());
-  document.getElementById('todaytasks-header').classList.remove('summer-scene');
+  if (headerContainer) headerContainer.classList.remove('summer-scene');
 
-  // Add rain and lightning
+  // Дождь/молнии (как раньше)
   const rainAndLightningHTML = `
     <div class="lightning-flash"></div>
-    ${[10, 20, 30, 40, 50, 60, 70].map((left, i) =>
-      `<span class="rain-drop" style="left: ${left}%; animation-delay: ${i * 0.2}s;"></span>`
+    ${[10,20,30,40,50,60,70].map((left,i) =>
+      `<span class="rain-drop" style="left:${left}%; animation-delay:${i*0.2}s;"></span>`
     ).join('')}
-    ${Array.from({length: 3}).map(() =>
-      `<div class="lightning-drop" style="left: ${Math.random() * 90 + 5}%; animation-delay: ${Math.random() * 3}s;"></div>`
+    ${Array.from({length:3}).map(() =>
+      `<div class="lightning-drop" style="left:${Math.random()*90 + 5}%; animation-delay:${Math.random()*3}s;"></div>`
     ).join('')}
   `;
-  header.insertAdjacentHTML('beforeend', rainAndLightningHTML);
+  if (headerContainer) {
+    const existingRain = headerContainer.querySelectorAll('.rain-drop, .lightning-drop, .lightning-flash');
+    if (existingRain && existingRain.length) existingRain.forEach(n => n.remove());
+    headerContainer.insertAdjacentHTML('beforeend', rainAndLightningHTML);
+  }
 
-  const content = document.getElementById('todaytasks-content');
+  // Exam timer (компактный) — как было, но при финише сохраняем snapshot answers
+  if (openType === "Exam based") {
+    if (unitEl) unitEl.style.display = 'none';
+    const existingCompact = document.getElementById('exam-timer');
+    if (existingCompact) existingCompact.remove();
+
+    const compactTimer = document.createElement('div');
+    compactTimer.id = 'exam-timer';
+    compactTimer.className = 'compact-exam-timer';
+    compactTimer.innerHTML = `<i class="fa-solid fa-stopwatch"></i> <span id="exam-time-text">--:--</span>`;
+    if (unitEl && unitEl.parentElement) {
+      unitEl.parentElement.insertBefore(compactTimer, unitEl.nextSibling);
+    } else if (headerH1 && headerH1.parentElement) {
+      headerH1.parentElement.appendChild(compactTimer);
+    } else if (headerContainer) {
+      headerContainer.appendChild(compactTimer);
+    }
+    const timeSpan = compactTimer.querySelector('#exam-time-text');
+
+    let remainingSeconds = 0;
+    try {
+      const res = await fetch('/get_remaining_time');
+      if (!res.ok) throw new Error('Failed to get remaining time');
+      const data = await res.json();
+      if (data.error) {
+        showToastNotification(data.error);
+        return;
+      }
+      remainingSeconds = Math.max(0, Math.floor(data.remaining_time || 0));
+    } catch (err) {
+      console.error('[Exam] Timer init error:', err);
+      return;
+    }
+
+    function tickTimer() {
+      if (remainingSeconds <= 0) {
+        clearInterval(window.examTimerInterval);
+        timeSpan.textContent = '00:00';
+        showToastNotification('Exam time is over!');
+        try {
+          // сохраняем ответы перед финальным модальным окном
+          collectAnswersFromDOM();
+          window._todaytasks_answers = JSON.parse(JSON.stringify(answersMap || {}));
+          showFinishModal(title, questions);
+          setTimeout(() => {
+            const yesBtn = document.querySelector('.Finish-modal .Finish-btn-yes');
+            if (yesBtn) yesBtn.click();
+            else {
+              // при прямом завершении передаём snapshot через глобал
+              window._todaytasks_answers = JSON.parse(JSON.stringify(answersMap || {}));
+              finishTodayTasks(title, questions);
+            }
+          }, 80);
+        } catch (modalErr) {
+          console.error('[Exam] Error triggering finish modal:', modalErr);
+          window._todaytasks_answers = JSON.parse(JSON.stringify(answersMap || {}));
+          finishTodayTasks(title, questions);
+        }
+        return;
+      }
+      const mm = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
+      const ss = String(remainingSeconds % 60).padStart(2, '0');
+      timeSpan.textContent = `${mm}:${ss}`;
+      remainingSeconds--;
+    }
+
+    tickTimer();
+    window.examTimerInterval = setInterval(tickTimer, 1000);
+  } else {
+    if (unitEl) unitEl.style.display = '';
+  }
+
+  // --- Главная логика ---
+  if (!content) {
+    console.error('todaytasks-content element not found');
+    return;
+  }
   content.innerHTML = '';
 
-  questions.forEach((q, qi) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'exam-question-block';
+  let currentIndex = 0;
+  const groups = Array.isArray(questions) ? questions : [];
+  let isAnimating = false;
 
+  /* ---------- Очистка старых swipe/key обработчиков (если были) ---------- */
+  function cleanupOldHandlers() {
+    try {
+      if (content && content._swipeHandlers) {
+        const h = content._swipeHandlers;
+        if (h.touchstart) content.removeEventListener('touchstart', h.touchstart, { passive: true });
+        if (h.touchmove) content.removeEventListener('touchmove', h.touchmove, { passive: true });
+        if (h.touchend) content.removeEventListener('touchend', h.touchend, { passive: true });
+        if (h.mousedown) content.removeEventListener('mousedown', h.mousedown);
+        if (h.mousemove) content.removeEventListener('mousemove', h.mousemove);
+        if (h.mouseup) content.removeEventListener('mouseup', h.mouseup);
+        if (h.keydown) document.removeEventListener('keydown', h.keydown);
+        delete content._swipeHandlers;
+      }
+    } catch (err) {
+      console.warn('Error during cleanupOldHandlers:', err);
+    }
+  }
+
+  /* ---------- Функции сохранения/восстановления ответов ---------- */
+
+  // Собирает ответы с текущего видимого контента (content) и кладёт в answersMap
+  function collectAnswersFromDOM() {
+    try {
+      // radio inputs (multiple_choice, true_false)
+      content.querySelectorAll('input[type="radio"]').forEach(r => {
+        if (r.name) {
+          const name = r.name; // "q12"
+          const base = name.replace(/^q/, '');
+          if (!answersMap[base]) answersMap[base] = {};
+          if (r.checked) answersMap[base].radio = r.value;
+        }
+      });
+
+      // text inputs (image-answer, listening-input, general text inputs incl. write-in-blank-input)
+      content.querySelectorAll('input[type="text"], input[type="password"], textarea, input.write-in-blank-input, input.image-answer, input.listening-input').forEach(inp => {
+        const name = inp.name || inp.dataset.qid || inp.id;
+        if (!name) return;
+        const base = String(name).replace(/^q/, '');
+        answersMap[base] = answersMap[base] || {};
+        answersMap[base].text = inp.value;
+      });
+
+      // custom-selects
+      content.querySelectorAll('.custom-select-wrapper').forEach(sw => {
+        const qid = sw.dataset.qid || (sw.closest('.exam-subquestion') && sw.closest('.exam-subquestion').dataset.qid);
+        if (!qid) return;
+        answersMap[qid] = answersMap[qid] || {};
+        answersMap[qid].select = sw.dataset.selected || (sw.querySelector('.selected-text') && sw.querySelector('.selected-text').textContent) || '';
+      });
+
+      // box-choose blanks
+      content.querySelectorAll('.box-choose-blank').forEach(b => {
+        const qid = b.dataset.qid || (b.id && b.id.replace(/^blank-/, ''));
+        if (!qid) return;
+        answersMap[qid] = answersMap[qid] || {};
+        answersMap[qid].box = answersMap[qid].box || [];
+        const blanks = Array.from(b.parentNode.querySelectorAll('.box-choose-blank'));
+        const idx = blanks.indexOf(b);
+        answersMap[qid].box[idx] = b.dataset.value || (b.classList.contains('filled') ? b.textContent : '');
+      });
+
+      // unscramble: сохраняем буквы в слотах в порядке
+      content.querySelectorAll('.unscramble-inputs').forEach(inputs => {
+        const qid = inputs.dataset.qid;
+        if (!qid) return;
+        answersMap[qid] = answersMap[qid] || {};
+        const arr = Array.from(inputs.querySelectorAll('.unscramble-input')).map(slot => slot.textContent || '');
+        answersMap[qid].unscramble = arr;
+      });
+    } catch (err) {
+      console.warn('collectAnswersFromDOM error', err);
+    }
+  }
+
+  // Восстанавливает ответы в новый wrapper (только для элементов внутри этого wrapper)
+  function restoreAnswersToWrapper(wrapper) {
+    try {
+      // radios
+      wrapper.querySelectorAll('input[type="radio"]').forEach(r => {
+        if (!r.name) return;
+        const base = r.name.replace(/^q/, '');
+        const saved = answersMap[base] && answersMap[base].radio;
+        if (saved !== undefined && String(saved) === String(r.value)) {
+          r.checked = true;
+        }
+      });
+
+      // text inputs
+      wrapper.querySelectorAll('input[type="text"], input[type="password"], textarea, input.write-in-blank-input, input.image-answer, input.listening-input').forEach(inp => {
+        const name = inp.name || inp.dataset.qid || inp.id;
+        if (!name) return;
+        const base = String(name).replace(/^q/, '');
+        const saved = answersMap[base] && answersMap[base].text;
+        if (saved !== undefined) inp.value = saved;
+      });
+
+      // custom-selects
+      wrapper.querySelectorAll('.custom-select-wrapper').forEach(sw => {
+        const qid = sw.dataset.qid;
+        if (!qid) return;
+        const saved = answersMap[qid] && answersMap[qid].select;
+        if (saved !== undefined && saved !== '') {
+          const textSpan = sw.querySelector('.selected-text');
+          if (textSpan) textSpan.textContent = saved;
+          sw.dataset.selected = saved;
+        }
+      });
+
+      // box-choose blanks
+      wrapper.querySelectorAll('.box-choose-blank').forEach(blank => {
+        const qid = blank.dataset.qid || (blank.id && blank.id.replace(/^blank-/, ''));
+        if (!qid) return;
+        const blanks = Array.from(blank.parentNode.querySelectorAll('.box-choose-blank'));
+        const idx = blanks.indexOf(blank);
+        const savedArr = answersMap[qid] && answersMap[qid].box;
+        if (savedArr && savedArr[idx]) {
+          const val = savedArr[idx];
+          blank.textContent = val;
+          blank.classList.add('filled');
+          blank.dataset.value = val;
+          blank.classList.remove('highlight-pending');
+          const optionsDiv = blank.closest('.exam-subquestion') && blank.closest('.exam-subquestion').querySelector('.box-choose-options');
+          if (optionsDiv) {
+            const optToRemove = Array.from(optionsDiv.querySelectorAll('.box-choose-option')).find(o => o.textContent.trim() === val.trim());
+            if (optToRemove) optToRemove.remove();
+          }
+        }
+      });
+
+      // unscramble restore
+      wrapper.querySelectorAll('.unscramble-inputs').forEach(inputContainer => {
+        const qid = inputContainer.dataset.qid;
+        if (!qid) return;
+        const saved = answersMap[qid] && answersMap[qid].unscramble;
+        if (saved && saved.length) {
+          const letterContainer = inputContainer.previousElementSibling && inputContainer.previousElementSibling.classList.contains('unscramble-letters')
+            ? inputContainer.previousElementSibling
+            : inputContainer.parentNode.querySelector('.unscramble-letters');
+          if (!letterContainer) return;
+          const letterEls = Array.from(letterContainer.querySelectorAll('.unscramble-letter'));
+          saved.forEach((letter, slotIndex) => {
+            if (!letter) return;
+            const match = letterEls.find(le => le.dataset.letter === letter && !le.classList.contains('used'));
+            if (match) {
+              const slot = inputContainer.querySelectorAll('.unscramble-input')[slotIndex];
+              if (slot) {
+                slot.textContent = match.dataset.letter;
+                slot.classList.add('filled');
+                slot.dataset.letterIndex = match.dataset.index;
+                match.classList.add('used');
+              }
+            }
+          });
+        }
+      });
+
+    } catch (err) {
+      console.warn('restoreAnswersToWrapper error', err);
+    }
+  }
+
+  /* ---------- Функция: создает/пересоздаёт прогресс-бар в корне (вне header) ---------- */
+  function renderProgressBarInRoot(percent) {
+    const old = document.getElementById('tasks-count-wrapper-root');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+
+    const wrapper = document.createElement('div');
+    wrapper.id = 'tasks-count-wrapper-root';
+    wrapper.className = 'tasks-count-wrapper';
+    wrapper.setAttribute('aria-hidden', 'false');
+
+    const bar = document.createElement('div');
+    bar.id = 'tasks-count-bar';
+    bar.className = 'tasks-count-bar';
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', '100');
+    bar.setAttribute('aria-valuenow', String(percent));
+
+    const fill = document.createElement('div');
+    fill.className = 'tasks-count-fill';
+    fill.style.width = `${percent}%`;
+    bar.appendChild(fill);
+
+    const pct = document.createElement('div');
+    pct.id = 'tasks-count-percentage';
+    pct.className = 'tasks-count-percentage';
+    pct.setAttribute('tabindex', '-1');
+    pct.textContent = `${percent}%`;
+
+    wrapper.appendChild(bar);
+    wrapper.appendChild(pct);
+
+    if (pageRoot) {
+      if (headerContainer && headerContainer.parentNode === pageRoot) {
+        if (headerContainer.nextSibling) pageRoot.insertBefore(wrapper, headerContainer.nextSibling);
+        else pageRoot.appendChild(wrapper);
+      } else {
+        const contentEl = document.getElementById('todaytasks-content');
+        if (contentEl && contentEl.parentNode === pageRoot) pageRoot.insertBefore(wrapper, contentEl);
+        else pageRoot.appendChild(wrapper);
+      }
+    } else {
+      const contentEl = document.getElementById('todaytasks-content');
+      if (contentEl && contentEl.parentNode) contentEl.parentNode.insertBefore(wrapper, contentEl);
+      else document.body.appendChild(wrapper);
+    }
+
+    // Анимация плашки
+    requestAnimationFrame(() => {
+      pct.classList.remove('pct-animate');
+      setTimeout(() => pct.classList.add('pct-animate'), 20);
+      setTimeout(() => pct.classList.remove('pct-animate'), 700);
+    });
+  }
+
+  function updateProgressIndicator() {
+    const percent = groups.length > 0 ? Math.round(((currentIndex + 1) / groups.length) * 100) : 0;
+    renderProgressBarInRoot(percent);
+  }
+
+  /* ---------- Переход к индексу (находится ДО регистрации обработчиков) ---------- */
+  function goToIndex(idx, direction = 'left') {
+    if (isAnimating) return;
+    if (idx < 0 || idx >= groups.length) return;
+    const prevIndex = currentIndex;
+    // перед переключением — собираем ответы с текущей страницы
+    collectAnswersFromDOM();
+    currentIndex = idx;
+    renderGroup(currentIndex, direction, prevIndex);
+    // Пересоздаём прогресс-бар при каждом перемещении
+    updateProgressIndicator();
+  }
+
+  /* ---------- Рендер группы (блок вопроса) ---------- */
+  function renderGroup(index, direction = 'left', prevIndex = null) {
+    const q = groups[index];
+    if (!q) return;
+    const newWrapper = document.createElement('div');
+    newWrapper.className = 'exam-question-block new-block';
+
+    // reading
     if (q.type === 'reading' && q.text) {
       const rich = document.createElement('div');
       rich.className = 'exam-parent-question';
       rich.innerHTML = q.text;
-      wrapper.appendChild(rich);
+      newWrapper.appendChild(rich);
     }
 
+    // listening top-level audio
     if (q.type === 'listening' && q.audio) {
       const div = document.createElement('div');
       div.innerHTML = `
@@ -3831,17 +4197,15 @@ function openTodayTaskPage(title, questions) {
           </div>
           <audio src="${q.audio}" preload="metadata" style="display:none;"></audio>
         </div>`;
-      wrapper.appendChild(div.firstElementChild);
+      newWrapper.appendChild(div.firstElementChild);
     }
 
+    // video
     if (q.type === 'video' && (q['link-youtube'] || q['local-link'])) {
       const div = document.createElement('div');
       div.className = 'video-question';
       if (q['link-youtube'] && q['link-youtube'].includes('<iframe')) {
-        div.innerHTML = `
-          <div class="video-player">
-            ${q['link-youtube']}
-          </div>`;
+        div.innerHTML = `<div class="video-player">${q['link-youtube']}</div>`;
       } else if (q['local-link']) {
         div.innerHTML = `
           <div class="video-player">
@@ -3851,14 +4215,14 @@ function openTodayTaskPage(title, questions) {
             </video>
           </div>`;
       }
-      wrapper.appendChild(div.firstElementChild);
+      newWrapper.appendChild(div.firstElementChild);
     }
 
     if (q.text && q.type !== 'reading') {
       const heading = document.createElement('h3');
       heading.className = 'question-title';
-      heading.innerHTML = `${qi + 1}. ${q.text}`;
-      wrapper.appendChild(heading);
+      heading.innerHTML = `${index + 1}. ${q.text}`;
+      newWrapper.appendChild(heading);
     }
 
     const subList = Array.isArray(q.subquestions) ? q.subquestions : [q];
@@ -3867,16 +4231,12 @@ function openTodayTaskPage(title, questions) {
     const groupedBoxChoose = [];
 
     subList.forEach(sub => {
-      if (sub.type === 'select-options') {
-        groupedSelectOptions.push(sub);
-      } else if (sub.type === 'write-in-blank') {
-        groupedWriteIn.push(sub);
-      } else if (sub.type === 'box-choose') {
-        groupedBoxChoose.push(sub);
-      }
+      if (sub.type === 'select-options') groupedSelectOptions.push(sub);
+      else if (sub.type === 'write-in-blank') groupedWriteIn.push(sub);
+      else if (sub.type === 'box-choose') groupedBoxChoose.push(sub);
     });
 
-    subList.forEach(sub => {
+    subList.forEach((sub) => {
       if (sub.type === 'select-options' || sub.type === 'write-in-blank' || sub.type === 'box-choose') return;
       const subDiv = document.createElement('div');
       subDiv.className = 'exam-subquestion';
@@ -3888,14 +4248,14 @@ function openTodayTaskPage(title, questions) {
         subDiv.appendChild(p);
       }
 
-      const group = document.createElement('div');
-      group.className = 'question-options';
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'question-options';
 
       if (['multiple_choice', 'true_false'].includes(sub.type)) {
         (sub.options || ['True', 'False']).forEach((opt, i) => {
           const letter = String.fromCharCode(65 + i);
           const id = `opt-${sub.id}-${letter}`;
-          group.innerHTML += `
+          groupDiv.innerHTML += `
             <div class="option-group">
               <input type="radio" name="q${sub.id}" value="${opt}" id="${id}">
               <label for="${id}">
@@ -3929,8 +4289,8 @@ function openTodayTaskPage(title, questions) {
           inputContainer.appendChild(slot);
         });
 
-        group.appendChild(letterContainer);
-        group.appendChild(inputContainer);
+        groupDiv.appendChild(letterContainer);
+        groupDiv.appendChild(inputContainer);
 
         letterContainer.querySelectorAll('.unscramble-letter').forEach(letterEl => {
           letterEl.onclick = () => {
@@ -3956,14 +4316,14 @@ function openTodayTaskPage(title, questions) {
           };
         });
       } else if (sub.type === 'picture') {
-        if (sub.image) group.innerHTML += `<img src="${sub.image}" alt="Image" class="question-image">`;
-        group.innerHTML += `<input type="text" name="q${sub.id}" class="image-answer" placeholder="Answer...">`;
+        if (sub.image) groupDiv.innerHTML += `<img src="${sub.image}" alt="Image" class="question-image">`;
+        groupDiv.innerHTML += `<input type="text" name="q${sub.id}" class="image-answer" placeholder="Answer...">`;
       } else if (sub.type === 'listening') {
-        group.innerHTML = `<input type="text" name="q${sub.id}" class="listening-input" placeholder="Your answer...">`;
+        groupDiv.innerHTML = `<input type="text" name="q${sub.id}" class="listening-input" placeholder="Your answer...">`;
       }
 
-      subDiv.appendChild(group);
-      wrapper.appendChild(subDiv);
+      subDiv.appendChild(groupDiv);
+      newWrapper.appendChild(subDiv);
     });
 
     if (groupedWriteIn.length) {
@@ -3972,10 +4332,10 @@ function openTodayTaskPage(title, questions) {
       groupedWriteIn.forEach(sub => {
         const p = document.createElement('p');
         p.className = 'question-text';
-        p.innerHTML = `${sub.id}. ${sub.text.replace('____', `<input type="password" class="write-in-blank-input" name="q${sub.id}" placeholder="____" autocomplete="off">`)}`;
+        p.innerHTML = `${sub.id}. ${sub.text.replace('____', `<input type="text" class="write-in-blank-input" name="q${sub.id}" autocomplete="off">`)}`;
         subDiv.appendChild(p);
       });
-      wrapper.appendChild(subDiv);
+      newWrapper.appendChild(subDiv);
     }
 
     if (groupedSelectOptions.length) {
@@ -4059,7 +4419,6 @@ function openTodayTaskPage(title, questions) {
         selectWrapper.appendChild(display);
         selectWrapper.appendChild(dropdown);
 
-        // Construct the p element with select-options in the middle
         const idSpan = document.createElement('span');
         idSpan.textContent = `${sub.id}. `;
         p.appendChild(idSpan);
@@ -4082,7 +4441,7 @@ function openTodayTaskPage(title, questions) {
 
         subDiv.appendChild(p);
       });
-      wrapper.appendChild(subDiv);
+      newWrapper.appendChild(subDiv);
     }
 
     if (groupedBoxChoose.length) {
@@ -4160,48 +4519,257 @@ function openTodayTaskPage(title, questions) {
         });
       }, 0);
 
-      wrapper.appendChild(subDiv);
+      newWrapper.appendChild(subDiv);
     }
 
-    content.appendChild(wrapper);
+    // Анимация между старым и новым блоком
+    const oldChild = content.querySelector('.exam-question-block');
+    if (!oldChild) {
+      newWrapper.classList.add(direction === 'left' ? 'slide-in-right' : 'slide-in-left');
+      content.appendChild(newWrapper);
+      // Восстанавливаем ответы (если были)
+      restoreAnswersToWrapper(newWrapper);
+      initCustomAudioPlayers();
+      newWrapper.addEventListener('animationend', function _n() {
+        newWrapper.classList.remove('slide-in-right', 'slide-in-left', 'new-block');
+        newWrapper.removeEventListener('animationend', _n);
+      });
+    } else {
+      // перед анимацией удаления — сохраним текущие ответы
+      collectAnswersFromDOM();
+      isAnimating = true;
+      oldChild.classList.add(direction === 'left' ? 'slide-out-left' : 'slide-out-right');
+      const onOldDone = () => {
+        if (oldChild && oldChild.parentNode) oldChild.parentNode.removeChild(oldChild);
+        newWrapper.classList.add(direction === 'left' ? 'slide-in-right' : 'slide-in-left');
+        content.appendChild(newWrapper);
+        // Restore saved answers
+        restoreAnswersToWrapper(newWrapper);
+        initCustomAudioPlayers();
+        newWrapper.addEventListener('animationend', function _n2() {
+          newWrapper.classList.remove('slide-in-right', 'slide-in-left', 'new-block');
+          newWrapper.removeEventListener('animationend', _n2);
+          isAnimating = false;
+        });
+        oldChild.removeEventListener('animationend', onOldDone);
+      };
+      oldChild.addEventListener('animationend', onOldDone);
+      setTimeout(() => {
+        if (isAnimating) onOldDone();
+      }, 600);
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  }
 
-document.getElementById('finish-tasks-btn').onclick = () => {
-  const btn = document.getElementById('floating-finish-btn');
-  if (btn) btn.style.display = 'none';
-  showFinishModal(title, questions);
-};
+  /* ---------- Swipe / drag обработчики с регистрацией/удалением ---------- */
+  function attachSwipeHandlers() {
+    // Перед регистрацией — удалим старые (если есть)
+    cleanupOldHandlers();
 
-document.getElementById('done-tasks-btn').onclick = () => {
-  showPage('today');
-  content.innerHTML = '';
-  document.getElementById('done-tasks-btn').style.display = 'none';
-  document.getElementById('finish-tasks-btn').style.display = 'inline-block';
-  const floating = document.getElementById('floating-finish-btn');
-  if (floating) floating.style.display = 'none';
-};
+    let startX = 0;
+    let startY = 0;
+    let isTouch = false;
+    let moved = false;
+    const threshold = 60;
 
-let floatingBtn = document.getElementById('floating-finish-btn');
-if (!floatingBtn) {
-  floatingBtn = document.createElement('button');
-  floatingBtn.id = 'floating-finish-btn';
-  floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
-  document.body.appendChild(floatingBtn);
-}
-floatingBtn.style.display = 'block';
-floatingBtn.onclick = () => {
-  floatingBtn.style.display = 'none';
-  showFinishModal(title, questions);
-};
+    // Touch handlers
+    const touchstart = (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      isTouch = true;
+      moved = false;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+    const touchmove = (e) => {
+      if (!isTouch || !e.touches || e.touches.length === 0) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) moved = true;
+    };
+    const touchend = (e) => {
+      if (!isTouch) return;
+      const touch = e.changedTouches && e.changedTouches[0];
+      if (!touch) return;
+      const dx = touch.clientX - startX;
+      if (!moved) { isTouch = false; return; }
+      if (dx < -threshold) goToIndex(Math.min(groups.length - 1, currentIndex + 1), 'left');
+      else if (dx > threshold) goToIndex(Math.max(0, currentIndex - 1), 'right');
+      isTouch = false;
+      moved = false;
+    };
 
+    // Mouse handlers
+    let mouseDown = false;
+    const mousedown = (e) => { mouseDown = true; startX = e.clientX; startY = e.clientY; moved = false; };
+    const mousemove = (e) => { if (!mouseDown) return; const dx = e.clientX - startX; const dy = e.clientY - startY; if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) moved = true; };
+    const mouseup = (e) => {
+      if (!mouseDown) return;
+      const dx = e.clientX - startX;
+      if (!moved) { mouseDown = false; return; }
+      if (dx < -threshold) goToIndex(Math.min(groups.length - 1, currentIndex + 1), 'left');
+      else if (dx > threshold) goToIndex(Math.max(0, currentIndex - 1), 'right');
+      mouseDown = false; moved = false;
+    };
+
+    // Keydown handler
+    const keydown = (e) => {
+      if (e.key === 'ArrowLeft') goToIndex(Math.max(0, currentIndex - 1), 'right');
+      else if (e.key === 'ArrowRight') goToIndex(Math.min(groups.length - 1, currentIndex + 1), 'left');
+    };
+
+    // Сохраняем ссылки на обработчики для последующей очистки
+    content._swipeHandlers = {
+      touchstart, touchmove, touchend,
+      mousedown, mousemove, mouseup,
+      keydown
+    };
+
+    // Регистрация слушателей
+    content.addEventListener('touchstart', touchstart, { passive: true });
+    content.addEventListener('touchmove', touchmove, { passive: true });
+    content.addEventListener('touchend', touchend, { passive: true });
+
+    content.addEventListener('mousedown', mousedown);
+    content.addEventListener('mousemove', mousemove);
+    content.addEventListener('mouseup', mouseup);
+
+    document.addEventListener('keydown', keydown);
+  }
+
+  // Инициализация: первый рендер + регистрация обработчиков + прогресс
+  if (groups.length > 0) {
+    currentIndex = 0;
+    renderGroup(currentIndex, 'left', null);
+  } else {
+    content.innerHTML = '<p class="no-questions">No questions available.</p>';
+  }
+
+  // Создаём/обновляем прогресс (пересоздаётся внутри renderProgressBarInRoot)
+  updateProgressIndicator();
+
+  // Привязка свайпов — теперь точно без дублирования и goToIndex доступен
+  attachSwipeHandlers();
+
+  // Finish / Done / Floating
+  const finishBtnEl = document.getElementById('finish-tasks-btn');
+  if (finishBtnEl) {
+    finishBtnEl.onclick = () => {
+      const btn = document.getElementById('floating-finish-btn');
+      if (btn) btn.style.display = 'none';
+      // Сохраним перед завершением
+      collectAnswersFromDOM();
+      // snapshot в глобал — чтобы существующая логика finish могла его прочитать
+      window._todaytasks_answers = JSON.parse(JSON.stringify(answersMap || {}));
+      showFinishModal(title, questions);
+    };
+  }
+
+  const doneBtnEl = document.getElementById('done-tasks-btn');
+  if (doneBtnEl) {
+    doneBtnEl.onclick = () => {
+      showPage('today');
+      content.innerHTML = '';
+      doneBtnEl.style.display = 'none';
+      const finishBtn = document.getElementById('finish-tasks-btn');
+      if (finishBtn) finishBtn.style.display = 'inline-block';
+      const floating = document.getElementById('floating-finish-btn');
+      if (floating) floating.style.display = 'none';
+    };
+  }
+
+  let floatingBtn = document.getElementById('floating-finish-btn');
+  if (!floatingBtn) {
+    floatingBtn = document.createElement('button');
+    floatingBtn.id = 'floating-finish-btn';
+    floatingBtn.innerHTML = '<i class="fas fa-check"></i> Finish Task';
+    document.body.appendChild(floatingBtn);
+  }
+  floatingBtn.style.display = 'block';
+  floatingBtn.onclick = () => {
+    floatingBtn.style.display = 'none';
+    // Сохраним перед завершением
+    collectAnswersFromDOM();
+    window._todaytasks_answers = JSON.parse(JSON.stringify(answersMap || {}));
+    showFinishModal(title, questions);
+  };
+
+  // Инициализация аудио и прочих интерактивов
   initCustomAudioPlayers();
 }
 
+
+
 // --------------------
-// Модалка Finish-modal
+// Модалка Finish-modal (обновлённая — учитывает ответы со всех страниц)
+//
+// Использует window._todaytasks_answers (если есть) и объединяет с текущим DOM.
+// Перед вызовом finishTodayTasks сохраняет snapshot в window._todaytasks_answers
+// и также передаёт его как третий аргумент (backward-compatible).
 // --------------------
 function showFinishModal(taskName, questions) {
+  // helper: получить ответ из DOM для конкретного под-вопроса
+  function getDomAnswerForSub(sub) {
+    const qid = String(sub.id);
+    const ans = {};
+
+    // custom-select
+    const selectEl = document.querySelector(`.custom-select-wrapper[data-qid="${qid}"]`);
+    if (selectEl) {
+      const sel = selectEl.dataset.selected || (selectEl.querySelector('.selected-text') && selectEl.querySelector('.selected-text').textContent);
+      if (sel && String(sel).trim()) ans.select = String(sel).trim();
+    }
+
+    // radio (multiple_choice / true_false)
+    const radio = document.querySelector(`input[name="q${qid}"]:checked`);
+    if (radio) ans.radio = radio.value;
+
+    // text / password / textarea (write-in-blank, picture, listening, general)
+    const textInput = document.querySelector(`input[name="q${qid}"], textarea[name="q${qid}"]`);
+    if (textInput && String(textInput.value || '').trim()) ans.text = String(textInput.value).trim();
+
+    // box-choose blanks (may be several)
+    const blanks = Array.from(document.querySelectorAll(`.box-choose-blank[data-qid="${qid}"]`));
+    if (blanks.length) {
+      ans.box = blanks.map(b => {
+        if (b.dataset && b.dataset.value) return b.dataset.value;
+        if (b.classList && b.classList.contains('filled')) return (b.textContent || '').trim();
+        return '';
+      });
+    }
+
+    // unscramble inputs
+    const unscrambleSlots = Array.from(document.querySelectorAll(`.unscramble-inputs[data-qid="${qid}"] .unscramble-input`));
+    if (unscrambleSlots.length) {
+      ans.unscramble = unscrambleSlots.map(s => (s.textContent || '').trim());
+    }
+
+    return ans;
+  }
+
+  // Берём глобальный snapshot (если есть) — ключи как строки
+  const globalAnswers = (window._todaytasks_answers && typeof window._todaytasks_answers === 'object')
+    ? JSON.parse(JSON.stringify(window._todaytasks_answers))
+    : {};
+
+  // Собираем mergedAnswers = globalAnswers + данные из DOM (DOM перекрывает)
+  const mergedAnswers = Object.assign({}, globalAnswers);
+
+  // проходим все вопросы и собираем DOM-ответы (на случай, если есть ответы на видимой странице)
+  questions.forEach(q => {
+    const subList = Array.isArray(q.subquestions) ? q.subquestions : [q];
+    subList.forEach(sub => {
+      const qid = String(sub.id);
+      const domAns = getDomAnswerForSub(sub);
+      if (!mergedAnswers[qid]) mergedAnswers[qid] = {};
+      // наложение: значения из DOM перезаписывают глобальные (если есть)
+      Object.keys(domAns).forEach(k => {
+        mergedAnswers[qid][k] = domAns[k];
+      });
+    });
+  });
+
+  // Подсчёт answered / total
   let answeredCount = 0;
   let totalCount = 0;
 
@@ -4209,29 +4777,78 @@ function showFinishModal(taskName, questions) {
     const subList = Array.isArray(q.subquestions) ? q.subquestions : [q];
     subList.forEach(sub => {
       totalCount++;
+      const qid = String(sub.id);
+      const saved = mergedAnswers[qid] || {};
+
+      // Функция-помощник для проверки "пусто"
+      const hasText = v => (v !== undefined && v !== null && String(v).trim() !== '');
+      const hasBoxAny = arr => Array.isArray(arr) && arr.some(x => hasText(x));
+      const hasUnscrambleAny = arr => Array.isArray(arr) && arr.some(x => hasText(x));
+
+      let isAnswered = false;
+
       if (sub.type === 'select-options') {
-        const selected = document.querySelector(`.custom-select-wrapper[data-qid="${sub.id}"]`)?.dataset.selected;
-        if (selected) answeredCount++;
+        if (hasText(saved.select)) isAnswered = true;
+        else {
+          // fallback: check DOM again quickly (should be covered above, but double-check)
+          const sel = document.querySelector(`.custom-select-wrapper[data-qid="${qid}"]`)?.dataset.selected;
+          if (sel && String(sel).trim()) isAnswered = true;
+        }
       } else if (sub.type === 'write-in-blank') {
-        const input = document.querySelector(`input[name="q${sub.id}"]`);
-        if (input && input.value.trim()) answeredCount++;
+        if (hasText(saved.text)) isAnswered = true;
+        else {
+          const input = document.querySelector(`input[name="q${qid}"]`);
+          if (input && String(input.value || '').trim()) isAnswered = true;
+        }
       } else if (sub.type === 'box-choose') {
-        const blank = document.querySelector(`.box-choose-blank[data-qid="${sub.id}"]`);
-        if (blank && blank.classList.contains('filled')) answeredCount++;
+        if (hasBoxAny(saved.box)) isAnswered = true;
+        else {
+          const blank = document.querySelectorAll(`.box-choose-blank[data-qid="${qid}"]`);
+          if (blank && Array.from(blank).some(b => b.classList.contains('filled'))) isAnswered = true;
+        }
       } else if (['multiple_choice', 'true_false'].includes(sub.type)) {
-        const checked = document.querySelector(`input[name="q${sub.id}"]:checked`);
-        if (checked) answeredCount++;
+        if (hasText(saved.radio)) isAnswered = true;
+        else {
+          const checked = document.querySelector(`input[name="q${qid}"]:checked`);
+          if (checked) isAnswered = true;
+        }
       } else if (sub.type === 'unscramble') {
-        const filled = document.querySelectorAll(`.unscramble-inputs[data-qid="${sub.id}"] .filled`).length;
-        if (filled > 0) answeredCount++;
+        if (hasUnscrambleAny(saved.unscramble)) isAnswered = true;
+        else {
+          const filled = document.querySelectorAll(`.unscramble-inputs[data-qid="${qid}"] .filled`).length;
+          if (filled > 0) isAnswered = true;
+        }
       } else if (sub.type === 'picture' || sub.type === 'listening') {
-        const input = document.querySelector(`input[name="q${sub.id}"]`);
-        if (input && input.value.trim()) answeredCount++;
+        if (hasText(saved.text)) isAnswered = true;
+        else {
+          const input = document.querySelector(`input[name="q${qid}"]`);
+          if (input && String(input.value || '').trim()) isAnswered = true;
+        }
+      } else {
+        // default fallback: consider any stored value as answered
+        if (Object.keys(saved).length > 0) {
+          // if any non-empty field found
+          if (hasText(saved.text) || hasText(saved.radio) || hasText(saved.select) || hasBoxAny(saved.box) || hasUnscrambleAny(saved.unscramble)) {
+            isAnswered = true;
+          } else {
+            // check DOM generically
+            const input = document.querySelector(`input[name="q${qid}"], textarea[name="q${qid}"]`);
+            const checked = document.querySelector(`input[name="q${qid}"]:checked`);
+            if ((input && String(input.value || '').trim()) || checked) isAnswered = true;
+          }
+        } else {
+          // no saved — check DOM minimal
+          const input = document.querySelector(`input[name="q${qid}"], textarea[name="q${qid}"]`);
+          const checked = document.querySelector(`input[name="q${qid}"]:checked`);
+          if ((input && String(input.value || '').trim()) || checked) isAnswered = true;
+        }
       }
+
+      if (isAnswered) answeredCount++;
     });
   });
 
-  const unansweredCount = totalCount - answeredCount;
+  const unansweredCount = Math.max(0, totalCount - answeredCount);
 
   // Удаляем старую модалку если есть
   const oldModal = document.querySelector('.Finish-modal');
@@ -4257,11 +4874,27 @@ function showFinishModal(taskName, questions) {
     const btn = document.getElementById('floating-finish-btn');
     if (btn) btn.style.display = 'block';
   };
+
   modal.querySelector('.Finish-btn-yes').onclick = () => {
     modal.remove();
-    finishTodayTasks(taskName, questions);
+
+    // Сохраняем snapshot в глобал (чтобы finishTodayTasks / сервер / другие функции могли получить все ответы)
+    window._todaytasks_answers = JSON.parse(JSON.stringify(mergedAnswers || {}));
+
+    // Если finishTodayTasks умеет принимать третий аргумент - передадим snapshot. И в любом случае глобал уже обновлён.
+    try {
+      finishTodayTasks(taskName, questions, JSON.parse(JSON.stringify(mergedAnswers || {})));
+    } catch (err) {
+      // на всякий случай, если finishTodayTasks не принимает аргументы или бросает — всё равно вызовем без аргумента
+      try {
+        finishTodayTasks(taskName, questions);
+      } catch (err2) {
+        console.error('finishTodayTasks error:', err2);
+      }
+    }
   };
 }
+
 
 function getInstructionForType(type) {
   switch (type) {
@@ -4281,254 +4914,363 @@ function getInstructionForType(type) {
 // ----------------------------
 // ----------------------------
 // 3. Сбор ответов и отправка на сервер с результатом и ошибками
+// Обновлённая: принимает optional answersSnapshot (from showFinishModal),
+// объединяет snapshot + текущий DOM (DOM значения перекрывают snapshot),
+// нормализует и отправляет полный набор ответов.
+// Добавлено: проигрывание звука неудачи /static/music/lagapet.ogg если percent < 79
 // ----------------------------
-function finishTodayTasks(title, questions) {
-  initExamSecurity(false);
-  updateStrikes();
-  showNavigation();
-  const answers = {};
-  const errors = [];
-  const content = document.getElementById('todaytasks-content');
+function finishTodayTasks(title, questions, answersSnapshot = null) {
+  try {
+    initExamSecurity(false);
+    updateStrikes();
+    showNavigation();
 
-  // 1. Обычные input/textarea
-  content.querySelectorAll('input[name^="q"], textarea[name^="q"]').forEach(el => {
-    const qid = el.name.slice(1);
-    if (el.type === 'radio') {
-      if (el.checked) answers[qid] = el.value;
-    } else {
-      const val = el.value.trim();
-      if (val) answers[qid] = val;
+    const content = document.getElementById('todaytasks-content');
+    const btn = document.getElementById('floating-finish-btn');
+    if (btn) btn.style.display = 'none';
+
+    // 1) Берём глобальный snapshot (переданный или из window)
+    const globalAnswersRaw = answersSnapshot && typeof answersSnapshot === 'object'
+      ? JSON.parse(JSON.stringify(answersSnapshot))
+      : (window._todaytasks_answers && typeof window._todaytasks_answers === 'object'
+          ? JSON.parse(JSON.stringify(window._todaytasks_answers))
+          : {});
+
+    // 2) Сбор ответов из текущего DOM (видимой страницы)
+    const domAnswers = {}; // структура похожа на answersMap: { qid: { text, radio, select, box:[], unscramble:[] } }
+    if (content) {
+      try {
+        // radios (multiple_choice, true_false)
+        content.querySelectorAll('input[type="radio"]').forEach(r => {
+          if (!r.name) return;
+          const qid = String(r.name).replace(/^q/, '');
+          domAnswers[qid] = domAnswers[qid] || {};
+          if (r.checked) domAnswers[qid].radio = r.value;
+        });
+
+        // text/password/textarea (write-in-blank, picture, listening, general)
+        content.querySelectorAll('input[type="text"], input[type="password"], textarea').forEach(inp => {
+          const name = inp.name || inp.dataset.qid || inp.id;
+          if (!name) return;
+          const qid = String(name).replace(/^q/, '');
+          domAnswers[qid] = domAnswers[qid] || {};
+          const v = String(inp.value || '').trim();
+          if (v) domAnswers[qid].text = v;
+        });
+
+        // listening specific inputs (class)
+        content.querySelectorAll('.listening-input').forEach(inp => {
+          const name = inp.name || inp.dataset.qid || inp.id;
+          if (!name) return;
+          const qid = String(name).replace(/^q/, '');
+          domAnswers[qid] = domAnswers[qid] || {};
+          const v = String(inp.value || '').trim();
+          if (v) domAnswers[qid].text = v;
+        });
+
+        // custom-select wrappers
+        content.querySelectorAll('.custom-select-wrapper').forEach(sw => {
+          const qid = sw.dataset.qid;
+          if (!qid) return;
+          domAnswers[qid] = domAnswers[qid] || {};
+          const sel = sw.dataset.selected || (sw.querySelector('.selected-text') && sw.querySelector('.selected-text').textContent);
+          if (sel && String(sel).trim()) domAnswers[qid].select = String(sel).trim();
+        });
+
+        // box-choose blanks (possibly multiple blanks per qid)
+        content.querySelectorAll('.box-choose-blank').forEach(b => {
+          const qid = b.dataset.qid || (b.id && b.id.replace(/^blank-/, ''));
+          if (!qid) return;
+          domAnswers[qid] = domAnswers[qid] || {};
+          domAnswers[qid].box = domAnswers[qid].box || [];
+          const blanks = Array.from(b.parentNode.querySelectorAll('.box-choose-blank'));
+          const idx = blanks.indexOf(b);
+          const val = (b.dataset && b.dataset.value) ? b.dataset.value : (b.classList.contains('filled') ? (b.textContent || '').trim() : '');
+          domAnswers[qid].box[idx] = val || '';
+        });
+
+        // unscramble
+        content.querySelectorAll('.unscramble-inputs').forEach(group => {
+          const qid = group.dataset.qid;
+          if (!qid) return;
+          domAnswers[qid] = domAnswers[qid] || {};
+          const arr = Array.from(group.querySelectorAll('.unscramble-input')).map(s => (s.textContent || '').trim());
+          domAnswers[qid].unscramble = arr;
+        });
+
+      } catch (err) {
+        console.warn('finishTodayTasks: error collecting DOM answers', err);
+      }
     }
-  });
 
-  // 2. box-choose blanks
-  content.querySelectorAll('.box-choose-blank').forEach(blank => {
-    const qid = blank.dataset.qid;
-    const val = blank.dataset.value;
-    if (val) answers[qid] = val;
-    else errors.push(`Please complete box-choose for question ${qid}`);
-  });
+    // 3) Merge: globalAnswersRaw + domAnswers -> mergedAnswersStructured
+    // DOM overrides global for same qid
+    const mergedStructured = JSON.parse(JSON.stringify(globalAnswersRaw || {})); // shallow copy
+    Object.keys(domAnswers).forEach(qid => {
+      mergedStructured[qid] = mergedStructured[qid] || {};
+      // If domAnswers[qid] itself may be primitive (older snapshots), normalize:
+      if (typeof domAnswers[qid] !== 'object' || Array.isArray(domAnswers[qid])) {
+        // assume primitive text or similar
+        mergedStructured[qid].text = String(domAnswers[qid]);
+      } else {
+        Object.keys(domAnswers[qid]).forEach(k => {
+          mergedStructured[qid][k] = domAnswers[qid][k];
+        });
+      }
+    });
 
-  // 3. unscramble
-  content.querySelectorAll('.unscramble-inputs').forEach(group => {
-    const qid = group.dataset.qid;
-    const inputs = group.querySelectorAll('.unscramble-input');
-    const text = Array.from(inputs).map(span => span.textContent.trim()).join('');
-    if (qid) {
-      if (text) answers[qid] = text;
-      else errors.push(`Unscramble incomplete for question ${qid}`);
+    // 4) Normalize to flat answers mapping expected by backend: answers[qid] = string
+    const answers = {};
+    Object.keys(mergedStructured).forEach(qid => {
+      const v = mergedStructured[qid];
+      if (v === null || v === undefined) return;
+      // if v is primitive (string/number) — use it
+      if (typeof v === 'string' || typeof v === 'number') {
+        const s = String(v).trim();
+        if (s) answers[qid] = s;
+        return;
+      }
+      // prefer explicit fields in order: radio -> select -> text -> box -> unscramble
+      if (v.radio && String(v.radio).trim()) {
+        answers[qid] = String(v.radio).trim();
+        return;
+      }
+      if (v.select && String(v.select).trim()) {
+        answers[qid] = String(v.select).trim();
+        return;
+      }
+      if (v.text && String(v.text).trim()) {
+        answers[qid] = String(v.text).trim();
+        return;
+      }
+      if (Array.isArray(v.box) && v.box.length) {
+        // choose first non-empty value (common case: single blank). Fallback: join with '||'
+        const firstNonEmpty = v.box.find(x => x !== undefined && x !== null && String(x).trim() !== '');
+        if (firstNonEmpty !== undefined) {
+          answers[qid] = String(firstNonEmpty).trim();
+          return;
+        } else {
+          // fallback join
+          const joined = v.box.map(x => String(x || '').trim()).filter(x => x !== '').join('||');
+          if (joined) answers[qid] = joined;
+          return;
+        }
+      }
+      if (Array.isArray(v.unscramble) && v.unscramble.length) {
+        const joined = v.unscramble.map(x => String(x || '')).join('');
+        if (joined.trim()) answers[qid] = joined;
+        return;
+      }
+      // As last resort, check nested fields for strings
+      const fallback = ['answer', 'value'].reduce((acc, key) => acc || (v[key] && String(v[key]).trim()), null);
+      if (fallback) answers[qid] = String(fallback).trim();
+    });
+
+    // 5) Also ensure we include any answers that are present only in DOM but not in mergedStructured (should be covered)
+    // (already merged above)
+
+    // 6) Final checks (errors optional — preserved commented style)
+    const errors = [];
+    // you can re-enable per-question required checks here if needed
+
+    if (errors.length) {
+      showToastNotification(errors[0], 'warning');
+      return;
     }
-  });
 
-  // 4. listening
-  content.querySelectorAll('.listening-input').forEach(input => {
-    const qid = input.name?.slice(1);
-    const val = input.value.trim();
-    if (qid && val) answers[qid] = val;
-    else if (qid) errors.push(`Listening answer missing for question ${qid}`);
-  });
+    // 7) Update global snapshot so showFinishModal/other parts can read full merged answers
+    window._todaytasks_answers = JSON.parse(JSON.stringify(mergedStructured || {}));
 
-  // 5. select-options
-  content.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
-    const qid = wrapper.dataset.qid; // Use the stored question ID
-    const selected = wrapper.dataset.selected;
-    if (qid && selected) {
-      answers[qid] = selected;
-    } else if (qid) {
-      errors.push(`Select option missing for question ${qid}`);
-    }
-  });
+    // 8) Prepare payload and send
+    const payload = {
+      level: currentLevel,
+      unit: currentUnit,
+      username: currentUser,
+      title,
+      answers
+    };
 
-  // 6. Проверка ошибок
-  if (errors.length) {
-    showToastNotification(errors[0], 'warning');
-    return;
-  }
+    // Show modal / spinner
+    const updateModal = document.getElementById('updateModal');
+    if (updateModal) updateModal.style.display = 'flex';
+    startUpdateStatusText();
 
-  const payload = {
-    level: currentLevel,
-    unit: currentUnit,
-    username: currentUser,
-    title,
-    answers
-  };
+    fetch('/api/submit-tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        // hide modal
+        if (updateModal) updateModal.style.display = 'none';
+        stopUpdateStatusText();
 
-  // ПОКАЗАТЬ МОДАЛКУ
-  document.getElementById('updateModal').style.display = 'flex';
-  startUpdateStatusText();
+        if (!ok) throw new Error(data.error || 'Submission failed');
 
-  fetch('/api/submit-tasks', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-    .then(res => res.json().then(data => ({ ok: res.ok, data })))
-    .then(({ ok, data }) => {
-      // СКРЫТЬ МОДАЛКУ
-      document.getElementById('updateModal').style.display = 'none';
-      stopUpdateStatusText();
+        const { incorrect_list = [], correct, total, percent } = data;
+        const resultHTML = [];
 
-      if (!ok) throw new Error(data.error || 'Submission failed');
+        resultHTML.push(`<h2 style="margin-bottom: 16px;">Result: ${correct}/${total} correct (${Math.round(percent)}%)</h2>`);
 
-      const { incorrect_list = [], correct, total, percent } = data;
-      const resultHTML = [];
+        if (incorrect_list.length > 0) {
+          resultHTML.push(`<p style="color: #ffc107;">You made mistakes in the following questions:</p>`);
+          incorrect_list.forEach(item => {
+            const q = questions.find(q =>
+              q.id === item.q || (q.subquestions || []).some(sq => sq.id === item.q)
+            );
+            const sub = (q && (q.subquestions || []).find(sq => sq.id === item.q)) || q || { text: '' };
 
-      resultHTML.push(`<h2 style="margin-bottom: 16px;">Result: ${correct}/${total} correct (${Math.round(percent)}%)</h2>`);
+            resultHTML.push(`<div class="exam-subquestion" style="margin: 16px 0;">`);
+            resultHTML.push(`<p class="question-text"><strong>${item.q}.</strong> ${sub.text || ''}</p>`);
 
-      if (incorrect_list.length > 0) {
-        resultHTML.push(`<p style="color: #ffc107;">You made mistakes in the following questions:</p>`);
-        incorrect_list.forEach(item => {
-          const q = questions.find(q =>
-            q.id === item.q || (q.subquestions || []).some(sq => sq.id === item.q)
-          );
-          const sub = (q.subquestions || []).find(sq => sq.id === item.q) || q;
+            // multiple-choice / true-false
+            if (sub && (sub.type === 'true_false' || (sub.type === 'multiple_choice' && Array.isArray(sub.options)))) {
+              const options = sub.type === 'true_false' ? ['True', 'False'] : sub.options;
+              resultHTML.push(`<div class="question-options">`);
+              options.forEach((opt, i) => {
+                const isUser = item.user === opt;
+                const isCorrect = item.correct === opt;
+                const isWrong = isUser && !isCorrect;
+                const letter = String.fromCharCode(65 + i);
 
-          resultHTML.push(`<div class="exam-subquestion" style="margin: 16px 0;">`);
-          resultHTML.push(`<p class="question-text"><strong>${item.q}.</strong> ${sub.text || ''}</p>`);
+                resultHTML.push(`
+                  <div class="option-group">
+                    <input type="radio" disabled ${isUser ? 'checked' : ''}>
+                    <label style="${isWrong ? 'background-color: #fdd;' : ''};">
+                      <span class="option-letter">${letter}</span>
+                      <span class="option-text">${opt}</span>
+                      ${isWrong ? ' ❌' : ''}
+                    </label>
+                  </div>
+                `);
+              });
+              resultHTML.push(`</div>`);
+            }
 
-          // multiple-choice / true-false
-          if (sub.type === 'true_false' || (sub.type === 'multiple_choice' && Array.isArray(sub.options))) {
-            const options = sub.type === 'true_false' ? ['True', 'False'] : sub.options;
-            resultHTML.push(`<div class="question-options">`);
-            options.forEach((opt, i) => {
-              const isUser = item.user === opt;
-              const isCorrect = item.correct === opt;
-              const isWrong = isUser && !isCorrect;
-              const letter = String.fromCharCode(65 + i);
-
+            // box-choose
+            else if (sub && sub.type === 'box-choose') {
+              const isCorrect = item.user === item.correct;
+              resultHTML.push(`<div class="box-choose-options">`);
               resultHTML.push(`
-                <div class="option-group">
-                  <input type="radio" disabled ${isUser ? 'checked' : ''}>
-                  <label style="${isWrong ? 'background-color: #fdd;' : ''};">
-                    <span class="option-letter">${letter}</span>
-                    <span class="option-text">${opt}</span>
-                    ${isWrong ? ' ❌' : ''}
-                  </label>
-                </div>
+                <span class="box-choose-blank ${isCorrect ? 'correct' : 'incorrect'}">
+                  ${item.user || '—'} ${!isCorrect ? '❌' : ''}
+                </span>
+                ${!isCorrect ? `<span class="box-choose-blank correct">${item.correct}</span>` : ''}
               `);
-            });
-            resultHTML.push(`</div>`);
-          }
+              resultHTML.push(`</div>`);
+            }
 
-          // box-choose
-          else if (sub.type === 'box-choose') {
-            const isCorrect = item.user === item.correct;
-            resultHTML.push(`<div class="box-choose-options">`);
-            resultHTML.push(`
-              <span class="box-choose-blank ${isCorrect ? 'correct' : 'incorrect'}">
-                ${item.user || '—'} ${!isCorrect ? '❌' : ''}
-              </span>
-              ${!isCorrect ? `<span class="box-choose-blank correct">${item.correct}</span>` : ''}
-            `);
-            resultHTML.push(`</div>`);
-          }
+            // unscramble
+            else if (sub && sub.type === 'unscramble') {
+              const userLetters = (item.user || '').split('');
+              const correctLetters = (item.correct || '').split('');
 
-          // unscramble
-          else if (sub.type === 'unscramble') {
-            const userLetters = (item.user || '').split('');
-            const correctLetters = (item.correct || '').split('');
+              resultHTML.push(`<div class="unscramble-letters-review">`);
+              userLetters.forEach((l, i) => {
+                const correct = correctLetters[i] === l;
+                resultHTML.push(`<span class="unscramble-letter ${correct ? 'correct' : 'incorrect'}">${l || '_'}</span>`);
+              });
+              resultHTML.push(`</div>`);
 
-            resultHTML.push(`<div class="unscramble-letters-review">`);
-            userLetters.forEach((l, i) => {
-              const correct = correctLetters[i] === l;
-              resultHTML.push(`<span class="unscramble-letter ${correct ? 'correct' : 'incorrect'}">${l || '_'}</span>`);
-            });
-            resultHTML.push(`</div>`);
+              resultHTML.push(`<p><strong>Correct:</strong> <span style="color:#4caf50">${item.correct}</span></p>`);
+            }
 
-            resultHTML.push(`<p><strong>Correct:</strong> <span style="color:#4caf50">${item.correct}</span></p>`);
-          }
+            // select-options
+            else if (sub && sub.type === 'select-options') {
+              const isCorrect = item.user === item.correct;
+              resultHTML.push(`<p><strong>Your Answer:</strong> <span style="${isCorrect ? 'color: #4caf50;' : 'color: #f44336;'}">${item.user || '—'}</span></p>`);
+              if (!isCorrect) {
+                resultHTML.push(`<p><strong>Correct Answer:</strong> <span style="color: #4caf50;">${item.correct}</span></p>`);
+              }
+            }
 
-          // select-options
-          else if (sub.type === 'select-options') {
-            const isCorrect = item.user === item.correct;
-            resultHTML.push(`<p><strong>Your Answer:</strong> <span style="${isCorrect ? 'color: #4caf50;' : 'color: #f44336;'}">${item.user || '—'}</span></p>`);
-            if (!isCorrect) {
+            // текст и другие
+            else {
+              resultHTML.push(`<p><strong>Your Answer:</strong> <span style="color: #f44336;">${item.user || '—'}</span></p>`);
               resultHTML.push(`<p><strong>Correct Answer:</strong> <span style="color: #4caf50;">${item.correct}</span></p>`);
             }
-          }
 
-          // текст
-          else {
-            resultHTML.push(`<p><strong>Your Answer:</strong> <span style="color: #f44336;">${item.user || '—'}</span></p>`);
-            resultHTML.push(`<p><strong>Correct Answer:</strong> <span style="color: #4caf50;">${item.correct}</span></p>`);
-          }
+            resultHTML.push(`</div>`);
+          });
+        } else {
+          resultHTML.push(`<p style="color: #4caf50;">🎉 Excellent! You answered all questions correctly.</p>`);
+        }
 
-          resultHTML.push(`</div>`);
-        });
-      } else {
-        resultHTML.push(`<p style="color: #4caf50;">🎉 Excellent! You answered all questions correctly.</p>`);
-      }
+        // replace content with result
+        if (content) content.innerHTML = resultHTML.join('');
 
-      content.innerHTML = resultHTML.join('');
-      if (percent >= 80) {
-        new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
-      }
+        // Play sounds: reward if >= 80, fail sound if < 79
+        if (percent >= 80) {
+          new Audio('/static/music/Coins_Rewarded.mp3').play().catch(console.log);
+        } else if (percent < 79) {
+          new Audio('/static/music/lagapet.ogg').play().catch(console.log);
+        }
 
-      // Remove rain and lightning
-      document.querySelectorAll('.rain-drop, .lightning-flash, .lightning-drop').forEach(el => el.remove());
+        // Remove rain and lightning
+        document.querySelectorAll('.rain-drop, .lightning-flash, .lightning-drop').forEach(el => el.remove());
 
-      // Add summer night scene
-      const header = document.getElementById('todaytasks-header');
-      header.classList.add('summer-scene');
+        // Add summer night scene
+        const header = document.getElementById('todaytasks-header');
+        if (header) header.classList.add('summer-scene');
 
-      // 🌙 Moon
-      const moon = document.createElement('div');
-      moon.className = 'moon';
-      header.appendChild(moon);
+        // add decorations (moon, tree, stars, fireflies)
+        const moon = document.createElement('div'); moon.className = 'moon'; if (header) header.appendChild(moon);
+        const tree = document.createElement('div'); tree.className = 'summer-tree'; if (header) header.appendChild(tree);
+        for (let i = 0; i < 30; i++) {
+          const star = document.createElement('div'); star.className = 'star';
+          star.style.top = `${Math.random() * 60}%`; star.style.left = `${Math.random() * 100}%`;
+          star.style.animationDelay = `${Math.random() * 4}s`; if (header) header.appendChild(star);
+        }
+        for (let i = 0; i < 8; i++) {
+          const firefly = document.createElement('div'); firefly.className = 'firefly';
+          firefly.style.top = `${60 + Math.random() * 40}%`; firefly.style.left = `${Math.random() * 100}%`;
+          firefly.style.animationDelay = `${Math.random() * 5}s`; if (header) header.appendChild(firefly);
+        }
 
-      // 🌳 Tree
-      const tree = document.createElement('div');
-      tree.className = 'summer-tree';
-      header.appendChild(tree);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // ✨ Stars
-      for (let i = 0; i < 30; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.top = `${Math.random() * 60}%`;
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.animationDelay = `${Math.random() * 4}s`;
-        header.appendChild(star);
-      }
+        // Buttons: hide finish, show done
+        const finishBtn = document.getElementById('finish-tasks-btn');
+        if (finishBtn) finishBtn.style.display = 'none';
 
-      // 🪰 Fireflies
-      for (let i = 0; i < 8; i++) {
-        const firefly = document.createElement('div');
-        firefly.className = 'firefly';
-        firefly.style.top = `${60 + Math.random() * 40}%`;
-        firefly.style.left = `${Math.random() * 100}%`;
-        firefly.style.animationDelay = `${Math.random() * 5}s`;
-        header.appendChild(firefly);
-      }
+        let doneBtn = document.getElementById('done-tasks-btn');
+        if (!doneBtn) {
+          doneBtn = document.createElement('button');
+          doneBtn.id = 'done-tasks-btn';
+          doneBtn.className = 'btn btn-success';
+          doneBtn.style.padding = '0.5rem 1rem';
+          doneBtn.style.fontSize = '1rem';
+          doneBtn.textContent = 'Done';
+          doneBtn.onclick = () => {
+            showPage('today');
+            if (content) content.innerHTML = '';
+            doneBtn.style.display = 'none';
+            const finishBtn2 = document.getElementById('finish-tasks-btn');
+            if (finishBtn2) finishBtn2.style.display = 'inline-block';
+          };
+          const headerEl = document.getElementById('todaytasks-header');
+          if (headerEl) headerEl.appendChild(doneBtn);
+        } else {
+          doneBtn.style.display = 'inline-block';
+        }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      })
+      .catch(err => {
+        console.error(err);
+        const updateModal = document.getElementById('updateModal');
+        if (updateModal) updateModal.style.display = 'none';
+        stopUpdateStatusText();
+        showToastNotification(err.message, 'error');
+      });
 
-      // Buttons
-      document.getElementById('finish-tasks-btn').style.display = 'none';
-      let doneBtn = document.getElementById('done-tasks-btn');
-      if (!doneBtn) {
-        doneBtn = document.createElement('button');
-        doneBtn.id = 'done-tasks-btn';
-        doneBtn.className = 'btn btn-success';
-        doneBtn.style.padding = '0.5rem 1rem';
-        doneBtn.style.fontSize = '1rem';
-        doneBtn.textContent = 'Done';
-        doneBtn.onclick = () => {
-          showPage('today');
-          content.innerHTML = '';
-          doneBtn.style.display = 'none';
-          document.getElementById('finish-tasks-btn').style.display = 'inline-block';
-        };
-        document.getElementById('todaytasks-header').appendChild(doneBtn);
-      } else {
-        doneBtn.style.display = 'inline-block';
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById('updateModal').style.display = 'none';
-      showToastNotification(err.message, 'error');
-    });
+  } catch (errOuter) {
+    console.error('finishTodayTasks error:', errOuter);
+    stopUpdateStatusText();
+    const updateModal = document.getElementById('updateModal');
+    if (updateModal) updateModal.style.display = 'none';
+    showToastNotification('An error occurred while finishing tasks.', 'error');
+  }
 }
 
 
@@ -5470,7 +6212,6 @@ Event
 function initExamSecurity(enable = true) {
 
     if (enable) {
-		showModalStatus("Tizim anti-cheating ishga tushirdi");
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('blur', handleWindowBlur);
         window.addEventListener('focus', handleWindowFocus);
@@ -5479,7 +6220,6 @@ function initExamSecurity(enable = true) {
         document.addEventListener('copy', onCopy);
         document.addEventListener('contextmenu', onContextMenu);
     } else {
-		showToastNotification("Tizim anti-cheating ochirdi");
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         window.removeEventListener('blur', handleWindowBlur);
         window.removeEventListener('focus', handleWindowFocus);
@@ -5558,7 +6298,7 @@ function onContextMenu(event) {
 }
 
 let violationCount = 0;
-const maxViolations = 3;
+let maxViolations = 3;
 
 function incrementViolation(reason = "Violation") {
   let warningText = "";
@@ -5584,7 +6324,7 @@ One more violation and you're out — permanently. Make the right choice.`;
   showToastNotification(`${reason}: ${violationCount}/${maxViolations}`, 'info');
 
   if (violationCount >= maxViolations) {
-    blockUser(currentUser, 900); // временная блокировка на 15 минут
+    blockUser(currentUser, 180); // временная блокировка на 15 минут
     violationCount = 0; // сброс счётчика
   }
 }
@@ -6908,10 +7648,10 @@ async function openLiveLesson() {
     showPage("liveLesson");
   });
   
-  // showWritingTopList() — единственная внешняя функция.
-// Требует: HTML-блок с id="writing-top-list" (как у тебя) и Chart.js подключён.
+// showWritingTopList() — единственная внешняя функция.
+// showWritingTopList() — единственная внешняя функция.
 function showWritingTopList() {
-  // конфиг / глобалы
+  // Конфиг / глобалы
   const unit = (typeof currentUnit !== 'undefined' && currentUnit) ? currentUnit : (document.getElementById('todaytasks-unit')?.textContent || '1.0');
   const level = (typeof currentLevel !== 'undefined' && currentLevel) ? currentLevel : 'Beginner';
   const userName = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : (window.APP_USER || 'You');
@@ -6919,7 +7659,7 @@ function showWritingTopList() {
   const page = document.getElementById('writing-top-list');
   if (!page) { console.warn('writing-top-list element not found'); return; }
 
-  // Обёртка .wtl-card (если нет) — для CSS эффекта
+  // Обёртка .wtl-card (если нет)
   if (!page.querySelector('.wtl-card')) {
     const inner = document.createElement('div');
     inner.className = 'wtl-card';
@@ -6927,20 +7667,22 @@ function showWritingTopList() {
     page.appendChild(inner);
   }
 
-  // показать только эту страницу
+  // Показать только эту страницу
   document.querySelectorAll('.page').forEach(p => { if (p !== page) p.style.display = 'none'; });
   page.style.display = 'block';
   page.querySelector('.wtl-card').classList.add('show');
 
-  // элементы
+  // Элементы
   const posEl = page.querySelector('#wtl-position');
   const unitEl = page.querySelector('#wtl-unit');
   const levelEl = page.querySelector('#wtl-level');
   const listEl = page.querySelector('#wtl-list');
   const refreshBtn = page.querySelector('#wtl-refresh');
+  const bestStatEl = page.querySelector('#wtl-best');
+  const avgStatEl = page.querySelector('#wtl-avg');
+  const diffStatEl = page.querySelector('#wtl-diff');
   let canvas = page.querySelector('#writing-chart');
 
-  // ensure elements exist
   if (!listEl) {
     const ln = document.createElement('div'); ln.id = 'wtl-list'; ln.className = 'wtl-list';
     page.querySelector('.wtl-card').appendChild(ln);
@@ -6956,121 +7698,104 @@ function showWritingTopList() {
   levelEl && (levelEl.textContent = level);
   posEl && (posEl.textContent = 'Loading...');
 
-  // Chart instance holder (global-ish to avoid duplicates)
   if (!window._writingTopChart) window._writingTopChart = null;
 
-  // helpers
   function findWritingKey(obj) {
     if (!obj) return null;
     return Object.keys(obj).find(k => k.toLowerCase().includes('writing')) || null;
   }
-  function extractWritingScore(wobj) {
-    if (!wobj) return { raw: 0, percent: 0, meta: wobj };
-    if (typeof wobj.percent === 'number') return { raw: wobj.percent, percent: Math.max(0, Math.min(100, wobj.percent)), meta: wobj };
-    if (typeof wobj.score === 'number') return { raw: wobj.score, percent: null, meta: wobj };
-    if (Array.isArray(wobj.details) && wobj.details.length) {
-      let sum = 0, found = false;
-      for (const d of wobj.details) {
-        if (typeof d.score === 'number') { sum += d.score; found = true; }
-      }
-      if (found) return { raw: sum, percent: null, meta: wobj };
-      if (typeof wobj.total === 'number' && typeof wobj.correct === 'number') {
-        const p = wobj.total ? Math.round((wobj.correct / wobj.total) * 100) : 0;
-        return { raw: wobj.correct, percent: p, meta: wobj };
-      }
+
+  function extractWritingPercent(wobj) {
+    if (!wobj) return null;
+    if (typeof wobj.percent === 'number') return Math.max(0, Math.min(100, wobj.percent));
+    if (typeof wobj.score === 'number' && typeof wobj.total === 'number') {
+      return wobj.total ? Math.round((wobj.score / wobj.total) * 100) : 0;
     }
     if (typeof wobj.correct === 'number' && typeof wobj.total === 'number') {
-      const p = wobj.total ? Math.round((wobj.correct / wobj.total) * 100) : 0;
-      return { raw: wobj.correct, percent: p, meta: wobj };
+      return wobj.total ? Math.round((wobj.correct / wobj.total) * 100) : 0;
     }
-    return { raw: 0, percent: 0, meta: wobj };
+    return null;
   }
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-  // draw list
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '—';
+    return d.toLocaleString();
+  }
+
   function renderList(entries, currentPlace) {
     const list = page.querySelector('#wtl-list');
     list.innerHTML = '';
-    entries.forEach((e,idx) => {
+    entries.forEach((e, idx) => {
       const row = document.createElement('div');
-      row.className = 'wtl-item' + ((currentPlace && idx === currentPlace-1) ? ' current' : '');
+      row.className = 'wtl-item' + ((currentPlace && idx === currentPlace - 1) ? ' current' : '');
+      row.style.animation = `fadeIn 0.4s ease ${idx * 0.05}s both`;
       row.innerHTML = `
         <div class="left">
-          <div class="wtl-rank">${idx+1}</div>
+          <div class="wtl-rank">${idx + 1}</div>
           <div class="wtl-user">
             <div class="name">${escapeHtml(e.username)}</div>
-            <div class="meta">Raw: ${escapeHtml(String(e.raw))} — ${escapeHtml(String(e.percent))}%</div>
+            <div class="time">Last: ${escapeHtml(formatDate(e.lastTime))}</div>
           </div>
         </div>
-        <div class="wtl-score">${escapeHtml(String(e.percent))}%</div>
+        <div class="wtl-score">${escapeHtml(String(e.best))}%</div>
       `;
-      if (currentPlace && idx === currentPlace-1) row.classList.add('current');
+      if (currentPlace && idx === currentPlace - 1) row.classList.add('current');
       list.appendChild(row);
     });
   }
 
-  // build chart with Chart.js
   async function buildChart(entries) {
-    // destroy previous chart
     if (window._writingTopChart) {
       window._writingTopChart.destroy();
       window._writingTopChart = null;
     }
 
-    // prepare labels and data
-    const labels = entries.map(e => e.username.length > 14 ? e.username.slice(0,13) + '…' : e.username);
-    const data = entries.map(e => e.percent);
+    const labels = entries.map(e => e.username.length > 14 ? e.username.slice(0, 13) + '…' : e.username);
+    const bestData = entries.map(e => e.best);
 
-    // Chart.js dataset with gradient background
     const ctx = canvas.getContext('2d');
-
-    // create chart (responsive)
     window._writingTopChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels,
-        datasets: [{
-          label: 'Writing AI %',
-          data,
-          // backgroundColor will be a function to create gradient per render
-          backgroundColor: function(context) {
-            const chart = context.chart;
-            const {ctx, chartArea} = chart;
-            if (!chartArea) return '#64b5f6';
-            const grad = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            grad.addColorStop(0, '#64b5f6');
-            grad.addColorStop(1, '#0288d1');
-            return grad;
-          },
-          borderRadius: 8,
-          borderSkipped: false
-        }]
+        datasets: [
+          {
+            label: 'Percentage',
+            data: bestData,
+            backgroundColor: function (context) {
+              const chart = context.chart;
+              const { ctx, chartArea } = chart;
+              if (!chartArea) return '#42a5f5';
+              const grad = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              grad.addColorStop(0, 'rgba(33,150,243,0.9)');
+              grad.addColorStop(1, 'rgba(3,169,244,0.4)');
+              return grad;
+            },
+            borderRadius: 8,
+            borderSkipped: false
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 900, easing: 'easeOutCubic' },
         scales: {
-          x: {
-            ticks: { color: '#d6d9e6' },
-            grid: { display: false }
-          },
-          y: {
-            beginAtZero: true,
-            max: 100,
-            ticks: { color: '#d6d9e6', stepSize: 20 },
-            grid: { color: 'rgba(255,255,255,0.06)' }
-          }
+          x: { ticks: { color: '#d6d9e6' }, grid: { display: false } },
+          y: { beginAtZero: true, ticks: { color: '#d6d9e6' }, grid: { color: 'rgba(255,255,255,0.06)' } }
         },
         plugins: {
-          legend: { display: false },
+          legend: { labels: { color: '#fff' } },
           tooltip: {
             callbacks: {
-              label: function(ctx) {
+              label: function (ctx) {
                 const idx = ctx.dataIndex;
                 const original = entries[idx];
-                // show percent and raw
-                return ` ${original.percent}% — raw: ${original.raw}`;
+                return ` ${original.username} — ${original.best}%`;
               }
             }
           }
@@ -7078,14 +7803,12 @@ function showWritingTopList() {
       }
     });
 
-    // make canvas container height adaptive
     const wrap = page.querySelector('.wtl-chart-wrap') || canvas.parentElement;
     if (wrap) {
       wrap.style.height = Math.max(240, Math.min(420, labels.length * 36)) + 'px';
     }
   }
 
-  // main fetch->process->render
   async function fetchAndRender() {
     posEl && (posEl.textContent = 'Loading...');
     page.querySelector('#wtl-list').innerHTML = '';
@@ -7102,14 +7825,20 @@ function showWritingTopList() {
       return;
     }
 
-    // extract writing AI per user
     const arr = [];
     for (const [username, userObj] of Object.entries(json || {})) {
       const wkey = findWritingKey(userObj);
       if (!wkey) continue;
-      const wobj = userObj[wkey];
-      const ex = extractWritingScore(wobj);
-      arr.push({ username, raw: ex.raw, percent: ex.percent, meta: ex.meta, time: ex.meta?.time || null });
+      const wlist = Array.isArray(userObj[wkey]) ? userObj[wkey] : [userObj[wkey]];
+
+      const percents = wlist.map(extractWritingPercent).filter(p => p !== null);
+      if (!percents.length) continue;
+
+      const best = Math.max(...percents);
+      const avg = Math.round(percents.reduce((a, b) => a + b, 0) / percents.length);
+      const lastTime = wlist.map(w => w?.time).filter(Boolean).sort().pop() || null;
+
+      arr.push({ username, best, avg, lastTime });
     }
 
     if (!arr.length) {
@@ -7119,23 +7848,12 @@ function showWritingTopList() {
       return;
     }
 
-    // normalize percent if missing
-    const needNorm = arr.some(e => e.percent === null || typeof e.percent !== 'number');
-    if (needNorm) {
-      const maxRaw = Math.max(...arr.map(e => Math.max(1, e.raw)));
-      arr.forEach(e => e.percent = Math.round((e.raw / maxRaw) * 100));
-    } else {
-      arr.forEach(e => { if (typeof e.percent !== 'number') e.percent = 0; });
-    }
-
-    // sort desc by percent, then by time
-    arr.sort((a,b) => {
-      if (b.percent !== a.percent) return b.percent - a.percent;
-      if (a.time && b.time) return new Date(b.time) - new Date(a.time);
+    arr.sort((a, b) => {
+      if (b.best !== a.best) return b.best - a.best;
+      if (a.lastTime && b.lastTime) return new Date(b.lastTime) - new Date(a.lastTime);
       return a.username.localeCompare(b.username);
     });
 
-    // find current user's position
     let idx = arr.findIndex(e => e.username === userName);
     if (idx === -1) {
       const low = userName.toLowerCase();
@@ -7144,15 +7862,22 @@ function showWritingTopList() {
     const place = idx === -1 ? null : idx + 1;
     posEl && (posEl.textContent = place ? `#${place}` : '#—');
 
-    // render list + chart
+    // статистика по всем пользователям
+    const maxBestAll = Math.max(...arr.map(u => u.best));
+    const avgAvgAll = Math.round(arr.reduce((sum, u) => sum + u.avg, 0) / arr.length);
+    const leaderBest = arr[0].best;
+    const avgDiffAll = Math.round(arr.reduce((sum, u) => sum + (leaderBest - u.best), 0) / arr.length);
+
+    bestStatEl && (bestStatEl.textContent = `${maxBestAll}%`);
+    avgStatEl && (avgStatEl.textContent = `${avgAvgAll}%`);
+    diffStatEl && (diffStatEl.textContent = `${avgDiffAll}%`);
+
     renderList(arr, place);
     await buildChart(arr);
   }
 
-  // attach refresh
   if (refreshBtn) refreshBtn.onclick = fetchAndRender;
 
-  // responsive redraw on resize (Chart.js handles resize but we might want to re-create gradient)
   let resizeTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
@@ -7161,9 +7886,145 @@ function showWritingTopList() {
     }, 200);
   });
 
-  // initial load
   fetchAndRender();
-
-  // expose reload function
   window.reloadWritingTopList = fetchAndRender;
 }
+
+function loadCertificates(currentLevel) {
+  const levels = ['Beginner', 'Elementary', 'Pre-Intermediate', 'Intermediate', 'IELTS L1', 'IELTS L2'];
+  const container = document.getElementById('certificates-container');
+  container.innerHTML = '';
+
+  const zoomLevel = 60;
+  const unitValue = parseFloat(currentUnit);
+
+  levels.forEach((level, index) => {
+    let status, statusText;
+
+    if (level === currentLevel && unitValue < 12.3 && unitValue !== 0) {
+      status = 'in-progress';
+      statusText = 'In Progress';
+    } else if (level === currentLevel && unitValue > 12.3) {
+      status = 'in-progress';
+      statusText = 'Generating';
+    } else if (level === currentLevel && unitValue === 0) {
+      status = 'completed';
+      statusText = 'Completed';
+    } else if (levels.indexOf(currentLevel) > index) {
+      status = 'completed';
+      statusText = 'Completed';
+    } else {
+      status = 'locked';
+      statusText = 'Locked';
+    }
+
+    // Создаём обёртку карточки
+    const wrapper = document.createElement('div');
+    wrapper.className = 'certificate-wrapper';
+
+    // Создаём карточку
+    const card = document.createElement('div');
+    card.className = `certificate-card ${status}`;
+    card.innerHTML = `
+      <div class="certificate-image-wrapper">
+        <img class="certificate-image" src="/static/certificates/preview/${encodeURIComponent(level)}.png" alt="${level} Certificate" onerror="this.src='/static/certificates/preview/NoPhoto.png';">
+      </div>
+      <div class="certificate-info">
+        <div class="certificate-title">${level}</div>
+        <div class="certificate-status">${statusText}</div>
+      </div>
+    `;
+
+    if (status === 'in-progress' || status === 'locked') {
+      const overlay = document.createElement('div');
+      overlay.className = 'certificate-overlay';
+      let iconHtml = '';
+
+      if (status === 'in-progress') {
+        iconHtml = `
+          <div class="spinner">
+            ${Array.from({ length: 12 }).map(() => '<div class="spinner-blade"></div>').join('')}
+          </div>
+        `;
+      } else {
+        iconHtml = '<i class="fas fa-lock overlay-icon"></i>';
+      }
+
+      overlay.innerHTML = `
+        <div class="overlay-button">
+          ${iconHtml}
+          <span class="overlay-text">${statusText}</span>
+        </div>
+      `;
+      card.querySelector('.certificate-image-wrapper').appendChild(overlay);
+    } else if (status === 'completed') {
+      card.addEventListener('click', () => {
+        const pdfUrl = `/static/certificates/completed/${encodeURIComponent(level)}/${currentUser}.pdf`;
+        const pdfUrlWithZoom = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&zoom=${zoomLevel}`;
+
+        const certificateView = document.createElement('div');
+        certificateView.id = 'certificate-view';
+        certificateView.innerHTML = `
+          <div id="certificate-panel">
+            <button id="back-btn">&lt;</button>
+            <div id="pdf-container">
+              <iframe id="pdf-frame" src="${pdfUrlWithZoom}"></iframe>
+            </div>
+            <div id="button-container">
+              <button id="download-btn"><i class="fas fa-download"></i> Download</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(certificateView);
+
+        certificateView.querySelector('#back-btn').addEventListener('click', () => certificateView.remove());
+        certificateView.querySelector('#download-btn').addEventListener('click', () => {
+          const link = document.createElement('a');
+          link.href = pdfUrl;
+          link.download = `${level}_${currentUser}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        });
+      });
+    }
+
+    // Вставляем карточку в обёртку
+    wrapper.appendChild(card);
+    container.appendChild(wrapper);
+  });
+}
+
+const header = document.getElementById('todaytasks-header');
+let lastScroll = 0;
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+
+  if (scrollTop > lastScroll && scrollTop > 10) {
+    header.classList.add('sticky-active');
+  } else if (scrollTop <= 10) {
+    header.classList.remove('sticky-active');
+  }
+
+  lastScroll = scrollTop;
+});
+
+// Глобальный обработчик наведения
+document.addEventListener('mouseover', function (e) {
+  const target = e.target.closest('.exam-subquestion');
+  if (target) {
+    target.querySelectorAll('input.write-in-blank-input').forEach(inp => {
+      inp.type = 'password';
+    });
+  }
+});
+
+document.addEventListener('mouseout', function (e) {
+  const target = e.target.closest('.exam-subquestion');
+  if (target) {
+    target.querySelectorAll('input.write-in-blank-input').forEach(inp => {
+      inp.type = 'text';
+    });
+  }
+});
